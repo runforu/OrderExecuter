@@ -1,0 +1,7 @@
+LIBRARY TestHelper
+
+EXPORTS
+    MtSrvAbout
+    MtSrvStartup
+    MtSrvCleanup
+
