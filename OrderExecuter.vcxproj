@@ -61,7 +61,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\Release/DealerHelper.tlb</TypeLibraryName>
+      <TypeLibraryName>.\Release/$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName />
     </Midl>
     <ClCompile>
@@ -115,7 +115,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Release/DealerHelper.bsc</OutputFile>
+      <OutputFile>.\Release/$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
       <Command>..\..\include\debuginfo.exe $(TargetPath)</Command>
@@ -127,7 +127,7 @@
       <MkTypLibCompatible>true</MkTypLibCompatible>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <TargetEnvironment>Win32</TargetEnvironment>
-      <TypeLibraryName>.\Debug/DealerHelper.tlb</TypeLibraryName>
+      <TypeLibraryName>.\Debug/$(TargetName).tlb</TypeLibraryName>
       <HeaderFileName />
     </Midl>
     <ClCompile>
@@ -170,7 +170,7 @@
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>
-      <OutputFile>.\Debug/DealerHelper.bsc</OutputFile>
+      <OutputFile>.\Debug/$(TargetName).bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -197,6 +197,5 @@
     <None Include="OrderExecuter.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>

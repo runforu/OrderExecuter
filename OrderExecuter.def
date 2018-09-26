@@ -1,4 +1,4 @@
-LIBRARY TestHelper
+LIBRARY 
 
 EXPORTS
     MtSrvAbout
