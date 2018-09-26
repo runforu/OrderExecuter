@@ -58,6 +58,7 @@ void Processor::TestPrice(int cmd, double* open_price, double* close_price, doub
     double deviation = 0.043;
     GetCurrentPrice("USDJPY", "lmoa-main", prices);
     switch (cmd) {
+        // market order sl, tp based on close price; pending order sl, tp based on open price
         case OP_BUY:
             *open_price = prices[1];
             *close_price = prices[0];
@@ -71,24 +72,28 @@ void Processor::TestPrice(int cmd, double* open_price, double* close_price, doub
             *tp = *close_price - deviation;
             break;
         case OP_BUY_LIMIT:
+            // open price = ask - ConSymbol.stops_level
             *open_price = prices[1] - deviation;
             *close_price = prices[1];
             *sl = *open_price - deviation;
             *tp = *open_price + deviation;
             break;
         case OP_SELL_LIMIT:
+            // open price = bid + ConSymbol.stops_level
             *open_price = prices[0] + deviation;
             *close_price = prices[1];
             *sl = *open_price + deviation;
             *tp = *open_price - deviation;
             break;
         case OP_BUY_STOP:
+            // open price = ask + ConSymbol.stops_level
             *open_price = prices[1] + deviation;
             *close_price = prices[0];
             *sl = *open_price - deviation;
             *tp = *open_price + deviation;
             break;
         case OP_SELL_STOP:
+            // open price = bid - ConSymbol.stops_level
             *open_price = prices[0] - deviation;
             *close_price = prices[1];
             *sl = *open_price + deviation;

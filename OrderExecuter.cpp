@@ -44,17 +44,14 @@ int APIENTRY MtSrvStartup(CServerInterface* server) {
     }
     //--- save server interface link
     Factory::SetServerInterface(server);
-    LOG("%1024s"," ");
-    Factory::GetProcessor()->Initialize();
 
+    Factory::GetProcessor()->Initialize();
     Factory::GetProcessor()->UnitTest();
 
     return (TRUE);
 }
 
 void APIENTRY MtSrvCleanup() {
-    LOG("MtSrvCleanup");
-
     Factory::GetProcessor()->Shutdown();
     Factory::SetServerInterface(NULL);
 }
