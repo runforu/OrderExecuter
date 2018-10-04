@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head> 
+  <title>Help</title> 
+  <style type="text/css">
+i {color:#FF0000}
+</style> 
+  <link href="./prism.css" rel="stylesheet" /> 
+ </head> 
+ <body> 
+  <h3>Request to <i>Open</i> an order</h3> 
+  <b>Request</b> 
+  <div style="margin-left:60px;width:50%; background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "request": "OpenOrder",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "symbol": "USDJPY",
+    "cmd": "OP_BUY",
+    "volume": 77,
+    "open_price": 112.75,
+    "sl": 112.75,
+    "tp": 112.75,
+    "comment": "test OpenOrder"
+}</code></pre> 
+  </div> 
+  <b>Response</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "result": "ok",
+    "message": "success"
+}</code></pre> 
+  </div> 
+  <br /> 
+  <hr /> 
+  <br /> 
+  <h3>Request to <i>Add</i> order (same as OpenOrder)</h3> 
+  <b>Request</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "request": "AddOrder",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "symbol": "USDJPY",
+    "cmd": "OP_BUY",
+    "volume": 77,
+    "open_price": 112.75,
+    "sl": 112.75,
+    "tp": 112.75,
+    "comment": "test OpenOrder"
+}</code></pre> 
+  </div> 
+  <b>Response</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "result": "ok",
+    "message": "success",
+}</code></pre> 
+  </div> 
+  <br /> 
+  <hr /> 
+  <br /> 
+  <h3>Request to <i>Update</i> an position</h3> 
+  <b>Request</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "request":"UpdateOrder",
+    "ip": "0.0.0.0",
+    "order": 1212,
+    "open_price": 112.75,
+    "sl": 112.75,
+    "tp": 112.75,
+    "comment": "test UpdateOrder"
+}</code></pre> 
+  </div> 
+  <b>Response</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "result": "ok",
+    "message": "success",
+}</code></pre> 
+  </div> 
+  <br /> 
+  <hr /> 
+  <br /> 
+  <h3>Request to <i>Close</i> an position</h3> 
+  <b>Request</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "request":"CloseOrder",
+    "ip": "0.0.0.0",
+    "order": 1212,
+    "close_price": 112.75,
+    "comment": "test CloseOrder"
+}</code></pre> 
+  </div> 
+  <b>Response</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "result": "ok",
+    "message": "success",
+}</code></pre> 
+  </div> 
+  <br /> 
+  <hr /> 
+  <br /> 
+  <h3>Request to <i>Change</i> user balance</h3> 
+  <b>Request</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "request":"SetBalance",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "balance": 1212,
+    "comment": "test SetBalance"
+}</code></pre> 
+  </div> 
+  <b>Response</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "result": "ok",
+    "message": "success",
+}</code></pre> 
+  </div> 
+  <br /> 
+  <hr /> 
+  <br /> 
+  <h3>Request to <i>Change</i> user balance</h3> 
+  <b>Request</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "request":"GetUserRecord"
+    "login": 5,
+    "ip": "0.0.0.0"
+}</code></pre> 
+  </div> 
+  <b>Response</b> 
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
+   <pre class=" language-json line-numbers "><code>{
+    "result":0,
+    "message":"success",
+	"login": 5,
+	"group": "test",
+	"password": "test",
+	"enable": 5,
+	"enable_change_password": 5,
+	"enable_read_only": 5,
+	"enable_otp": 5,
+	"enable_reserved[2]": 5,
+	"password_investor": "test",
+	"password_phone": "test",
+	"name": "test",
+	"country": "test",
+	"city": "test",
+	"state": "test",
+	"zipcode": "test",
+	"address": "test",
+	"lead_source": "test",
+	"phone": "test",
+	"email": "test",
+	"comment": "test",
+	"id": "test",
+	"status": "test",
+	"regdate": 111111111,
+	"lastdate": 111111111,
+	"leverage": 5,
+	"agent_account": 5,
+	"timestamp": 111111111,
+	"last_ip": 5,
+	"balance": 100.22,
+	"prevmonthbalance": 100.22,
+	"prevbalance": 100.22,
+	"credit": 100.22,
+	"interestrate": 100.22,
+	"taxes": 100.22,
+	"prevmonthequity": 100.22,
+	"prevequity": 100.22,
+	"reserved2[2]": 100.22,
+	"otp_secret": "test",
+	"secure_reserved": "test",
+	"send_reports": 5,
+	"mqid": 5,
+	"user_color": 121212
+}</code></pre> 
+  </div> 
+  <br /> 
+  <br /> 
+  <script src="./prism.js"></script>   
+ </body>
+</html>

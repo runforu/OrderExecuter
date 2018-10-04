@@ -71,9 +71,9 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>_RELEASE_LOG_;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_RELEASE_LOG_;WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
       <StringPooling>false</StringPooling>
-      <ExceptionHandling>false</ExceptionHandling>
+      <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -133,7 +133,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -175,23 +175,50 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="file_handler.cpp" />
+    <ClCompile Include="http_server\connection.cpp" />
+    <ClCompile Include="http_server\header.cpp" />
+    <ClCompile Include="http_server\mime_types.cpp" />
+    <ClCompile Include="http_server\reply.cpp" />
+    <ClCompile Include="http_server\request_dispatcher.cpp" />
+    <ClCompile Include="http_server\request_parser.cpp" />
+    <ClCompile Include="http_server\server.cpp" />
+    <ClCompile Include="http_server\server_property.cpp" />
+    <ClCompile Include="json_handler.cpp" />
+    <ClCompile Include="json_wrapper.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="FileUtil.cpp" />
-    <ClCompile Include="json\jsoncpp.cpp" />
     <ClCompile Include="Loger.cpp" />
     <ClCompile Include="OrderExecuter.cpp" />
     <ClCompile Include="Factory.cpp" />
+    <ClCompile Include="RequestHandlerProviderImp.cpp" />
+    <ClCompile Include="ServerApiAdapter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="file_handler.h" />
+    <ClInclude Include="http_server\connection.h" />
+    <ClInclude Include="http_server\header.h" />
+    <ClInclude Include="http_server\mime_types.h" />
+    <ClInclude Include="http_server\reply.h" />
+    <ClInclude Include="http_server\request.h" />
+    <ClInclude Include="http_server\request_dispatcher.h" />
+    <ClInclude Include="http_server\request_handler.h" />
+    <ClInclude Include="http_server\request_handler_provider.h" />
+    <ClInclude Include="http_server\request_parser.h" />
+    <ClInclude Include="http_server\server.h" />
+    <ClInclude Include="http_server\server_property.h" />
+    <ClInclude Include="json_handler.h" />
+    <ClInclude Include="json_wrapper.h" />
     <ClInclude Include="Processor.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Factory.h" />
     <ClInclude Include="FileUtil.h" />
-    <ClInclude Include="json\json.h" />
     <ClInclude Include="Loger.h" />
+    <ClInclude Include="RequestHandlerProviderImp.h" />
+    <ClInclude Include="ServerApiAdapter.h" />
     <ClInclude Include="Synchronizer.h" />
   </ItemGroup>
   <ItemGroup>
