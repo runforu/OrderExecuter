@@ -4,11 +4,21 @@
 #include "Factory.h"
 #include "Loger.h"
 #include "ServerApiAdapter.h"
+#include "common.h"
+#include "../include/MT4ServerAPI.h"
 
-void ServerApiAdapter::Shutdown() {
+#define MESSAGE_COPY(message, src)                       \
+    {                                                    \
+        if (message != NULL && src != NULL) {            \
+            strncpy(message, src, MESSAGE_MAX_SIZE - 1); \
+            message[MESSAGE_MAX_SIZE - 1] = 0;           \
+        }                                                \
+    }
+
+ServerApiAdapter& ServerApiAdapter::Instance() {
+    static ServerApiAdapter _instance;
+    return _instance;
 }
-
-void ServerApiAdapter::Initialize() {}
 
 void ServerApiAdapter::TestRoutine(int cmd) {
     FUNC_WARDER;
@@ -22,7 +32,7 @@ void ServerApiAdapter::TestRoutine(int cmd) {
     long time_ms = 1000;
     char message[MESSAGE_MAX_SIZE];
 
-    LOG("-----------------------------------------%s-----------------------", TRADECMD(cmd));
+    LOG("-----------------------------------------%s-----------------------", TradeCmdStr(cmd));
     double open_price, close_price, sl, tp;
 
     Sleep(time_ms);
@@ -101,7 +111,7 @@ void ServerApiAdapter::TestPrice(int cmd, double* open_price, double* close_pric
     LOG("open_price = %f, close_price = %f, sl = %f, tp = %f,", *open_price, *close_price, *sl, *tp);
 }
 
-void ServerApiAdapter::TestEntry(LPVOID parameter) {
+void ServerApiAdapter::TestEntry(void* parameter) {
     for (int cmd = OP_BUY; cmd <= OP_SELL_STOP; cmd++) {
         ((ServerApiAdapter*)parameter)->TestRoutine(cmd);
     }
@@ -112,8 +122,9 @@ void ServerApiAdapter::UnitTest() {
     _beginthread(TestEntry, 0, this);
 }
 
-bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                          double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE], int* order) {
+bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume,
+                                 double open_price, double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE],
+                                 int* order) {
     FUNC_WARDER;
 
     UserInfo user_info = {0};
@@ -228,8 +239,141 @@ bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* sy
     return true;
 }
 
-bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                         double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE], int* order) {
+bool ServerApiAdapter::GetUserRecord(int user, UserRecord* user_record, char message[MESSAGE_MAX_SIZE]) {
+    if (user_record == NULL || user < 0) {
+        return false;
+    }
+
+    if (Factory::GetServerInterface()->ClientsUserInfo(user, user_record) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::UpdateUserRecord(int user, const char* group, const char* name, const char* phone, const char* email,
+                                        int enable, int leverage, char message[MESSAGE_MAX_SIZE]) {
+    if (user < 0) {
+        return false;
+    }
+
+    UserRecord user_record = {0};
+
+    if (Factory::GetServerInterface()->ClientsUserInfo(user, &user_record) == FALSE) {
+        return false;
+    }
+
+    if (group != NULL && strnlen_s(group, sizeof(user_record.group)) != 0) {
+        COPY_STR(user_record.group, group);
+    }
+    if (group != NULL && strnlen_s(name, sizeof(user_record.name)) != 0) {
+        COPY_STR(user_record.name, name);
+    }
+    if (group != NULL && strnlen_s(phone, sizeof(user_record.phone)) != 0) {
+        COPY_STR(user_record.phone, phone);
+    }
+    if (group != NULL && strnlen_s(email, sizeof(user_record.email)) != 0) {
+        COPY_STR(user_record.email, email);
+    }
+    if (enable != -1) {
+        user_record.enable = enable;
+    }
+    if (leverage != -1) {
+        user_record.leverage = leverage;
+    }
+    if (Factory::GetServerInterface()->ClientsUserUpdate(&user_record) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::ChangePassword(int user, const char* password, char message[MESSAGE_MAX_SIZE]) {
+    if (user < 0) {
+        return false;
+    }
+    if (strnlen_s(password, 32) < 5) {
+        return false;
+    }
+    if (Factory::GetServerInterface()->ClientsChangePass(user, password, FALSE, FALSE) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::CheckPassword(int user, const char* password, char message[MESSAGE_MAX_SIZE]) {
+    if (user < 0) {
+        return false;
+    }
+
+    if (Factory::GetServerInterface()->ClientsCheckPass(user, password, FALSE) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::GetMargin(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
+                                 char message[MESSAGE_MAX_SIZE]) {
+    if (user < 0 || user_info == NULL || margin == NULL || freemargin == NULL || equity == NULL) {
+        return false;
+    }
+    if (Factory::GetServerInterface()->TradesMarginGet(user, user_info, margin, freemargin, equity) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::GetOrder(int order, TradeRecord* trade_record, char message[MESSAGE_MAX_SIZE]) {
+    if (order < 0 || trade_record == NULL) {
+        return false;
+    }
+    if (Factory::GetServerInterface()->OrdersGet(order, trade_record) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::GetOpenOrders(int user, int* total, TradeRecord** orders, char message[MESSAGE_MAX_SIZE]) {
+    if (user < 0) {
+        return false;
+    }
+
+    UserInfo user_info = {0};
+    if (GetUserInfo(user, &user_info) == FALSE) {
+        return false;
+    }
+
+    if ((*orders = Factory::GetServerInterface()->OrdersGetOpen(&user_info, total)) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::GetClosedOrders(int user, time_t from, time_t to, int* total, TradeRecord** orders,
+                                       char message[MESSAGE_MAX_SIZE]) {
+    if (user < 0 || message == NULL) {
+        return false;
+    }
+    if (from == -1) {
+        from = Factory::GetServerInterface()->TradeTime() - 7 * 24 * 60 * 60;
+    }
+    if (to == -1) {
+        to = Factory::GetServerInterface()->TradeTime();
+    }
+
+    if (to - from > 7 * 24 * 60 * 60) {
+        MESSAGE_COPY(message, "Time span is too large");
+        return false;
+    }
+
+    int users[1] = {user};
+    if ((*orders = Factory::GetServerInterface()->OrdersGetClosed(from, to, users, 1, total)) == FALSE) {
+        return false;
+    }
+    return true;
+}
+
+bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume,
+                                double open_price, double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE],
+                                int* order) {
     FUNC_WARDER;
 
     UserInfo user_info = {0};
@@ -370,8 +514,8 @@ bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* sym
     return true;
 }
 
-bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, const char* comment,
-                            char message[MESSAGE_MAX_SIZE]) {
+bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp,
+                                   const char* comment, char message[MESSAGE_MAX_SIZE]) {
     FUNC_WARDER;
 
     UserInfo user_info = {0};
@@ -488,7 +632,7 @@ bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_
 }
 
 bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_price, const char* comment,
-                           char message[MESSAGE_MAX_SIZE]) {
+                                  char message[MESSAGE_MAX_SIZE]) {
     FUNC_WARDER;
 
     UserInfo user_info = {0};
@@ -535,6 +679,13 @@ bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_
 
     //--- prepare transaction
     trade_trans_info.order = order;
+    double prices[2] = {0};
+    GetCurrentPrice(trade_record.symbol, user_info.group, prices);
+    if (close_price <= PRICE_PRECISION) {
+        close_price = (trade_record.cmd == OP_BUY || trade_record.cmd == OP_BUY_LIMIT || trade_record.cmd == OP_BUY_STOP)
+                          ? prices[0]
+                          : prices[1];
+    }
     trade_trans_info.price = close_price;
     trade_trans_info.volume = trade_record.volume;
     trade_trans_info.cmd = trade_record.cmd;
@@ -573,7 +724,6 @@ bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_
 
     //--- close position
     LOG_INFO(&trade_trans_info);
-    trade_trans_info.price = close_price;
     if (Factory::GetServerInterface()->OrdersClose(&trade_trans_info, &user_info) == FALSE) {
         LOG("CloseOrder: CloseOrder failed");
         return false;  // error
@@ -583,15 +733,16 @@ bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_
     return true;
 }
 
-bool ServerApiAdapter::Deposit(const int login, const char* ip, const double value, const char* comment,
-                        char message[MESSAGE_MAX_SIZE]) {
+bool ServerApiAdapter::Deposit(const int login, const char* ip, const double value, const char* comment, double* balance,
+                               char message[MESSAGE_MAX_SIZE]) {
     FUNC_WARDER;
 
     UserInfo user = {0};
     if (!GetUserInfo(login, &user)) {
         return false;
     }
-    if (Factory::GetServerInterface()->ClientsChangeBalance(login, &user.grp, user.balance + value, comment) == 0) {
+
+    if ((*balance = Factory::GetServerInterface()->ClientsChangeBalance(login, &user.grp, value, comment)) == 0) {
         return false;
     }
     return true;

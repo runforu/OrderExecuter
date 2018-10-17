@@ -1,7 +1,7 @@
 #include "RequestHandlerProviderImp.h"
 #include "file_handler.h"
-#include "json_handler.h"
 #include "http_server/request_handler.h"
+#include "json_handler.h"
 
 RequestHandlerProviderImp::RequestHandlerProviderImp() {
     m_request_handlers.push_back(new http::server::json_handler());
@@ -9,7 +9,8 @@ RequestHandlerProviderImp::RequestHandlerProviderImp() {
 }
 
 RequestHandlerProviderImp::~RequestHandlerProviderImp() {
-    for (std::vector<http::server::request_handler*>::iterator it = m_request_handlers.begin(); it != m_request_handlers.end(); it++) {
+    for (std::vector<http::server::request_handler*>::iterator it = m_request_handlers.begin(); it != m_request_handlers.end();
+         it++) {
         if (*it != NULL) {
             delete *it;
             *it = NULL;

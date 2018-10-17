@@ -2,7 +2,6 @@
 #define _CONFIGURATION_H_
 
 #include <time.h>
-#include <windows.h>
 #include "../include/MT4ServerAPI.h"
 #include "Synchronizer.h"
 #include "common.h"
@@ -22,16 +21,16 @@ private:
 
 public:
     //--- Initializing the database (reading the config file)
-    void Load(LPCSTR filename);
+    void Load(const char* filename);
     void Save(void);
 
     //--- access
     int Add(const char* name, const char* value, bool save = false);
     int Add(const PluginCfg* cfg);
     int Set(const PluginCfg* values, const int total);
-    int Get(LPCSTR name, PluginCfg* cfg);
+    int Get(const char* name, PluginCfg* cfg);
     int Next(const int index, PluginCfg* cfg);
-    int Delete(LPCSTR name);
+    int Delete(const char* name);
     inline int Total(void) {
         m_sync.Lock();
         int total = m_cfg_total;
@@ -39,21 +38,21 @@ public:
         return (total);
     }
 
-    int GetInteger(LPCSTR name, int* value, LPCSTR defvalue = NULL);
-    int GetLong(LPCSTR name, long* value, LPCSTR defvalue = NULL);
-    int GetString(LPCSTR name, LPTSTR value, const int maxlen, LPCSTR defvalue = NULL);
-    bool HasKey(LPCSTR name);
+    int GetInteger(const char* name, int* value, const char* defvalue = NULL);
+    int GetLong(const char* name, long* value, const char* defvalue = NULL);
+    int GetString(const char* name, char* value, const int maxlen, const char* defvalue = NULL);
+    bool HasKey(const char* name);
 
 private:
     Config();
     ~Config();
     Config(Config const&) {}
     void operator=(Config const&) {}
-    PluginCfg* Search(LPCSTR name);
+    PluginCfg* Search(const char* name);
     static int SortByName(const void* left, const void* right);
     static int SearchByName(const void* left, const void* right);
 };
 
-//extern Config ExtConfig;
+// extern Config ExtConfig;
 //+------------------------------------------------------------------+
 #endif  // !_CONFIGURATION_H_

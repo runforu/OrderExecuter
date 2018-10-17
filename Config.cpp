@@ -25,7 +25,7 @@ Config::~Config() {
 //+------------------------------------------------------------------+
 //| Load config from file                                            |
 //+------------------------------------------------------------------+
-void Config::Load(LPCSTR filename) {
+void Config::Load(const char* filename) {
     char tmp[MAX_PATH], *cp, *start;
     FileUtil in;
     PluginCfg cfg, *buf;
@@ -100,7 +100,7 @@ void Config::Save(void) {
 //+------------------------------------------------------------------+
 //| Search config by name                                            |
 //+------------------------------------------------------------------+
-PluginCfg* Config::Search(LPCSTR name) {
+PluginCfg* Config::Search(const char* name) {
     PluginCfg* config = NULL;
 
     if (m_cfg != NULL && m_cfg_total > 0)
@@ -225,7 +225,7 @@ int Config::Set(const PluginCfg* values, const int total) {
 //+------------------------------------------------------------------+
 //| Look for config by name                                          |
 //+------------------------------------------------------------------+
-int Config::Get(LPCSTR name, PluginCfg* cfg) {
+int Config::Get(const char* name, PluginCfg* cfg) {
     PluginCfg* config = NULL;
     if (name != NULL && cfg != NULL) {
         m_sync.Lock();
@@ -253,7 +253,7 @@ int Config::Next(const int index, PluginCfg* cfg) {
 //+------------------------------------------------------------------+
 //| Remove config by name                                            |
 //+------------------------------------------------------------------+
-int Config::Delete(LPCSTR name) {
+int Config::Delete(const char* name) {
     PluginCfg* config = NULL;
     if (name != NULL) {
         m_sync.Lock();
@@ -275,7 +275,7 @@ int Config::SortByName(const void* left, const void* right) {
 
 int Config::SearchByName(const void* left, const void* right) { return strcmp((char*)left, ((PluginCfg*)right)->name); }
 
-int Config::GetInteger(LPCSTR name, int* value, LPCSTR defvalue) {
+int Config::GetInteger(const char* name, int* value, const char* defvalue) {
     PluginCfg* config = NULL;
     if (name != NULL && value != NULL) {
         m_sync.Lock();
@@ -298,7 +298,7 @@ int Config::GetInteger(LPCSTR name, int* value, LPCSTR defvalue) {
     return (config != NULL);
 }
 
-int Config::GetLong(LPCSTR name, long* value, LPCSTR defvalue) {
+int Config::GetLong(const char* name, long* value, const char* defvalue) {
     PluginCfg* config = NULL;
     if (name != NULL && value != NULL) {
         m_sync.Lock();
@@ -318,7 +318,7 @@ int Config::GetLong(LPCSTR name, long* value, LPCSTR defvalue) {
     return (config != NULL);
 }
 
-int Config::GetString(LPCSTR name, LPTSTR value, const int maxlen, LPCSTR defvalue) {
+int Config::GetString(const char* name, char* value, const int maxlen, const char* defvalue) {
     PluginCfg* config = NULL;
     if (name != NULL && value != NULL) {
         m_sync.Lock();
@@ -343,7 +343,7 @@ int Config::GetString(LPCSTR name, LPTSTR value, const int maxlen, LPCSTR defval
     return (config != NULL);
 }
 
-bool Config::HasKey(LPCSTR name) {
+bool Config::HasKey(const char* name) {
     if (name != NULL) {
         m_sync.Lock();
         PluginCfg* config = Search(name);

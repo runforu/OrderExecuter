@@ -1,10 +1,9 @@
 #ifndef _FACTORY_H_
 #define _FACTORY_H_
 
-#include <windows.h>
+#include "Processor.h"
 #include "Config.h"
 #include "Synchronizer.h"
-#include "Processor.h"
 
 class Factory {
 private:

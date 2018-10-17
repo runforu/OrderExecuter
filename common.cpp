@@ -1,4 +1,4 @@
-#include <windows.h>
+#include "../include/MT4ServerAPI.h"
 #include "common.h"
 
 static const double ExtDecimalArray[9] = {1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 10000000.0, 100000000.0};
@@ -166,7 +166,6 @@ char* StrRange(char* str, const char begin, const char end, char** buf) {
     return NULL;
 }
 
-
 bool IsDigitalStr(char* string) {
     if (string == NULL) {
         return false;
@@ -179,4 +178,88 @@ bool IsDigitalStr(char* string) {
         string++;
     }
     return true;
+}
+
+const char* TradeTypeStr(int trade_type) {
+    static char* trans_type_str[] = {
+        "TT_ORDER_IE_OPEN",      "TT_ORDER_REQ_OPEN",  "TT_ORDER_MK_OPEN",     "TT_ORDER_PENDING_OPEN", "TT_ORDER_IE_CLOSE",
+        "TT_ORDER_REQ_CLOSE",    "TT_ORDER_MK_CLOSE",  "TT_ORDER_MODIFY",      "TT_ORDER_DELETE",       "TT_ORDER_CLOSE_BY",
+        "TT_ORDER_CLOSE_ALL",    "TT_BR_ORDER_OPEN",   "TT_BR_ORDER_CLOSE",    "TT_BR_ORDER_DELETE",    "TT_BR_ORDER_CLOSE_BY",
+        "TT_BR_ORDER_CLOSE_ALL", "TT_BR_ORDER_MODIFY", "TT_BR_ORDER_ACTIVATE", "TT_BR_ORDER_COMMENT",   "TT_BR_BALANCE",
+    };
+    return trans_type_str[trade_type - 64];
+}
+
+const char* TradeCmdStr(int trade_cmd) {
+    static char* trans_cmd_str[] = {"OP_BUY",      "OP_SELL",      "OP_BUY_LIMIT", "OP_SELL_LIMIT",
+                                    "OP_BUY_STOP", "OP_SELL_STOP", "OP_BALANCE",   "OP_CREDIT"};
+    return trans_cmd_str[trade_cmd];
+}
+
+const char* OrderTypeStr(int order_type) {
+    static char* price_option_str[] = {"OT_NONE",
+                                       "OT_OPEN",
+                                       "OT_CLOSE",
+                                       "OT_CLOSE|OT_OPEN"
+                                       "OT_TP",
+                                       "OT_TP|OT_OPEN",
+                                       "OT_TP|OT_CLOSE",
+                                       "OT_TP|OT_CLOSE|OT_OPEN",
+                                       "OT_SL",
+                                       "OT_SL|OT_OPEN",
+                                       "OT_SL|OT_CLOSE",
+                                       "OT_SL|OT_CLOSE|OT_OPEN",
+                                       "OT_SL|OT_TP",
+                                       "OT_SL|OT_TP|OT_OPEN",
+                                       "OT_SL|OT_TP|OT_CLOSE",
+                                       "OT_SL|OT_TP|OT_CLOSE|OT_OPEN",
+                                       "OT_PENDING",
+                                       "OT_PENDING|OT_OPEN",
+                                       "OT_PENDING|OT_CLOSE",
+                                       "OT_PENDING|OT_CLOSE|OT_OPEN"
+                                       "OT_PENDING|OT_TP",
+                                       "OT_PENDING|OT_TP|OT_OPEN",
+                                       "OT_PENDING|OT_TP|OT_CLOSE",
+                                       "OT_PENDING|OT_TP|OT_CLOSE|OT_OPEN",
+                                       "OT_PENDING|OT_SL",
+                                       "OT_PENDING|OT_SL|OT_OPEN",
+                                       "OT_PENDING|OT_SL|OT_CLOSE",
+                                       "OT_PENDING|OT_SL|OT_CLOSE|OT_OPEN",
+                                       "OT_PENDING|OT_SL|OT_TP",
+                                       "OT_PENDING|OT_SL|OT_TP|OT_OPEN",
+                                       "OT_PENDING|OT_SL|OT_TP|OT_CLOSE",
+                                       "OT_ALL"};
+    return price_option_str[order_type];
+}
+
+int ToCmd(const char* cmd_str, int default_value) {
+    if (cmd_str == NULL) {
+        return default_value;
+    }
+    if (strcmp("OP_BUY", cmd_str) == 0) {
+        return OP_BUY;
+    } else if (strcmp("OP_BUY", cmd_str) == 0) {
+        return OP_BUY;
+    } else if (strcmp("OP_SELL", cmd_str) == 0) {
+        return OP_SELL;
+    } else if (strcmp("OP_BUY_LIMIT", cmd_str) == 0) {
+        return OP_BUY_LIMIT;
+    } else if (strcmp("OP_SELL_LIMIT", cmd_str) == 0) {
+        return OP_SELL_LIMIT;
+    } else if (strcmp("OP_BUY_STOP", cmd_str) == 0) {
+        return OP_BUY_STOP;
+    } else if (strcmp("OP_SELL_STOP", cmd_str) == 0) {
+        return OP_SELL_STOP;
+    }
+
+    return default_value;
+}
+
+const char* ToTradeRecordStateStr(int state) {
+    if (state < TS_OPEN_NORMAL || state > TS_DELETED) {
+        return NULL;
+    }
+    static const char* string[] = {"TS_OPEN_NORMAL", "TS_OPEN_REMAND", "TS_OPEN_RESTORED", "TS_CLOSED_NORMAL",
+                                   "TS_CLOSED_PART", "TS_CLOSED_BY",   "TS_DELETED"};
+    return string[state];
 }

@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
- <head> 
-  <title>Help</title> 
-  <style type="text/css">
-i {color:#FF0000}
-</style> 
-  <link href="./prism.css" rel="stylesheet" /> 
- </head> 
- <body> 
-  <h3>Request to <i>Open</i> an order</h3> 
-  <b>Request</b> 
-  <div style="margin-left:60px;width:50%; background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+  <head>
+    <meta name="generator"
+    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
+    <title>Help</title>
+    <style type="text/css">
+      i {color:#FF0000}
+    </style>
+    <link href="./prism.css" rel="stylesheet" />
+  </head>
+  <body>
+  
+    <h3>Request to 
+    <i>Open</i> an order</h3>
+    <b>Request</b>
+    <div style="margin-left:60px;width:50%; background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
     "request": "OpenOrder",
     "login": 5,
     "ip": "0.0.0.0",
@@ -22,22 +27,30 @@ i {color:#FF0000}
     "sl": 112.75,
     "tp": 112.75,
     "comment": "test OpenOrder"
-}</code></pre> 
-  </div> 
-  <b>Response</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "OpenOrder",
     "result": "ok",
     "message": "success"
-}</code></pre> 
-  </div> 
-  <br /> 
-  <hr /> 
-  <br /> 
-  <h3>Request to <i>Add</i> order (same as OpenOrder)</h3> 
-  <b>Request</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Add</i> order (same as OpenOrder)</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
     "request": "AddOrder",
     "login": 5,
     "ip": "0.0.0.0",
@@ -48,22 +61,30 @@ i {color:#FF0000}
     "sl": 112.75,
     "tp": 112.75,
     "comment": "test OpenOrder"
-}</code></pre> 
-  </div> 
-  <b>Response</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "AddOrder",
     "result": "ok",
     "message": "success",
-}</code></pre> 
-  </div> 
-  <br /> 
-  <hr /> 
-  <br /> 
-  <h3>Request to <i>Update</i> an position</h3> 
-  <b>Request</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Update</i> an position</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
     "request":"UpdateOrder",
     "ip": "0.0.0.0",
     "order": 1212,
@@ -71,120 +92,472 @@ i {color:#FF0000}
     "sl": 112.75,
     "tp": 112.75,
     "comment": "test UpdateOrder"
-}</code></pre> 
-  </div> 
-  <b>Response</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"UpdateOrder",
     "result": "ok",
     "message": "success",
-}</code></pre> 
-  </div> 
-  <br /> 
-  <hr /> 
-  <br /> 
-  <h3>Request to <i>Close</i> an position</h3> 
-  <b>Request</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Close</i> an position</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
     "request":"CloseOrder",
     "ip": "0.0.0.0",
     "order": 1212,
     "close_price": 112.75,
     "comment": "test CloseOrder"
-}</code></pre> 
-  </div> 
-  <b>Response</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"CloseOrder",
     "result": "ok",
     "message": "success",
-}</code></pre> 
-  </div> 
-  <br /> 
-  <hr /> 
-  <br /> 
-  <h3>Request to <i>Change</i> user balance</h3> 
-  <b>Request</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
-    "request":"SetBalance",
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Deposit</i></h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"Deposit",
     "login": 5,
     "ip": "0.0.0.0",
     "balance": 1212,
-    "comment": "test SetBalance"
-}</code></pre> 
-  </div> 
-  <b>Response</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+    "comment": "test Deposit"
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"Deposit",
     "result": "ok",
     "message": "success",
-}</code></pre> 
-  </div> 
-  <br /> 
-  <hr /> 
-  <br /> 
-  <h3>Request to <i>Change</i> user balance</h3> 
-  <b>Request</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Change</i> password</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"ChangePassword",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "password": "12345678",
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"ChangePassword",
+    "result": "ok",
+    "message": "success",
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Update</i> user information</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"UpdateUserRecord",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "user": 5,
+    "group":"main",
+    "ip": "0.0.0.0",
+    "name":"test",
+    "phone":"12323232323",
+    "email":"abc@bcd.com",
+    "enable":true,
+    "leverage": 20
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"UpdateUserRecord",
+    "result": "ok",
+    "message": "success",
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> user margin</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetMargin",
+    "login": 5
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetMargin",
+    "result": "ok",
+    "message": "success",
+    "margin":"1000.00"
+    "freemargin":"2000.0"
+    "equity":"1000.00"
+    "group":"group"
+    "ip":"0.0.0.0"
+    "leverage":"100"
+    "balance":"1000.00"
+    "credit":"2000.00"
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> order information</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetOrder",
+    "login": 5,
+    "order": 122
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetOrder",
+    "result": "ok",
+    "message": "success",
+    "order" : 122,  
+    "login":5,
+    "symbol":"USDJPY",
+    "digits":5,
+    "cmd":5,
+    "volume":5,
+    "open_time":1212312,
+    "state":5,
+    "open_price":97.3,
+    "sl":97.3,
+    "tp":97.3,
+    "close_time":1212312,
+    "gw_volume":5,
+    "expiration":1212312,
+    "commission":97.3,
+    "commission_agent":97.3,
+    "storage":97.3,
+    "close_price":97.3,
+    "profit":97.3,
+    "taxes":97.3,
+    "magic":5,
+    "comment":"USDJPY",
+    "gw_order":5,
+    "activation":5,
+    "gw_open_price":97,
+    "gw_close_price":97,
+    "margin_rate":97.3,
+    "timestamp":1212312
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> open orders of a user</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetOpenOrders",
+    "login": 5
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetOpenOrders",
+    "result": "ok",
+    "message": "success",
+    "orders" : [{
+        "order" : 122,
+        "login":5,
+        "symbol":"USDJPY",
+        "digits":5,
+        "cmd":5,
+        "volume":5,
+        "open_time":1212312,
+        "state":5,
+        "open_price":97.3,
+        "sl":97.3,
+        "tp":97.3,
+        "close_time":1212312,
+        "gw_volume":5,
+        "expiration":1212312,
+        "commission":97.3,
+        "commission_agent":97.3,
+        "storage":97.3,
+        "close_price":97.3,
+        "profit":97.3,
+        "taxes":97.3,
+        "magic":5,
+        "comment":"USDJPY",
+        "gw_order":5,
+        "activation":5,
+        "gw_open_price":97,
+        "gw_close_price":97,
+        "margin_rate":97.3,
+        "timestamp":1212312
+    },
+    {
+        "order" : 1222,
+        "login":5,
+        "symbol":"USDJPY",
+        "digits":5,
+        "cmd":5,
+        "volume":5,
+        "open_time":1212312,
+        "state":5,
+        "open_price":97.3,
+        "sl":97.3,
+        "tp":97.3,
+        "close_time":1212312,
+        "gw_volume":5,
+        "expiration":1212312,
+        "commission":97.3,
+        "commission_agent":97.3,
+        "storage":97.3,
+        "close_price":97.3,
+        "profit":97.3,
+        "taxes":97.3,
+        "magic":5,
+        "comment":"USDJPY",
+        "gw_order":5,
+        "activation":5,
+        "gw_open_price":97,
+        "gw_close_price":97,
+        "margin_rate":97.3,
+        "timestamp":1212312
+    }]   
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> closed orders of a user</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetClosedOrders",
+    "login": 5,
+    "from": 1212312,
+    "to": 1212312
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetClosedOrders",
+    "result": "ok",
+    "message": "success",
+    "orders" : [{
+        "order" : 122,
+        "login":5,
+        "symbol":"USDJPY",
+        "digits":5,
+        "cmd":5,
+        "volume":5,
+        "open_time":1212312,
+        "state":5,
+        "open_price":97.3,
+        "sl":97.3,
+        "tp":97.3,
+        "close_time":1212312,
+        "gw_volume":5,
+        "expiration":1212312,
+        "commission":97.3,
+        "commission_agent":97.3,
+        "storage":97.3,
+        "close_price":97.3,
+        "profit":97.3,
+        "taxes":97.3,
+        "magic":5,
+        "comment":"USDJPY",
+        "gw_order":5,
+        "activation":5,
+        "gw_open_price":97,
+        "gw_close_price":97,
+        "margin_rate":97.3,
+        "timestamp":1212312
+    },
+    {
+        "order" : 1222,
+        "login":5,
+        "symbol":"USDJPY",
+        "digits":5,
+        "cmd":5,
+        "volume":5,
+        "open_time":1212312,
+        "state":5,
+        "open_price":97.3,
+        "sl":97.3,
+        "tp":97.3,
+        "close_time":1212312,
+        "gw_volume":5,
+        "expiration":1212312,
+        "commission":97.3,
+        "commission_agent":97.3,
+        "storage":97.3,
+        "close_price":97.3,
+        "profit":97.3,
+        "taxes":97.3,
+        "magic":5,
+        "comment":"USDJPY",
+        "gw_order":5,
+        "activation":5,
+        "gw_open_price":97,
+        "gw_close_price":97,
+        "margin_rate":97.3,
+        "timestamp":1212312
+    }]   
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> user information</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
     "request":"GetUserRecord"
     "login": 5,
     "ip": "0.0.0.0"
-}</code></pre> 
-  </div> 
-  <b>Response</b> 
-  <div style=" margin-left:60px; width:50%;background:#eeeeee;"> 
-   <pre class=" language-json line-numbers "><code>{
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetUserRecord"
     "result":0,
     "message":"success",
-	"login": 5,
-	"group": "test",
-	"password": "test",
-	"enable": 5,
-	"enable_change_password": 5,
-	"enable_read_only": 5,
-	"enable_otp": 5,
-	"enable_reserved[2]": 5,
-	"password_investor": "test",
-	"password_phone": "test",
-	"name": "test",
-	"country": "test",
-	"city": "test",
-	"state": "test",
-	"zipcode": "test",
-	"address": "test",
-	"lead_source": "test",
-	"phone": "test",
-	"email": "test",
-	"comment": "test",
-	"id": "test",
-	"status": "test",
-	"regdate": 111111111,
-	"lastdate": 111111111,
-	"leverage": 5,
-	"agent_account": 5,
-	"timestamp": 111111111,
-	"last_ip": 5,
-	"balance": 100.22,
-	"prevmonthbalance": 100.22,
-	"prevbalance": 100.22,
-	"credit": 100.22,
-	"interestrate": 100.22,
-	"taxes": 100.22,
-	"prevmonthequity": 100.22,
-	"prevequity": 100.22,
-	"reserved2[2]": 100.22,
-	"otp_secret": "test",
-	"secure_reserved": "test",
-	"send_reports": 5,
-	"mqid": 5,
-	"user_color": 121212
-}</code></pre> 
-  </div> 
-  <br /> 
-  <br /> 
-  <script src="./prism.js"></script>   
- </body>
+        "login": 5,
+        "group": "test",
+        "password": "test",
+        "enable": 5,
+        "enable_change_password": 5,
+        "enable_read_only": 5,
+        "enable_otp": 5,
+        "password_investor": "test",
+        "password_phone": "test",
+        "name": "test",
+        "country": "test",
+        "city": "test",
+        "state": "test",
+        "zipcode": "test",
+        "address": "test",
+        "lead_source": "test",
+        "phone": "test",
+        "email": "test",
+        "comment": "test",
+        "id": "test",
+        "status": "test",
+        "regdate": 111111111,
+        "lastdate": 111111111,
+        "leverage": 5,
+        "agent_account": 5,
+        "timestamp": 111111111,
+        "last_ip": 5,
+        "balance": 100.22,
+        "prevmonthbalance": 100.22,
+        "prevbalance": 100.22,
+        "credit": 100.22,
+        "interestrate": 100.22,
+        "taxes": 100.22,
+        "prevmonthequity": 100.22,
+        "prevequity": 100.22,
+        "otp_secret": "test",
+        "secure_reserved": "test",
+        "send_reports": 5,
+        "mqid": 5,
+        "user_color": 121212
+}</code>
+</pre>
+    </div>
+    <br />
+    <br />
+    <script src="./prism.js"></script>
+  </body>
 </html>

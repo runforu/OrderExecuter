@@ -1,63 +1,27 @@
+#include "Loger.h"
 #include <stdio.h>
 #include <time.h>
 #include "Factory.h"
-#include "Loger.h"
 
 #ifdef _RELEASE_LOG_
 
-const char* Loger::TradeTypeStr(int trade_type) {
-    static char* trans_type_str[] = {
-        "TT_ORDER_IE_OPEN",      "TT_ORDER_REQ_OPEN",  "TT_ORDER_MK_OPEN",     "TT_ORDER_PENDING_OPEN", "TT_ORDER_IE_CLOSE",
-        "TT_ORDER_REQ_CLOSE",    "TT_ORDER_MK_CLOSE",  "TT_ORDER_MODIFY",      "TT_ORDER_DELETE",       "TT_ORDER_CLOSE_BY",
-        "TT_ORDER_CLOSE_ALL",    "TT_BR_ORDER_OPEN",   "TT_BR_ORDER_CLOSE",    "TT_BR_ORDER_DELETE",    "TT_BR_ORDER_CLOSE_BY",
-        "TT_BR_ORDER_CLOSE_ALL", "TT_BR_ORDER_MODIFY", "TT_BR_ORDER_ACTIVATE", "TT_BR_ORDER_COMMENT",   "TT_BR_BALANCE",
-    };
-    return trans_type_str[trade_type - 64];
+void Loger::out(const int code, const char* ip, std::string msg) {
+    if (Factory::GetServerInterface() == NULL) {
+        return;
+    }
+
+    Factory::GetServerInterface()->LogsOut(code, ip, msg.c_str());
 }
 
-const char* Loger::TradeCmdStr(int trade_cmd) {
-    static char* trans_cmd_str[] = {"OP_BUY",      "OP_SELL",      "OP_BUY_LIMIT", "OP_SELL_LIMIT",
-                                    "OP_BUY_STOP", "OP_SELL_STOP", "OP_BALANCE",   "OP_CREDIT"};
-    return trans_cmd_str[trade_cmd];
+void Loger::out(const int code, const char* ip, int value) {
+    Loger::out(code, ip, "%d", value);
 }
 
-const char* Loger::OrderTypeStr(int order_type) {
-    static char* price_option_str[] = {"OT_NONE",
-                                       "OT_OPEN",
-                                       "OT_CLOSE",
-                                       "OT_CLOSE|OT_OPEN"
-                                       "OT_TP",
-                                       "OT_TP|OT_OPEN",
-                                       "OT_TP|OT_CLOSE",
-                                       "OT_TP|OT_CLOSE|OT_OPEN",
-                                       "OT_SL",
-                                       "OT_SL|OT_OPEN",
-                                       "OT_SL|OT_CLOSE",
-                                       "OT_SL|OT_CLOSE|OT_OPEN",
-                                       "OT_SL|OT_TP",
-                                       "OT_SL|OT_TP|OT_OPEN",
-                                       "OT_SL|OT_TP|OT_CLOSE",
-                                       "OT_SL|OT_TP|OT_CLOSE|OT_OPEN",
-                                       "OT_PENDING",
-                                       "OT_PENDING|OT_OPEN",
-                                       "OT_PENDING|OT_CLOSE",
-                                       "OT_PENDING|OT_CLOSE|OT_OPEN"
-                                       "OT_PENDING|OT_TP",
-                                       "OT_PENDING|OT_TP|OT_OPEN",
-                                       "OT_PENDING|OT_TP|OT_CLOSE",
-                                       "OT_PENDING|OT_TP|OT_CLOSE|OT_OPEN",
-                                       "OT_PENDING|OT_SL",
-                                       "OT_PENDING|OT_SL|OT_OPEN",
-                                       "OT_PENDING|OT_SL|OT_CLOSE",
-                                       "OT_PENDING|OT_SL|OT_CLOSE|OT_OPEN",
-                                       "OT_PENDING|OT_SL|OT_TP",
-                                       "OT_PENDING|OT_SL|OT_TP|OT_OPEN",
-                                       "OT_PENDING|OT_SL|OT_TP|OT_CLOSE",
-                                       "OT_ALL"};
-    return price_option_str[order_type];
+void Loger::out(const int code, const char* ip, double value) {
+    Loger::out(code, ip, "%f", value);
 }
 
-void Loger::out(const int code, LPCSTR ip, LPCSTR msg, ...) {
+void Loger::out(const int code, const char* ip, const char* msg, ...) {
     if (Factory::GetServerInterface() == NULL || msg == NULL) {
         return;
     }
@@ -71,7 +35,7 @@ void Loger::out(const int code, LPCSTR ip, LPCSTR msg, ...) {
     Factory::GetServerInterface()->LogsOut(code, ip, buffer);
 }
 
-void Loger::out(const int code, LPCSTR ip, const RequestInfo* request) {
+void Loger::out(const int code, const char* ip, const RequestInfo* request) {
     Loger::out(code, ip,
                " ----->   RequestInfo: [\n"
                "                        id =               %d\n"
@@ -91,7 +55,7 @@ void Loger::out(const int code, LPCSTR ip, const RequestInfo* request) {
                request->gw_price);
 }
 
-void Loger::out(const int code, LPCSTR ip, const TradeTransInfo* transaction) {
+void Loger::out(const int code, const char* ip, const TradeTransInfo* transaction) {
     Loger::out(code, ip,
                " ----->   TradeTransInfo: [\n"
                "                        type =          %s\n"
@@ -108,11 +72,11 @@ void Loger::out(const int code, LPCSTR ip, const TradeTransInfo* transaction) {
                "                        comment =       %s\n"
                "                        expiration =    %d ].",
                transaction->type >= 64 ? TradeTypeStr(transaction->type) : "Other Type", transaction->flags,
-               TradeCmdStr(transaction->cmd), transaction->order, transaction->orderby, transaction->symbol, transaction->volume,
-               transaction->price, transaction->sl, transaction->tp, transaction->ie_deviation, transaction->comment,
-               transaction->expiration);
+               TradeCmdStr(transaction->cmd), transaction->order, transaction->orderby, transaction->symbol,
+               transaction->volume, transaction->price, transaction->sl, transaction->tp, transaction->ie_deviation,
+               transaction->comment, transaction->expiration);
 }
-void Loger::out(const int code, LPCSTR ip, const UserInfo* user_info) {
+void Loger::out(const int code, const char* ip, const UserInfo* user_info) {
     Loger::out(code, ip,
                " ----->   UserInfo: [\n"
                "                        login =                  %d\n"
@@ -133,18 +97,18 @@ void Loger::out(const int code, LPCSTR ip, const UserInfo* user_info) {
                user_info->enable_change_password, user_info->enable_read_only, user_info->flags, user_info->leverage,
                user_info->agent_account, user_info->balance, user_info->credit, user_info->prevbalance);
 }
-void Loger::out(const int code, LPCSTR ip, const ConSymbol* con_symbol) {
+void Loger::out(const int code, const char* ip, const ConSymbol* con_symbol) {
     Loger::out(code, ip, "ConSymbol: [ symbol = %s ].", con_symbol->symbol);
 }
-void Loger::out(const int code, LPCSTR ip, const ConGroup* con_group) {
+void Loger::out(const int code, const char* ip, const ConGroup* con_group) {
     Loger::out(code, ip, "ConGroup: [ group = %s ].", con_group->group);
 }
 
-void Loger::out(const int code, LPCSTR ip, const TickAPI* tick) {
+void Loger::out(const int code, const char* ip, const TickAPI* tick) {
     Loger::out(code, ip, "TickAPI: [ time = %d, bid = %f, ask = %f ].", tick->ctm, tick->bid, tick->ask);
 }
 
-void Loger::out(const int code, LPCSTR ip, const TradeRecord* trade_record) {
+void Loger::out(const int code, const char* ip, const TradeRecord* trade_record) {
     Loger::out(code, ip,
                " ----->   TradeRecord: [\n"
                "                        order =            %d\n"

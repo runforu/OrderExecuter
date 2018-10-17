@@ -1,22 +1,28 @@
-#ifndef _AUTOTEST_H_
-#define _AUTOTEST_H_
+#ifndef _PROCESSOR_H_
+#define _PROCESSOR_H_
 
-#include <process.h>
-#include <windows.h>
-#include "../include/MT4ServerAPI.h"
-#include "Synchronizer.h"
-#include "ServerApiAdapter.h"
+#include <boost/thread.hpp>
+
+namespace http {
+namespace server {
+class server;
+}
+}  // namespace http
 
 class Processor {
     friend class Factory;
 
 public:
-    void Initialize();
+    void Initialize(const char* port, const char* root, const char* num_threads);
     void Shutdown();
+    Processor();
 
 private:
-    ServerApiAdapter m_api;
-    Synchronizer m_synchronizer;
+    void StartServer(const char* port, const char* root, const char* num_threads);
+
+private:
+    http::server::server* m_http_server;
+    boost::thread m_thread;
 };
 
-#endif  // !_AUTOTEST_H_
+#endif  // !_PROCESSOR_H_
