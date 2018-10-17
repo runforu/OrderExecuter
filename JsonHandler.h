@@ -5,15 +5,12 @@
 #include "http_server/request_handler.h"
 #include "../include/MT4ServerAPI.h"
 
-namespace http {
-namespace server {
-
-class json_handler : public request_handler {
+class JsonHandler : public http::server::request_handler {
 public:
     virtual int get_priority() const;
-    virtual bool handle(const request& req, reply& rep);
-    virtual ~json_handler() {}
-    json_handler() {}
+    virtual bool handle(const http::server::request& req, http::server::reply& rep);
+    virtual ~JsonHandler() {}
+    JsonHandler() {}
 
 private:
     typedef bool (*FilterOut)(TradeRecord&);
@@ -25,6 +22,7 @@ private:
     boost::property_tree::ptree GetUserRecord(boost::property_tree::ptree pt);
     boost::property_tree::ptree UpdateUserRecord(boost::property_tree::ptree pt);
     boost::property_tree::ptree ChangePassword(boost::property_tree::ptree pt);
+    boost::property_tree::ptree CheckPassword(boost::property_tree::ptree pt);
     boost::property_tree::ptree GetMargin(boost::property_tree::ptree pt);
     boost::property_tree::ptree GetOrder(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree GetOpenOrders(boost::property_tree::ptree pt);
@@ -36,6 +34,4 @@ private:
     boost::property_tree::ptree _GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter);
 };
 
-}  // namespace server
-}  // namespace http
 #endif  // !_HTTP_SERVER_JSON_HANDLER_H_

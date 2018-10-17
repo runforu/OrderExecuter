@@ -13,11 +13,17 @@ class Processor {
     friend class Factory;
 
 public:
+    static Processor& Instance();
+
     void Initialize(const char* port, const char* root, const char* num_threads);
     void Shutdown();
-    Processor();
 
 private:
+    Processor() : m_http_server(NULL) {}
+    ~Processor() {};
+    Processor(Processor const&) {}
+    void operator=(Processor const&) {}
+
     void StartServer(const char* port, const char* root, const char* num_threads);
 
 private:

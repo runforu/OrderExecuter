@@ -3,11 +3,12 @@
 #include "FileUtil.h"
 #include "Loger.h"
 
-// Config ExtConfig;
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
-Config::Config() : m_cfg(NULL), m_cfg_total(0), m_cfg_max(0) { m_filename[0] = 0; }
+Config::Config() : m_cfg(NULL), m_cfg_total(0), m_cfg_max(0) {
+    m_filename[0] = 0;
+}
 //+------------------------------------------------------------------+
 //|                                                                  |
 //+------------------------------------------------------------------+
@@ -22,6 +23,12 @@ Config::~Config() {
 
     m_sync.Unlock();
 }
+
+Config& Config::Instance() {
+    static Config _instance;
+    return _instance;
+}
+
 //+------------------------------------------------------------------+
 //| Load config from file                                            |
 //+------------------------------------------------------------------+
@@ -75,7 +82,6 @@ void Config::Load(const char* filename) {
     //--- sort config by name
     if (m_cfg != NULL && m_cfg_total > 0) qsort(m_cfg, m_cfg_total, sizeof(PluginCfg), SortByName);
     m_sync.Unlock();
-    LOG("------------Load----------Load------Load------");
 }
 //+------------------------------------------------------------------+
 //| save configs to file                                             |
@@ -273,7 +279,9 @@ int Config::SortByName(const void* left, const void* right) {
     return strcmp(((PluginCfg*)left)->name, ((PluginCfg*)right)->name);
 }
 
-int Config::SearchByName(const void* left, const void* right) { return strcmp((char*)left, ((PluginCfg*)right)->name); }
+int Config::SearchByName(const void* left, const void* right) {
+    return strcmp((char*)left, ((PluginCfg*)right)->name);
+}
 
 int Config::GetInteger(const char* name, int* value, const char* defvalue) {
     PluginCfg* config = NULL;

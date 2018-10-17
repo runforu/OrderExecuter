@@ -10,8 +10,6 @@
 //| Simple configuration                                             |
 //+------------------------------------------------------------------+
 class Config {
-    friend class Factory;
-
 private:
     Synchronizer m_sync;        // synchronizer
     char m_filename[MAX_PATH];  // name of the configuration file
@@ -20,6 +18,8 @@ private:
     int m_cfg_max;              // max number of records
 
 public:
+    static Config& Instance();
+
     //--- Initializing the database (reading the config file)
     void Load(const char* filename);
     void Save(void);

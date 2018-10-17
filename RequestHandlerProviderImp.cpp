@@ -1,11 +1,11 @@
 #include "RequestHandlerProviderImp.h"
-#include "file_handler.h"
+#include "FileHandler.h"
 #include "http_server/request_handler.h"
-#include "json_handler.h"
+#include "JsonHandler.h"
 
 RequestHandlerProviderImp::RequestHandlerProviderImp() {
-    m_request_handlers.push_back(new http::server::json_handler());
-    m_request_handlers.push_back(new http::server::file_handler());
+    m_request_handlers.push_back(new JsonHandler());
+    m_request_handlers.push_back(new FileHandler());
 }
 
 RequestHandlerProviderImp::~RequestHandlerProviderImp() {

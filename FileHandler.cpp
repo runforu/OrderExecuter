@@ -3,30 +3,27 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "file_handler.h"
+#include "FileHandler.h"
 #include "http_server/mime_types.h"
 #include "http_server/reply.h"
 #include "http_server/request.h"
 #include "http_server/server_property.h"
 
-namespace http {
-namespace server {
-
-int file_handler::get_priority() const {
+int FileHandler::get_priority() const {
     return 0;
 }
 
-bool file_handler::handle(const request& req, reply& rep) {
+bool FileHandler::handle(const http::server::request& req, http::server::reply& rep) {
     // Decode url to path.
     std::string request_path;
     if (!url_decode(req.uri, request_path)) {
-        rep = reply::stock_reply(reply::bad_request);
+        rep = http::server::reply::stock_reply(http::server::reply::bad_request);
         return false;
     }
 
     // Request path must be absolute and not contain "..".
     if (request_path.empty() || request_path[0] != '/' || request_path.find("..") != std::string::npos) {
-        rep = reply::stock_reply(reply::bad_request);
+        rep = http::server::reply::stock_reply(http::server::reply::bad_request);
         return false;
     }
 
@@ -44,15 +41,15 @@ bool file_handler::handle(const request& req, reply& rep) {
     }
 
     // Open the file to send back.
-    std::string full_path = server_property::s_doc_root + request_path;
+    std::string full_path = http::server::server_property::s_doc_root + request_path;
     std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
     if (!is) {
-        rep = reply::stock_reply(reply::not_found);
+        rep = http::server::reply::stock_reply(http::server::reply::not_found);
         return false;
     }
 
     // Fill out the reply to be sent to the client.
-    rep.status = reply::ok;
+    rep.status = http::server::reply::ok;
     char buf[512];
     while (is.read(buf, sizeof(buf)).gcount() > 0) {
         rep.content.append(buf, is.gcount());
@@ -61,11 +58,11 @@ bool file_handler::handle(const request& req, reply& rep) {
     rep.headers[0].name = "Content-Length";
     rep.headers[0].value = boost::lexical_cast<std::string>(rep.content.size());
     rep.headers[1].name = "Content-Type";
-    rep.headers[1].value = mime_types::extension_to_type(extension);
+    rep.headers[1].value = http::server::mime_types::extension_to_type(extension);
     return true;
 }
 
-bool file_handler::url_decode(const std::string& in, std::string& out) {
+bool FileHandler::url_decode(const std::string& in, std::string& out) {
     out.clear();
     out.reserve(in.size());
     for (std::size_t i = 0; i < in.size(); ++i) {
@@ -90,6 +87,3 @@ bool file_handler::url_decode(const std::string& in, std::string& out) {
     }
     return true;
 }
-
-}  // namespace server
-}  // namespace http

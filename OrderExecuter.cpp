@@ -1,8 +1,7 @@
-#include "Processor.h"
 #include "Config.h"
-#include "Factory.h"
+#include "ServerApi.h"
 #include "Loger.h"
-
+#include "Processor.h"
 
 PluginInfo ExtPluginInfo = {"Order Executer", 1, "DH Copyrigh.", {0}};
 
@@ -11,7 +10,7 @@ static char DocRootPath[256];
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID /*lpReserved*/) {
     switch (reason) {
         case DLL_PROCESS_ATTACH:
-            char tmp[256], *cp;            
+            char tmp[256], *cp;
             GetModuleFileName((HMODULE)hModule, tmp, sizeof(tmp) - 5);
             //--- set root path
             COPY_STR(DocRootPath, tmp);
@@ -24,10 +23,12 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID /*lpReserved*/) {
                 *cp = 0;
                 strcat(tmp, ".ini");
             }
-            Factory::GetConfig()->Load(tmp);
+            Config::Instance().Load(tmp);
             break;
 
         case DLL_THREAD_ATTACH:
+            break;
+
         case DLL_THREAD_DETACH:
             break;
 
@@ -52,15 +53,13 @@ int APIENTRY MtSrvStartup(CServerInterface* server) {
         return (FALSE);
     }
 
-    //--- save server interface link
-    Factory::SetServerInterface(server);
+    ServerApi::Initialize(server);
 
-    Factory::GetProcessor()->Initialize("8080", DocRootPath, "512");
+    Processor::Instance().Initialize("8080", DocRootPath, "512");
 
     return (TRUE);
 }
 
 void APIENTRY MtSrvCleanup() {
-    Factory::GetProcessor()->Shutdown();
-    Factory::SetServerInterface(NULL);
+    Processor::Instance().Shutdown();
 }

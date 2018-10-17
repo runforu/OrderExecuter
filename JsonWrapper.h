@@ -6,19 +6,11 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-using namespace boost::property_tree;
-
-namespace http {
-namespace server {
-
-class json_wrapper {
+class JsonWrapper {
 public:
-    static ptree parse_json(std::string json_str);
+    static boost::property_tree::ptree parse_json(std::string json_str);
 
-    static std::string to_json(ptree& pt);
+    static std::string to_json(boost::property_tree::ptree& pt);
 };
-
-}  // namespace server
-}  // namespace http
 
 #endif  // !_HTTP_SERVER_JSON_HELPER_H_

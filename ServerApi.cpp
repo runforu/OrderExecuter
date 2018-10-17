@@ -1,9 +1,8 @@
 #include <process.h>
 #include <stdlib.h>
 #include "Config.h"
-#include "Factory.h"
 #include "Loger.h"
-#include "ServerApiAdapter.h"
+#include "ServerApi.h"
 #include "common.h"
 #include "../include/MT4ServerAPI.h"
 
@@ -15,13 +14,22 @@
         }                                                \
     }
 
-ServerApiAdapter& ServerApiAdapter::Instance() {
-    static ServerApiAdapter _instance;
-    return _instance;
+CServerInterface* ServerApi::s_interface=NULL;
+
+void ServerApi::Initialize(CServerInterface* server_interface) {
+    s_interface = server_interface;
 }
 
-void ServerApiAdapter::TestRoutine(int cmd) {
+CServerInterface* ServerApi::Api() throw(...) {
+    return s_interface;
+}
+
+void ServerApi::TestRoutine(int cmd) {
     FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        return;
+    }
 
     int order = 0;
     const char* symbol = "USDJPY";
@@ -60,7 +68,11 @@ void ServerApiAdapter::TestRoutine(int cmd) {
     CloseOrder(ip, order, close_price, NULL, message);
 }
 
-void ServerApiAdapter::TestPrice(int cmd, double* open_price, double* close_price, double* sl, double* tp) {
+void ServerApi::TestPrice(int cmd, double* open_price, double* close_price, double* sl, double* tp) {
+    if (s_interface == NULL) {
+        return;
+    }
+
     double prices[2];
     double deviation = 0.043;
     GetCurrentPrice("USDJPY", "lmoa-main", prices);
@@ -111,21 +123,24 @@ void ServerApiAdapter::TestPrice(int cmd, double* open_price, double* close_pric
     LOG("open_price = %f, close_price = %f, sl = %f, tp = %f,", *open_price, *close_price, *sl, *tp);
 }
 
-void ServerApiAdapter::TestEntry(void* parameter) {
+void ServerApi::TestEntry(void* parameter) {
     for (int cmd = OP_BUY; cmd <= OP_SELL_STOP; cmd++) {
-        ((ServerApiAdapter*)parameter)->TestRoutine(cmd);
+        TestRoutine(cmd);
     }
     _endthread();
 }
 
-void ServerApiAdapter::UnitTest() {
-    _beginthread(TestEntry, 0, this);
+void ServerApi::UnitTest() {
+    _beginthread(TestEntry, 0, 0);
 }
 
-bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume,
-                                 double open_price, double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE],
-                                 int* order) {
+bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
+                          double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE], int* order) {
     FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        return false;
+    }
 
     UserInfo user_info = {0};
     ConSymbol symbol_cfg = {0};
@@ -145,18 +160,18 @@ bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* sy
     }
 
     //--- get group config
-    if (Factory::GetServerInterface()->GroupsGet(user_info.group, &group_cfg) == FALSE) {
+    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
         LOG("OpenOrder: GroupsGet failed [%s]", user_info.group);
         return false;  // error
     }
 
     //--- get symbol config
-    if (Factory::GetServerInterface()->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
+    if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
         LOG("OpenOrder: SymbolsGet failed [%s]", symbol);
         return false;  // error
     }
 
-    if (Factory::GetServerInterface()->TradesCheckSessions(&symbol_cfg, Factory::GetServerInterface()->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("AddOrder: market closed", user_info.group);
         return false;  // error
     }
@@ -174,7 +189,7 @@ bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* sy
     }
 
     //--- check secutiry
-    if (Factory::GetServerInterface()->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
         LOG("OpenOrder: trade disabled or market closed");
         return false;  // trade disabled, market closed, or no prices for long time
     }
@@ -211,26 +226,26 @@ bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* sy
     }
 
     //--- check tick size
-    if (Factory::GetServerInterface()->TradesCheckTickSize(open_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(open_price, &symbol_cfg) == FALSE) {
         LOG("OpenOrder: invalid price");
         return false;  // invalid price
     }
 
     //--- check volume
-    if (Factory::GetServerInterface()->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
+    if (s_interface->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
         LOG("OpenOrder: invalid volume");
         return false;  // invalid volume
     }
 
     //--- check stops
-    if (Factory::GetServerInterface()->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
+    if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("OpenOrder: invalid stops");
         return false;  // invalid stops
     }
 
     //--- open order with margin check
     LOG_INFO(&trade_trans_info);
-    if ((*order = Factory::GetServerInterface()->OrdersOpen(&trade_trans_info, &user_info)) == 0) {
+    if ((*order = s_interface->OrdersOpen(&trade_trans_info, &user_info)) == 0) {
         LOG("OpenOrder: OpenOrder failed");
         return false;  // error
     }
@@ -239,26 +254,34 @@ bool ServerApiAdapter::OpenOrder(const int login, const char* ip, const char* sy
     return true;
 }
 
-bool ServerApiAdapter::GetUserRecord(int user, UserRecord* user_record, char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::GetUserRecord(int user, UserRecord* user_record, char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (user_record == NULL || user < 0) {
         return false;
     }
 
-    if (Factory::GetServerInterface()->ClientsUserInfo(user, user_record) == FALSE) {
+    if (s_interface->ClientsUserInfo(user, user_record) == FALSE) {
         return false;
     }
     return true;
 }
 
-bool ServerApiAdapter::UpdateUserRecord(int user, const char* group, const char* name, const char* phone, const char* email,
-                                        int enable, int leverage, char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::UpdateUserRecord(int user, const char* group, const char* name, const char* phone, const char* email,
+                                 int enable, int leverage, char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (user < 0) {
         return false;
     }
 
     UserRecord user_record = {0};
 
-    if (Factory::GetServerInterface()->ClientsUserInfo(user, &user_record) == FALSE) {
+    if (s_interface->ClientsUserInfo(user, &user_record) == FALSE) {
         return false;
     }
 
@@ -280,58 +303,85 @@ bool ServerApiAdapter::UpdateUserRecord(int user, const char* group, const char*
     if (leverage != -1) {
         user_record.leverage = leverage;
     }
-    if (Factory::GetServerInterface()->ClientsUserUpdate(&user_record) == FALSE) {
+    if (s_interface->ClientsUserUpdate(&user_record) == FALSE) {
         return false;
     }
     return true;
 }
 
-bool ServerApiAdapter::ChangePassword(int user, const char* password, char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::ChangePassword(int user, const char* password, char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (user < 0) {
         return false;
     }
+
     if (strnlen_s(password, 32) < 5) {
         return false;
     }
-    if (Factory::GetServerInterface()->ClientsChangePass(user, password, FALSE, FALSE) == FALSE) {
+
+    if (s_interface->ClientsChangePass(user, password, FALSE, FALSE) == FALSE) {
         return false;
     }
+
     return true;
 }
 
-bool ServerApiAdapter::CheckPassword(int user, const char* password, char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::CheckPassword(int user, const char* password, char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (user < 0) {
         return false;
     }
 
-    if (Factory::GetServerInterface()->ClientsCheckPass(user, password, FALSE) == FALSE) {
+    if (s_interface->ClientsCheckPass(user, password, FALSE) == FALSE) {
         return false;
     }
     return true;
 }
 
-bool ServerApiAdapter::GetMargin(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
-                                 char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::GetMargin(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
+                          char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (user < 0 || user_info == NULL || margin == NULL || freemargin == NULL || equity == NULL) {
         return false;
     }
-    if (Factory::GetServerInterface()->TradesMarginGet(user, user_info, margin, freemargin, equity) == FALSE) {
+
+    if (s_interface->TradesMarginGet(user, user_info, margin, freemargin, equity) == FALSE) {
         return false;
     }
+
     return true;
 }
 
-bool ServerApiAdapter::GetOrder(int order, TradeRecord* trade_record, char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::GetOrder(int order, TradeRecord* trade_record, char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (order < 0 || trade_record == NULL) {
         return false;
     }
-    if (Factory::GetServerInterface()->OrdersGet(order, trade_record) == FALSE) {
+
+    if (s_interface->OrdersGet(order, trade_record) == FALSE) {
         return false;
     }
+
     return true;
 }
 
-bool ServerApiAdapter::GetOpenOrders(int user, int* total, TradeRecord** orders, char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::GetOpenOrders(int user, int* total, TradeRecord** orders, char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (user < 0) {
         return false;
     }
@@ -341,22 +391,26 @@ bool ServerApiAdapter::GetOpenOrders(int user, int* total, TradeRecord** orders,
         return false;
     }
 
-    if ((*orders = Factory::GetServerInterface()->OrdersGetOpen(&user_info, total)) == FALSE) {
+    if ((*orders = s_interface->OrdersGetOpen(&user_info, total)) == FALSE) {
         return false;
     }
     return true;
 }
 
-bool ServerApiAdapter::GetClosedOrders(int user, time_t from, time_t to, int* total, TradeRecord** orders,
-                                       char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, TradeRecord** orders,
+                                char message[MESSAGE_MAX_SIZE]) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     if (user < 0 || message == NULL) {
         return false;
     }
     if (from == -1) {
-        from = Factory::GetServerInterface()->TradeTime() - 7 * 24 * 60 * 60;
+        from = s_interface->TradeTime() - 7 * 24 * 60 * 60;
     }
     if (to == -1) {
-        to = Factory::GetServerInterface()->TradeTime();
+        to = s_interface->TradeTime();
     }
 
     if (to - from > 7 * 24 * 60 * 60) {
@@ -365,16 +419,19 @@ bool ServerApiAdapter::GetClosedOrders(int user, time_t from, time_t to, int* to
     }
 
     int users[1] = {user};
-    if ((*orders = Factory::GetServerInterface()->OrdersGetClosed(from, to, users, 1, total)) == FALSE) {
+    if ((*orders = s_interface->OrdersGetClosed(from, to, users, 1, total)) == FALSE) {
         return false;
     }
     return true;
 }
 
-bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume,
-                                double open_price, double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE],
-                                int* order) {
+bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
+                         double sl, double tp, const char* comment, char message[MESSAGE_MAX_SIZE], int* order) {
     FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        return false;
+    }
 
     UserInfo user_info = {0};
     ConSymbol symbol_cfg = {0};
@@ -397,18 +454,18 @@ bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* sym
     }
 
     //--- get group config
-    if (Factory::GetServerInterface()->GroupsGet(user_info.group, &group_cfg) == FALSE) {
+    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
         LOG("AddOrder: GroupsGet failed [%s]", user_info.group);
         return false;  // error
     }
 
     //--- get symbol config
-    if (Factory::GetServerInterface()->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
+    if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
         LOG("AddOrder: SymbolsGet failed [%s]", symbol);
         return false;  // error
     }
 
-    if (Factory::GetServerInterface()->TradesCheckSessions(&symbol_cfg, Factory::GetServerInterface()->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("AddOrder: market closed", user_info.group);
         return false;  // error
     }
@@ -425,7 +482,7 @@ bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* sym
     }
 
     //--- check secutiry
-    if (Factory::GetServerInterface()->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
         LOG("AddOrder: trade disabled or market closed");
         return false;  // trade disabled, market closed, or no prices for long time
     }
@@ -461,21 +518,20 @@ bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* sym
     }
 
     //--- check tick size
-    if (Factory::GetServerInterface()->TradesCheckTickSize(trade_record.open_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(trade_record.open_price, &symbol_cfg) == FALSE) {
         LOG("AddOrder: invalid price");
         return false;  // invalid price
     }
 
     //--- check volume
-    if (Factory::GetServerInterface()->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
+    if (s_interface->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
         LOG("AddOrder: invalid volume");
         return false;  // invalid volume
     }
 
     //--- check margin
     if (cmd == OP_BUY || cmd == OP_SELL) {
-        margin = Factory::GetServerInterface()->TradesMarginCheck(&user_info, &trade_trans_info, &profit, &free_margin,
-                                                                  &prev_margin);
+        margin = s_interface->TradesMarginCheck(&user_info, &trade_trans_info, &profit, &free_margin, &prev_margin);
         if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg.margin_hedged_strong != FALSE || prev_margin <= margin)) {
             LOG("AddOrder: not enough margin");
             return false;  // no enough margin
@@ -488,7 +544,7 @@ bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* sym
     trade_record.open_price = trade_trans_info.price;
     trade_record.volume = volume;
     trade_record.close_price = ((cmd == OP_BUY || cmd == OP_BUY_LIMIT || cmd == OP_BUY_STOP) ? prices[0] : prices[1]);
-    trade_record.open_time = Factory::GetServerInterface()->TradeTime();
+    trade_record.open_time = s_interface->TradeTime();
     trade_record.digits = symbol_cfg.digits;
 
     COPY_STR(trade_record.symbol, symbol);
@@ -498,14 +554,14 @@ bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* sym
     trade_record.tp = trade_trans_info.tp;
 
     //--- check stops
-    if (Factory::GetServerInterface()->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
+    if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("AddOrder: invalid stops");
         return false;  // invalid stops
     }
 
     //--- add order into database directly
     LOG_INFO(&trade_record);
-    if ((*order = Factory::GetServerInterface()->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
+    if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
         LOG("AddOrder: OrdersAdd failed");
         return false;  // error
     }
@@ -514,9 +570,13 @@ bool ServerApiAdapter::AddOrder(const int login, const char* ip, const char* sym
     return true;
 }
 
-bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp,
-                                   const char* comment, char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, const char* comment,
+                            char message[MESSAGE_MAX_SIZE]) {
     FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        return false;
+    }
 
     UserInfo user_info = {0};
     ConSymbol symbol_cfg = {0};
@@ -530,7 +590,7 @@ bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_
     }
 
     //--- get order
-    if (Factory::GetServerInterface()->OrdersGet(order, &trade_record) == FALSE) {
+    if (s_interface->OrdersGet(order, &trade_record) == FALSE) {
         LOG("UpdateOrder: OrdersGet failed");
         return false;  // error
     }
@@ -548,24 +608,24 @@ bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_
     }
 
     //--- get group config
-    if (Factory::GetServerInterface()->GroupsGet(user_info.group, &group_cfg) == FALSE) {
+    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
         LOG("UpdateOrder: GroupsGet failed [%s]", user_info.group);
         return false;  // error
     }
 
     //--- get symbol config
-    if (Factory::GetServerInterface()->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
+    if (s_interface->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
         LOG("UpdateOrder: SymbolsGet failed [%s]", trade_record.symbol);
         return false;  // error
     }
 
-    if (Factory::GetServerInterface()->TradesCheckSessions(&symbol_cfg, Factory::GetServerInterface()->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("UpdateOrder: market closed", user_info.group);
         return false;  // error
     }
 
     //--- check tick size
-    if (Factory::GetServerInterface()->TradesCheckTickSize(open_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(open_price, &symbol_cfg) == FALSE) {
         LOG("UpdateOrder: invalid price");
         return false;  // invalid price
     }
@@ -610,20 +670,20 @@ bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_
     }
 
     //--- check secutiry
-    if (Factory::GetServerInterface()->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
         LOG("UpdateOrder: trade disabled or market closed");
         return false;  // trade disabled, market closed, or no prices for long time
     }
 
     //--- check stops
     LOG_INFO(&trade_trans_info);
-    if (Factory::GetServerInterface()->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
+    if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("UpdateOrder: invalid stops");
         return false;  // invalid stops
     }
 
     COPY_STR(trade_record.comment, comment);
-    if (Factory::GetServerInterface()->OrdersUpdate(&trade_record, &user_info, UPDATE_NORMAL) == FALSE) {
+    if (s_interface->OrdersUpdate(&trade_record, &user_info, UPDATE_NORMAL) == FALSE) {
         LOG("UpdateOrder: OrdersUpdate failed");
         return false;  // error
     }
@@ -631,9 +691,13 @@ bool ServerApiAdapter::UpdateOrder(const char* ip, const int order, double open_
     return true;
 }
 
-bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_price, const char* comment,
-                                  char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, const char* comment,
+                           char message[MESSAGE_MAX_SIZE]) {
     FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        return false;
+    }
 
     UserInfo user_info = {0};
     ConGroup group_cfg = {0};
@@ -647,7 +711,7 @@ bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_
     }
 
     //--- get order
-    if (Factory::GetServerInterface()->OrdersGet(order, &trade_record) == FALSE) {
+    if (s_interface->OrdersGet(order, &trade_record) == FALSE) {
         LOG("CloseOrder: OrdersGet failed");
         return false;  // error
     }
@@ -661,18 +725,18 @@ bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_
     LOG_INFO(&trade_record);
 
     //--- get group config
-    if (Factory::GetServerInterface()->GroupsGet(user_info.group, &group_cfg) == FALSE) {
+    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
         LOG("CloseOrder: GroupsGet failed [%s]", user_info.group);
         return false;  // error
     }
 
     //--- get symbol config
-    if (Factory::GetServerInterface()->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
+    if (s_interface->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
         LOG("CloseOrder: SymbolsGet failed [%s]", trade_record.symbol);
         return false;  // error
     }
 
-    if (Factory::GetServerInterface()->TradesCheckSessions(&symbol_cfg, Factory::GetServerInterface()->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("CloseOrder: market closed", user_info.group);
         return false;  // error
     }
@@ -699,32 +763,32 @@ bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_
     }
 
     //--- check tick size
-    if (Factory::GetServerInterface()->TradesCheckTickSize(close_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(close_price, &symbol_cfg) == FALSE) {
         LOG("CloseOrder: invalid price");
         return false;  // invalid price
     }
 
     //--- check secutiry
-    if (Factory::GetServerInterface()->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
         LOG("OrdersUpdateClose: trade disabled or market closed");
         return false;  // trade disabled, market closed, or no prices for long time
     }
 
     //--- check volume
-    if (Factory::GetServerInterface()->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
+    if (s_interface->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
         LOG("OrdersUpdateClose: invalid volume");
         return false;  // invalid volume
     }
 
     //--- check stops
-    if (Factory::GetServerInterface()->TradesCheckFreezed(&symbol_cfg, &group_cfg, &trade_record) != RET_OK) {
+    if (s_interface->TradesCheckFreezed(&symbol_cfg, &group_cfg, &trade_record) != RET_OK) {
         LOG("OrdersUpdateClose: position freezed");
         return false;  // position freezed
     }
 
     //--- close position
     LOG_INFO(&trade_trans_info);
-    if (Factory::GetServerInterface()->OrdersClose(&trade_trans_info, &user_info) == FALSE) {
+    if (s_interface->OrdersClose(&trade_trans_info, &user_info) == FALSE) {
         LOG("CloseOrder: CloseOrder failed");
         return false;  // error
     }
@@ -733,25 +797,33 @@ bool ServerApiAdapter::CloseOrder(const char* ip, const int order, double close_
     return true;
 }
 
-bool ServerApiAdapter::Deposit(const int login, const char* ip, const double value, const char* comment, double* balance,
-                               char message[MESSAGE_MAX_SIZE]) {
+bool ServerApi::Deposit(const int login, const char* ip, const double value, const char* comment, double* balance,
+                        char message[MESSAGE_MAX_SIZE]) {
     FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        return false;
+    }
 
     UserInfo user = {0};
     if (!GetUserInfo(login, &user)) {
         return false;
     }
 
-    if ((*balance = Factory::GetServerInterface()->ClientsChangeBalance(login, &user.grp, value, comment)) == 0) {
+    if ((*balance = s_interface->ClientsChangeBalance(login, &user.grp, value, comment)) == 0) {
         return false;
     }
     return true;
 }
 
-bool ServerApiAdapter::GetUserInfo(const int login, UserInfo* user_info) {
+bool ServerApi::GetUserInfo(const int login, UserInfo* user_info) {
+    if (s_interface == NULL) {
+        return false;
+    }
+
     UserRecord user_record = {0};
 
-    if (Factory::GetServerInterface()->ClientsUserInfo(login, &user_record) == FALSE) {
+    if (s_interface->ClientsUserInfo(login, &user_record) == FALSE) {
         return false;
     }
 
@@ -764,7 +836,7 @@ bool ServerApiAdapter::GetUserInfo(const int login, UserInfo* user_info) {
     COPY_STR(user_info->name, user_record.name);
 
     ConGroup grpcfg = {0};
-    if (Factory::GetServerInterface()->GroupsGet(user_info->group, &grpcfg) == FALSE) {
+    if (s_interface->GroupsGet(user_info->group, &grpcfg) == FALSE) {
         return false;
     }
     user_info->grp = grpcfg;
@@ -772,12 +844,17 @@ bool ServerApiAdapter::GetUserInfo(const int login, UserInfo* user_info) {
     return true;
 }
 
-bool ServerApiAdapter::GetCurrentPrice(const char* symbol, const char* group, double* prices) {
-    ConGroup grpcfg = {0};
-    if (Factory::GetServerInterface()->GroupsGet(group, &grpcfg) == FALSE) {
+bool ServerApi::GetCurrentPrice(const char* symbol, const char* group, double* prices) {
+    if (s_interface == NULL) {
         return false;
     }
-    if (Factory::GetServerInterface()->HistoryPricesGroup(symbol, &grpcfg, prices) != RET_OK) {
+
+    ConGroup grpcfg = {0};
+    if (s_interface->GroupsGet(group, &grpcfg) == FALSE) {
+        return false;
+    }
+
+    if (s_interface->HistoryPricesGroup(symbol, &grpcfg, prices) != RET_OK) {
         return false;
     }
     return true;

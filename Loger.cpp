@@ -1,16 +1,17 @@
-#include "Loger.h"
 #include <stdio.h>
 #include <time.h>
-#include "Factory.h"
+#include "Loger.h"
+#include "ServerApi.h"
+#include "../include/MT4ServerAPI.h"
 
 #ifdef _RELEASE_LOG_
 
 void Loger::out(const int code, const char* ip, std::string msg) {
-    if (Factory::GetServerInterface() == NULL) {
+    if (ServerApi::Api() == NULL) {
         return;
     }
 
-    Factory::GetServerInterface()->LogsOut(code, ip, msg.c_str());
+    ServerApi::Api()->LogsOut(code, ip, msg.c_str());
 }
 
 void Loger::out(const int code, const char* ip, int value) {
@@ -22,7 +23,7 @@ void Loger::out(const int code, const char* ip, double value) {
 }
 
 void Loger::out(const int code, const char* ip, const char* msg, ...) {
-    if (Factory::GetServerInterface() == NULL || msg == NULL) {
+    if (ServerApi::Api() == NULL || msg == NULL) {
         return;
     }
 
@@ -32,7 +33,7 @@ void Loger::out(const int code, const char* ip, const char* msg, ...) {
     _vsnprintf(buffer, sizeof(buffer) - 1, msg, arg_ptr);
     va_end(arg_ptr);
 
-    Factory::GetServerInterface()->LogsOut(code, ip, buffer);
+    ServerApi::Api()->LogsOut(code, ip, buffer);
 }
 
 void Loger::out(const int code, const char* ip, const RequestInfo* request) {

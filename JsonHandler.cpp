@@ -3,22 +3,23 @@
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
 #include "Loger.h"
-#include "ServerApiAdapter.h"
+#include "ServerApi.h"
 #include "common.h"
-#include "json_handler.h"
-#include "json_wrapper.h"
+#include "JsonHandler.h"
+#include "JsonWrapper.h"
 
-namespace http {
-namespace server {
+using namespace boost::property_tree;
+using namespace http::server;
 
-int json_handler::get_priority() const {
+int JsonHandler::get_priority() const {
     return 100;
 }
 
-bool json_handler::handle(const request& req, reply& rep) {
-    if (std::find_if(req.headers.begin(), req.headers.end(), [&](const header& h) { return h == header::content_type; }) !=
-        req.headers.end()) {
-        ptree pt = json_wrapper::parse_json(req.body);
+bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
+    if (std::find_if(req.headers.begin(), req.headers.end(), [&](const http::server::header& h) {
+            return h == http::server::header::content_type;
+        }) != req.headers.end()) {
+        ptree pt = JsonWrapper::parse_json(req.body);
         ptree response;
         if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
             response = OpenOrder(pt);
@@ -36,6 +37,8 @@ bool json_handler::handle(const request& req, reply& rep) {
             response = UpdateUserRecord(pt);
         } else if (pt.get<std::string>("request", "").compare("ChangePassword") == 0) {
             response = ChangePassword(pt);
+        } else if (pt.get<std::string>("request", "").compare("CheckPassword") == 0) {
+            response = CheckPassword(pt);
         } else if (pt.get<std::string>("request", "").compare("GetMargin") == 0) {
             response = GetMargin(pt);
         } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
@@ -50,7 +53,7 @@ bool json_handler::handle(const request& req, reply& rep) {
             return false;
         }
         rep.headers.push_back(header::content_type);
-        std::string content = json_wrapper::to_json(response);
+        std::string content = JsonWrapper::to_json(response);
         rep.headers.push_back(header("Content-Length", std::to_string(content.length())));
         rep.content.append(content);
         return true;
@@ -59,7 +62,7 @@ bool json_handler::handle(const request& req, reply& rep) {
     return false;
 }
 
-ptree json_handler::OpenOrder(ptree pt) {
+ptree JsonHandler::OpenOrder(ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<std::string>("ip", "0.0.0.0"));
@@ -84,8 +87,8 @@ ptree json_handler::OpenOrder(ptree pt) {
     std::string comment = pt.get<std::string>("comment", "");
     int order;
 
-    bool result = ServerApiAdapter::Instance().OpenOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp,
-                                                         comment.c_str(), message, &order);
+    bool result = ServerApi::OpenOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, comment.c_str(),
+                                       message, &order);
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
@@ -96,7 +99,7 @@ ptree json_handler::OpenOrder(ptree pt) {
     return response;
 }
 
-ptree json_handler::AddOrder(ptree pt) {
+ptree JsonHandler::AddOrder(ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<std::string>("ip", "0.0.0.0"));
@@ -121,8 +124,8 @@ ptree json_handler::AddOrder(ptree pt) {
     int order;
     char message[32] = {0};
 
-    bool result = ServerApiAdapter::Instance().AddOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp,
-                                                        comment.c_str(), message, &order);
+    bool result = ServerApi::AddOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, comment.c_str(),
+                                      message, &order);
 
     ptree response;
     response.put("request", request);
@@ -134,7 +137,7 @@ ptree json_handler::AddOrder(ptree pt) {
     return response;
 }
 
-ptree json_handler::UpdateOrder(ptree pt) {
+ptree JsonHandler::UpdateOrder(ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<std::string>("ip", "0.0.0.0"));
     LOG(pt.get<int>("order", 0));
@@ -152,7 +155,7 @@ ptree json_handler::UpdateOrder(ptree pt) {
     std::string comment = pt.get<std::string>("comment", "");
     char message[32] = {0};
 
-    bool result = ServerApiAdapter::Instance().UpdateOrder(ip.c_str(), order, open_price, sl, tp, comment.c_str(), message);
+    bool result = ServerApi::UpdateOrder(ip.c_str(), order, open_price, sl, tp, comment.c_str(), message);
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
@@ -161,7 +164,7 @@ ptree json_handler::UpdateOrder(ptree pt) {
     return response;
 }
 
-ptree json_handler::CloseOrder(ptree pt) {
+ptree JsonHandler::CloseOrder(ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<std::string>("ip", "0.0.0.0"));
     LOG(pt.get<int>("order", 0));
@@ -175,7 +178,7 @@ ptree json_handler::CloseOrder(ptree pt) {
     std::string comment = pt.get<std::string>("comment", "");
     char message[32] = {0};
 
-    bool result = ServerApiAdapter::Instance().CloseOrder(ip.c_str(), order, close_price, comment.c_str(), message);
+    bool result = ServerApi::CloseOrder(ip.c_str(), order, close_price, comment.c_str(), message);
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
@@ -184,7 +187,7 @@ ptree json_handler::CloseOrder(ptree pt) {
     return response;
 }
 
-ptree json_handler::Deposit(ptree pt) {
+ptree JsonHandler::Deposit(ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<std::string>("ip", "0.0.0.0"));
@@ -198,7 +201,7 @@ ptree json_handler::Deposit(ptree pt) {
     std::string comment = pt.get<std::string>("comment", "");
     char message[32] = {0};
     double order = 0;
-    bool result = ServerApiAdapter::Instance().Deposit(login, ip.c_str(), value, comment.c_str(), &order, message);
+    bool result = ServerApi::Deposit(login, ip.c_str(), value, comment.c_str(), &order, message);
 
     ptree response;
     response.put("request", request);
@@ -211,7 +214,7 @@ ptree json_handler::Deposit(ptree pt) {
     return response;
 }
 
-ptree json_handler::GetUserRecord(ptree pt) {
+ptree JsonHandler::GetUserRecord(ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<int>("user", -1));
@@ -224,7 +227,7 @@ ptree json_handler::GetUserRecord(ptree pt) {
     char message[32] = {0};
 
     UserRecord user_record;
-    bool result = ServerApiAdapter::Instance().GetUserRecord(user, &user_record, message);
+    bool result = ServerApi::GetUserRecord(user, &user_record, message);
 
     ptree response;
     response.put("request", request);
@@ -275,7 +278,7 @@ ptree json_handler::GetUserRecord(ptree pt) {
     return response;
 }
 
-ptree json_handler::UpdateUserRecord(ptree pt) {
+ptree JsonHandler::UpdateUserRecord(ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<int>("user", -1));
@@ -299,8 +302,8 @@ ptree json_handler::UpdateUserRecord(ptree pt) {
     int leverage = pt.get<int>("leverage", -1);
     char message[32] = {0};
 
-    bool result = ServerApiAdapter::Instance().UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(),
-                                                                enable, leverage, message);
+    bool result =
+        ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage, message);
 
     ptree response;
     response.put("request", request);
@@ -310,7 +313,7 @@ ptree json_handler::UpdateUserRecord(ptree pt) {
     return response;
 }
 
-boost::property_tree::ptree json_handler::ChangePassword(boost::property_tree::ptree pt) {
+boost::property_tree::ptree JsonHandler::ChangePassword(boost::property_tree::ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<std::string>("ip", "0.0.0.0"));
@@ -321,7 +324,7 @@ boost::property_tree::ptree json_handler::ChangePassword(boost::property_tree::p
     std::string password = pt.get<std::string>("password", "");
     char message[32] = {0};
 
-    bool result = ServerApiAdapter::Instance().ChangePassword(login, password.c_str(), message);
+    bool result = ServerApi::ChangePassword(login, password.c_str(), message);
 
     ptree response;
     response.put("request", request);
@@ -331,7 +334,28 @@ boost::property_tree::ptree json_handler::ChangePassword(boost::property_tree::p
     return response;
 }
 
-boost::property_tree::ptree json_handler::GetMargin(boost::property_tree::ptree pt) {
+boost::property_tree::ptree JsonHandler::CheckPassword(boost::property_tree::ptree pt) {
+    LOG(pt.get<std::string>("request", ""));
+    LOG(pt.get<int>("login", -1));
+    LOG(pt.get<std::string>("ip", "0.0.0.0"));
+    LOG(pt.get<std::string>("password", ""));
+
+    std::string request = pt.get<std::string>("request", "");
+    int login = pt.get<int>("login", -1);
+    std::string password = pt.get<std::string>("password", "");
+    char message[32] = {0};
+
+    bool result = ServerApi::CheckPassword(login, password.c_str(), message);
+
+    ptree response;
+    response.put("request", request);
+    response.put("result", result ? "OK" : "ERROR");
+    response.put("message", message);
+
+    return response;
+}
+
+boost::property_tree::ptree JsonHandler::GetMargin(boost::property_tree::ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
 
@@ -343,7 +367,7 @@ boost::property_tree::ptree json_handler::GetMargin(boost::property_tree::ptree 
     double freemargin;
     double equity;
 
-    bool result = ServerApiAdapter::Instance().GetMargin(login, &user_info, &margin, &freemargin, &equity, message);
+    bool result = ServerApi::GetMargin(login, &user_info, &margin, &freemargin, &equity, message);
 
     ptree response;
     response.put("request", request);
@@ -363,7 +387,7 @@ boost::property_tree::ptree json_handler::GetMargin(boost::property_tree::ptree 
     return response;
 }
 
-boost::property_tree::ptree json_handler::GetOrder(boost::property_tree::ptree pt) {
+boost::property_tree::ptree JsonHandler::GetOrder(boost::property_tree::ptree pt) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<int>("order", -1));
@@ -374,7 +398,7 @@ boost::property_tree::ptree json_handler::GetOrder(boost::property_tree::ptree p
     char message[32] = {0};
     TradeRecord trade_record = {0};
 
-    bool result = ServerApiAdapter::Instance().GetOrder(order, &trade_record, message);
+    bool result = ServerApi::GetOrder(order, &trade_record, message);
 
     ptree response;
     response.put("request", request);
@@ -414,20 +438,20 @@ boost::property_tree::ptree json_handler::GetOrder(boost::property_tree::ptree p
     return response;
 }
 
-boost::property_tree::ptree json_handler::GetOpenOrders(boost::property_tree::ptree pt) {
+boost::property_tree::ptree JsonHandler::GetOpenOrders(boost::property_tree::ptree pt) {
     return _GetOpenOrders(pt, [](TradeRecord& trade) -> bool { return trade.cmd < OP_BUY || trade.cmd > OP_SELL; });
 }
 
-boost::property_tree::ptree json_handler::GetPendingOrders(boost::property_tree::ptree pt) {
+boost::property_tree::ptree JsonHandler::GetPendingOrders(boost::property_tree::ptree pt) {
     return _GetOpenOrders(pt, [](TradeRecord& trade) -> bool { return trade.cmd < OP_BUY_LIMIT || trade.cmd > OP_SELL_STOP; });
 }
 
-boost::property_tree::ptree json_handler::GetClosedOrders(boost::property_tree::ptree pt) {
+boost::property_tree::ptree JsonHandler::GetClosedOrders(boost::property_tree::ptree pt) {
     return _GetClosedOrders(pt,
                             [](TradeRecord& trade) -> bool { return false && trade.cmd < OP_BUY || trade.cmd > OP_SELL_STOP; });
 }
 
-boost::property_tree::ptree json_handler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter_out) {
+boost::property_tree::ptree JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter_out) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
 
@@ -438,7 +462,7 @@ boost::property_tree::ptree json_handler::_GetOpenOrders(boost::property_tree::p
     int total = 0;
     int count = 0;
 
-    bool result = ServerApiAdapter::Instance().GetOpenOrders(login, &total, &trade_record, message);
+    bool result = ServerApi::GetOpenOrders(login, &total, &trade_record, message);
 
     ptree response;
     response.put("request", request);
@@ -495,7 +519,7 @@ boost::property_tree::ptree json_handler::_GetOpenOrders(boost::property_tree::p
     return response;
 }
 
-boost::property_tree::ptree json_handler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter_out) {
+boost::property_tree::ptree JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter_out) {
     LOG(pt.get<std::string>("request", ""));
     LOG(pt.get<int>("login", -1));
     LOG(pt.get<int>("from", -1));
@@ -510,7 +534,7 @@ boost::property_tree::ptree json_handler::_GetClosedOrders(boost::property_tree:
     int total = 0;
     int count = 0;
 
-    bool result = ServerApiAdapter::Instance().GetClosedOrders(login, from, to, &total, &trade_record, message);
+    bool result = ServerApi::GetClosedOrders(login, from, to, &total, &trade_record, message);
 
     ptree response;
     response.put("request", request);
@@ -566,6 +590,3 @@ boost::property_tree::ptree json_handler::_GetClosedOrders(boost::property_tree:
 
     return response;
 }
-
-}  // namespace server
-}  // namespace http

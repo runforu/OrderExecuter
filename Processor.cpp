@@ -1,16 +1,20 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
-#include <boost/thread.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
 #include <process.h>
 #include <stdlib.h>
 #include "Config.h"
-#include "Factory.h"
 #include "Loger.h"
+#include "Processor.h"
 #include "RequestHandlerProviderImp.h"
 #include "http_server/server.h"
 #include "../include/MT4ServerAPI.h"
-#include "Processor.h"
+
+Processor& Processor::Instance() {
+    static Processor _instance;
+    return _instance;
+}
 
 void Processor::Initialize(const char* port, const char* root, const char* num_threads) {
     m_thread = boost::thread(boost::bind(&Processor::StartServer, this, port, root, num_threads));
@@ -22,8 +26,6 @@ void Processor::Shutdown() {
     }
     m_thread.join();
 }
-
-Processor::Processor() : m_http_server(NULL) {}
 
 void Processor::StartServer(const char* port, const char* root, const char* num_threads) {
     LOG("http server port: %s, root: %s, threads: %s", port, root, num_threads);

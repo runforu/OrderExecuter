@@ -176,7 +176,7 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="file_handler.cpp" />
+    <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="http_server\connection.cpp" />
     <ClCompile Include="http_server\header.cpp" />
     <ClCompile Include="http_server\mime_types.cpp" />
@@ -185,20 +185,19 @@
     <ClCompile Include="http_server\request_parser.cpp" />
     <ClCompile Include="http_server\server.cpp" />
     <ClCompile Include="http_server\server_property.cpp" />
-    <ClCompile Include="json_handler.cpp" />
-    <ClCompile Include="json_wrapper.cpp" />
+    <ClCompile Include="JsonHandler.cpp" />
+    <ClCompile Include="JsonWrapper.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="Loger.cpp" />
     <ClCompile Include="OrderExecuter.cpp" />
-    <ClCompile Include="Factory.cpp" />
     <ClCompile Include="RequestHandlerProviderImp.cpp" />
-    <ClCompile Include="ServerApiAdapter.cpp" />
+    <ClCompile Include="ServerApi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="file_handler.h" />
+    <ClInclude Include="FileHandler.h" />
     <ClInclude Include="http_server\connection.h" />
     <ClInclude Include="http_server\header.h" />
     <ClInclude Include="http_server\mime_types.h" />
@@ -210,16 +209,15 @@
     <ClInclude Include="http_server\request_parser.h" />
     <ClInclude Include="http_server\server.h" />
     <ClInclude Include="http_server\server_property.h" />
-    <ClInclude Include="json_handler.h" />
-    <ClInclude Include="json_wrapper.h" />
+    <ClInclude Include="JsonHandler.h" />
+    <ClInclude Include="JsonWrapper.h" />
     <ClInclude Include="Processor.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="Config.h" />
-    <ClInclude Include="Factory.h" />
     <ClInclude Include="FileUtil.h" />
     <ClInclude Include="Loger.h" />
     <ClInclude Include="RequestHandlerProviderImp.h" />
-    <ClInclude Include="ServerApiAdapter.h" />
+    <ClInclude Include="ServerApi.h" />
     <ClInclude Include="Synchronizer.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,19 @@
+#include "Loger.h"
+#include "JsonWrapper.h"
+
+boost::property_tree::ptree JsonWrapper::parse_json(std::string json_str) {
+    boost::property_tree::ptree tree;
+    std::stringstream ss(json_str);
+    try {
+        read_json(ss, tree);
+    } catch (boost::property_tree::ptree_error& e) {
+        LOG("read_json -- exception: %s", e.what());
+    }
+    return tree;
+}
+
+std::string JsonWrapper::to_json(boost::property_tree::ptree& pt) {
+    std::stringstream ss;
+    write_json(ss, pt);
+    return ss.str();
+}
