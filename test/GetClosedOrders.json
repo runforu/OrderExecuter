@@ -1,0 +1,6 @@
+{
+    "request": "GetClosedOrders",
+    "login": 5,
+    "from": -1,
+    "to": -1
+}

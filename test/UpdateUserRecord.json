@@ -1,0 +1,12 @@
+{
+    "request": "UpdateUserRecord",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "user": 5,
+    "name": "test",
+    "phone": "12345678",
+    "email": "abc@gmail.com",
+    "enable": -1,
+    "group": "",
+    "leverage": -1
+}
