@@ -74,7 +74,7 @@ ptree JsonHandler::OpenOrder(ptree pt) {
     LOG(pt.get<double>("tp", 0.0));
     LOG(pt.get<std::string>("comment", ""));
 
-    char message[32] = {0};
+    const ErrorCode* error_code;
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
@@ -88,11 +88,12 @@ ptree JsonHandler::OpenOrder(ptree pt) {
     int order;
 
     bool result = ServerApi::OpenOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, comment.c_str(),
-                                       message, &order);
+                                       &error_code, &order);
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
     if (result) {
         response.put("order", order);
     }
@@ -122,15 +123,16 @@ ptree JsonHandler::AddOrder(ptree pt) {
     double tp = pt.get<double>("tp", 0.0);
     std::string comment = pt.get<std::string>("comment", "");
     int order;
-    char message[32] = {0};
+    const ErrorCode* error_code;
 
     bool result = ServerApi::AddOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, comment.c_str(),
-                                      message, &order);
+                                      &error_code, &order);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
     if (result) {
         response.put("order", order);
     }
@@ -153,13 +155,14 @@ ptree JsonHandler::UpdateOrder(ptree pt) {
     double sl = pt.get<double>("sl", 0.0);
     double tp = pt.get<double>("tp", 0.0);
     std::string comment = pt.get<std::string>("comment", "");
-    char message[32] = {0};
+    const ErrorCode* error_code;
 
-    bool result = ServerApi::UpdateOrder(ip.c_str(), order, open_price, sl, tp, comment.c_str(), message);
+    bool result = ServerApi::UpdateOrder(ip.c_str(), order, open_price, sl, tp, comment.c_str(), &error_code);
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
 
     return response;
 }
@@ -176,13 +179,14 @@ ptree JsonHandler::CloseOrder(ptree pt) {
     int order = pt.get<int>("order", 0);
     double close_price = pt.get<double>("close_price", 0.0);
     std::string comment = pt.get<std::string>("comment", "");
-    char message[32] = {0};
+    const ErrorCode* error_code;
 
-    bool result = ServerApi::CloseOrder(ip.c_str(), order, close_price, comment.c_str(), message);
+    bool result = ServerApi::CloseOrder(ip.c_str(), order, close_price, comment.c_str(), &error_code);
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
 
     return response;
 }
@@ -199,9 +203,9 @@ ptree JsonHandler::Deposit(ptree pt) {
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
     double value = pt.get<double>("value", 0.0);
     std::string comment = pt.get<std::string>("comment", "");
-    char message[32] = {0};
+    const ErrorCode* error_code;
     double order = 0;
-    bool result = ServerApi::Deposit(login, ip.c_str(), value, comment.c_str(), &order, message);
+    bool result = ServerApi::Deposit(login, ip.c_str(), value, comment.c_str(), &order, &error_code);
 
     ptree response;
     response.put("request", request);
@@ -209,7 +213,8 @@ ptree JsonHandler::Deposit(ptree pt) {
     if (result) {
         response.put("order", order);
     }
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
 
     return response;
 }
@@ -224,15 +229,16 @@ ptree JsonHandler::GetUserRecord(ptree pt) {
     int login = pt.get<int>("login", -1);
     int user = pt.get<int>("user", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
-    char message[32] = {0};
+    const ErrorCode* error_code;
 
     UserRecord user_record;
-    bool result = ServerApi::GetUserRecord(user, &user_record, message);
+    bool result = ServerApi::GetUserRecord(user, &user_record, &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
     if (result) {
         response.put("login", user_record.login);
         response.put("group", user_record.group);
@@ -300,15 +306,16 @@ ptree JsonHandler::UpdateUserRecord(ptree pt) {
     std::string email = pt.get<std::string>("email", "");
     int enable = pt.get<int>("enable", -1);
     int leverage = pt.get<int>("leverage", -1);
-    char message[32] = {0};
+    const ErrorCode* error_code;
 
     bool result =
-        ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage, message);
+        ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage, &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
 
     return response;
 }
@@ -322,14 +329,15 @@ boost::property_tree::ptree JsonHandler::ChangePassword(boost::property_tree::pt
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
-    char message[32] = {0};
+    const ErrorCode* error_code;
 
-    bool result = ServerApi::ChangePassword(login, password.c_str(), message);
+    bool result = ServerApi::ChangePassword(login, password.c_str(), &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
 
     return response;
 }
@@ -343,14 +351,15 @@ boost::property_tree::ptree JsonHandler::CheckPassword(boost::property_tree::ptr
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
-    char message[32] = {0};
+    const ErrorCode* error_code;
 
-    bool result = ServerApi::CheckPassword(login, password.c_str(), message);
+    bool result = ServerApi::CheckPassword(login, password.c_str(), &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
 
     return response;
 }
@@ -361,18 +370,19 @@ boost::property_tree::ptree JsonHandler::GetMargin(boost::property_tree::ptree p
 
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
-    char message[32] = {0};
+    const ErrorCode* error_code;
     UserInfo user_info = {0};
     double margin;
     double freemargin;
     double equity;
 
-    bool result = ServerApi::GetMargin(login, &user_info, &margin, &freemargin, &equity, message);
+    bool result = ServerApi::GetMargin(login, &user_info, &margin, &freemargin, &equity, &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
     if (result) {
         response.put("margin", margin);
         response.put("freemargin", freemargin);
@@ -395,15 +405,16 @@ boost::property_tree::ptree JsonHandler::GetOrder(boost::property_tree::ptree pt
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int order = pt.get<int>("order", -1);
-    char message[32] = {0};
+    const ErrorCode* error_code;
     TradeRecord trade_record = {0};
 
-    bool result = ServerApi::GetOrder(order, &trade_record, message);
+    bool result = ServerApi::GetOrder(order, &trade_record, &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
     if (result) {
         response.put("order", trade_record.order);
         response.put("login", trade_record.login);
@@ -457,17 +468,18 @@ boost::property_tree::ptree JsonHandler::_GetOpenOrders(boost::property_tree::pt
 
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
-    char message[32] = {0};
+    const ErrorCode* error_code;
     TradeRecord* trade_record = NULL;
     int total = 0;
     int count = 0;
 
-    bool result = ServerApi::GetOpenOrders(login, &total, &trade_record, message);
+    bool result = ServerApi::GetOpenOrders(login, &total, &trade_record, &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
     if (result && trade_record != NULL) {
         ptree orders;
         for (int i = 0; i < total; i++) {
@@ -529,17 +541,18 @@ boost::property_tree::ptree JsonHandler::_GetClosedOrders(boost::property_tree::
     int login = pt.get<int>("login", -1);
     int from = pt.get<int>("from", -1);
     int to = pt.get<int>("to", -1);
-    char message[32] = {0};
+    const ErrorCode* error_code;
     TradeRecord* trade_record;
     int total = 0;
     int count = 0;
 
-    bool result = ServerApi::GetClosedOrders(login, from, to, &total, &trade_record, message);
+    bool result = ServerApi::GetClosedOrders(login, from, to, &total, &trade_record, &error_code);
 
     ptree response;
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
-    response.put("message", message);
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
     if (result && trade_record != NULL) {
         ptree orders;
         for (int i = 0; i < total; i++) {

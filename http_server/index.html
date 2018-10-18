@@ -10,7 +10,103 @@
     <link href="./prism.css" rel="stylesheet" />
   </head>
   <body>
+    <h3>Error code</h3>
+    <div style="margin-left:60px;width:80%; background:#eeeeee;">
+<pre class=" language-c line-numbers">
+<code>
+enum
+{
+    //--- common errors
+    RET_OK                =0,    // all OK
+    RET_OK_NONE,                 // all OK-no operation
+    RET_ERROR,                   // general error
+    RET_INVALID_DATA,            // invalid data
+    RET_TECH_PROBLEM,            // server technical problem
+    RET_OLD_VERSION,             // old client terminal
+    RET_NO_CONNECT,              // no connection
+    RET_NOT_ENOUGH_RIGHTS,       // no enough rights
+    RET_TOO_FREQUENT,            // too frequently access to server
+    RET_MALFUNCTION,             // mulfunctional operation
+    RET_GENERATE_KEY,            // need key generation
+    RET_SECURITY_SESSION,        // securied session authorization
+    
+    //--- account status
+    RET_ACCOUNT_DISABLED  =64,   // account blocked
+    RET_BAD_ACCOUNT_INFO,        // bad account info
+    RET_PUBLIC_KEY_MISSING,      // need public key
+    //--- trade
+    RET_TRADE_TIMEOUT     =128,  // trade transatcion timeou expired
+    RET_TRADE_BAD_PRICES,        // order has wrong prices
+    RET_TRADE_BAD_STOPS,         // wrong stops level
+    RET_TRADE_BAD_VOLUME,        // wrong lot size
+    RET_TRADE_MARKET_CLOSED,     // market closed
+    RET_TRADE_DISABLE,           // trade disabled
+    RET_TRADE_NO_MONEY,          // no enough money for order execution
+    RET_TRADE_PRICE_CHANGED,     // price changed
+    RET_TRADE_OFFQUOTES,         // no quotes
+    RET_TRADE_BROKER_BUSY,       // broker is busy
+    RET_TRADE_REQUOTE,           // requote
+    RET_TRADE_ORDER_LOCKED,      // order is proceed by dealer and cannot be changed
+    RET_TRADE_LONG_ONLY,         // allowed only BUY orders
+    RET_TRADE_TOO_MANY_REQ,      // too many requests from one client
+    //--- order status notification
+    RET_TRADE_ACCEPTED,          // trade request accepted by server and placed in request queue
+    RET_TRADE_PROCESS,           // trade request accepted by dealerd
+    RET_TRADE_USER_CANCEL,       // trade request canceled by client
+    //---                       
+    RET_TRADE_MODIFY_DENIED,     // modification denied because order too close to market
+    RET_TRADE_CONTEXT_BUSY,      // trade context busy (for client terminal only)
+    RET_TRADE_EXPIRATION_DENIED, // expiration specifieng is denied
+    RET_TRADE_TOO_MANY_ORDERS,   // too many orders
+    RET_TRADE_HEDGE_PROHIBITED,  // hedge is prohibited
+    RET_TRADE_PROHIBITED_BY_FIFO // prohibited by fifo rule
+};
+   
+const ErrorCode ServerApi::EC_OK = {0, "SUCCESS"};
+const ErrorCode ServerApi::EC_UNKNOWN_ERROR = {-1, "Unkown error"};
+const ErrorCode ServerApi::EC_BAD_PARAMETER = {-2, "Bad parameters"};
+const ErrorCode ServerApi::EC_BAD_TIME_SPAN = {-3, "Bad time span"};
+const ErrorCode ServerApi::EC_INVALID_USER_ID = {-4, "Invalid user id"};
+const ErrorCode ServerApi::EC_INVALID_SERVER_INTERFACE = {-5, "No server interface"};
+const ErrorCode ServerApi::EC_GROUP_NOT_FOUND = {-6, "User group not found"};
+const ErrorCode ServerApi::EC_GET_PRICE_ERROR = {-7, "Fail to gurrent price"};
+const ErrorCode ServerApi::EC_SYMBOL_NOT_FOUND = {-8, "Symbol not found"};
+const ErrorCode ServerApi::EC_INVALID_ORDER_TICKET = {-9, "Invalid order ticket"};
+const ErrorCode ServerApi::EC_CHANGE_OPEN_PRICE = {-10, "Open price not allowed to modify for open order"};
+const ErrorCode ServerApi::EC_CLOSE_ONLY = {-11, "Update order is not allowed [close only]"};
+const ErrorCode ServerApi::EC_WRONG_PASSWORD = {-12, "Password at lest 6 characters"};
+const ErrorCode ServerApi::EC_PENDING_ORDER_WITHOUT_OPEN_PRICE = {-13, "Pending order without open price"};
+const ErrorCode ServerApi::EC_BUY_ALLOWED_ONLY = {-14, "Only buy action is allowed"};
+
+const ErrorCode ServerApi::EC_NO_CONNECT = {RET_NO_CONNECT, "No connection"};
+const ErrorCode ServerApi::EC_ACCOUNT_DISABLED = {RET_ACCOUNT_DISABLED, "Account blocked"};
+const ErrorCode ServerApi::EC_BAD_ACCOUNT_INFO = {RET_BAD_ACCOUNT_INFO, "Bad account info"};
+const ErrorCode ServerApi::EC_TRADE_TIMEOUT = {RET_TRADE_TIMEOUT, "Trade transatcion timeou expired"};
+const ErrorCode ServerApi::EC_TRADE_BAD_PRICES = {RET_TRADE_BAD_PRICES, "Order has wrong prices"};
+const ErrorCode ServerApi::EC_TRADE_BAD_STOPS = {RET_TRADE_BAD_STOPS, "Wrong stops level"};
+const ErrorCode ServerApi::EC_TRADE_BAD_VOLUME = {RET_TRADE_BAD_VOLUME, "Wrong lot size"};
+const ErrorCode ServerApi::EC_TRADE_MARKET_CLOSED = {RET_TRADE_MARKET_CLOSED, "Market closed"};
+const ErrorCode ServerApi::EC_TRADE_DISABLE = {RET_TRADE_DISABLE, "Trade disabled"};
+const ErrorCode ServerApi::EC_TRADE_NO_MONEY = {RET_TRADE_NO_MONEY, "No enough money for order execution"};
+const ErrorCode ServerApi::EC_TRADE_PRICE_CHANGED = {RET_TRADE_PRICE_CHANGED, "Price changed"};
+const ErrorCode ServerApi::EC_TRADE_OFFQUOTES = {RET_TRADE_OFFQUOTES, "No quotes"};
+const ErrorCode ServerApi::EC_TRADE_BROKER_BUSY = {RET_TRADE_BROKER_BUSY, "Broker is busy"};
+const ErrorCode ServerApi::EC_TRADE_ORDER_LOCKED = {RET_TRADE_ORDER_LOCKED, "Order is proceed by dealer and cannot be changed"};
+const ErrorCode ServerApi::EC_TRADE_LONG_ONLY = {RET_TRADE_LONG_ONLY, "Allowed only BUY orders"};
+const ErrorCode ServerApi::EC_TRADE_TOO_MANY_REQ = {RET_TRADE_TOO_MANY_REQ, "Too many requests from one client"};
+const ErrorCode ServerApi::EC_TRADE_MODIFY_DENIED = {RET_TRADE_MODIFY_DENIED,
+                                                     "Modification denied because order too close to market"};
+const ErrorCode ServerApi::EC_TRADE_CONTEXT_BUSY = {RET_TRADE_CONTEXT_BUSY, "Trade context busy (for client terminal only)"};
+const ErrorCode ServerApi::EC_TRADE_EXPIRATION_DENIED = {RET_TRADE_EXPIRATION_DENIED, "Expiration specifieng is denied"};
+const ErrorCode ServerApi::EC_TRADE_TOO_MANY_ORDERS = {RET_TRADE_TOO_MANY_ORDERS, "Too many orders"};
+const ErrorCode ServerApi::EC_TRADE_HEDGE_PROHIBITED = {RET_TRADE_HEDGE_PROHIBITED, "Hedge is prohibited"};
+</code>
+</pre>
+    </div>
   
+    <br />
+    <hr />
+    <br />
     <h3>Request to 
     <i>Open</i> an order</h3>
     <b>Request</b>
@@ -70,7 +166,8 @@
 <code>{
     "request": "AddOrder",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
 }</code>
 </pre>
     </div>
@@ -101,7 +198,8 @@
 <code>{
     "request":"UpdateOrder",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
 }</code>
 </pre>
     </div>
@@ -130,7 +228,8 @@
 <code>{
     "request":"CloseOrder",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
 }</code>
 </pre>
     </div>
@@ -159,7 +258,8 @@
 <code>{
     "request":"Deposit",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
 }</code>
 </pre>
     </div>
@@ -187,7 +287,8 @@
 <code>{
     "request":"ChangePassword",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
 }</code>
 </pre>
     </div>
@@ -215,7 +316,8 @@
 <code>{
     "request":"ChechPassword",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
 }</code>
 </pre>
     </div>
@@ -250,7 +352,8 @@
 <code>{
     "request":"UpdateUserRecord",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
 }</code>
 </pre>
     </div>
@@ -276,7 +379,8 @@
 <code>{
     "request":"GetMargin",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
     "margin":"1000.00"
     "freemargin":"2000.0"
     "equity":"1000.00"
@@ -311,7 +415,8 @@
 <code>{
     "request":"GetOrder",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
     "order" : 122,  
     "login":5,
     "symbol":"USDJPY",
@@ -365,7 +470,8 @@
 <code>{
     "request":"GetOpenOrders",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
     "orders" : [{
         "order" : 122,
         "login":5,
@@ -453,7 +559,8 @@
 <code>{
     "request":"GetClosedOrders",
     "result": "ok",
-    "message": "success",
+    "error_code": "0",
+    "error_des": "success"
     "orders" : [{
         "order" : 122,
         "login":5,
