@@ -28,30 +28,24 @@ const ErrorCode ServerApi::EC_CHANGE_OPEN_PRICE = {-10, "Open price not allowed 
 const ErrorCode ServerApi::EC_CLOSE_ONLY = {-11, "Update order is not allowed [close only]"};
 const ErrorCode ServerApi::EC_WRONG_PASSWORD = {-12, "Password at lest 6 characters"};
 const ErrorCode ServerApi::EC_PENDING_ORDER_WITHOUT_OPEN_PRICE = {-13, "Pending order without open price"};
-const ErrorCode ServerApi::EC_BUY_ALLOWED_ONLY = {-14, "Only buy action is allowed"};
 
-const ErrorCode ServerApi::EC_NO_CONNECT = {RET_NO_CONNECT, "No connection"};
-const ErrorCode ServerApi::EC_ACCOUNT_DISABLED = {RET_ACCOUNT_DISABLED, "Account blocked"};
-const ErrorCode ServerApi::EC_BAD_ACCOUNT_INFO = {RET_BAD_ACCOUNT_INFO, "Bad account info"};
-const ErrorCode ServerApi::EC_TRADE_TIMEOUT = {RET_TRADE_TIMEOUT, "Trade transatcion timeou expired"};
-const ErrorCode ServerApi::EC_TRADE_BAD_PRICES = {RET_TRADE_BAD_PRICES, "Order has wrong prices"};
-const ErrorCode ServerApi::EC_TRADE_BAD_STOPS = {RET_TRADE_BAD_STOPS, "Wrong stops level"};
-const ErrorCode ServerApi::EC_TRADE_BAD_VOLUME = {RET_TRADE_BAD_VOLUME, "Wrong lot size"};
-const ErrorCode ServerApi::EC_TRADE_MARKET_CLOSED = {RET_TRADE_MARKET_CLOSED, "Market closed"};
-const ErrorCode ServerApi::EC_TRADE_DISABLE = {RET_TRADE_DISABLE, "Trade disabled"};
-const ErrorCode ServerApi::EC_TRADE_NO_MONEY = {RET_TRADE_NO_MONEY, "No enough money for order execution"};
-const ErrorCode ServerApi::EC_TRADE_PRICE_CHANGED = {RET_TRADE_PRICE_CHANGED, "Price changed"};
-const ErrorCode ServerApi::EC_TRADE_OFFQUOTES = {RET_TRADE_OFFQUOTES, "No quotes"};
-const ErrorCode ServerApi::EC_TRADE_BROKER_BUSY = {RET_TRADE_BROKER_BUSY, "Broker is busy"};
-const ErrorCode ServerApi::EC_TRADE_ORDER_LOCKED = {RET_TRADE_ORDER_LOCKED, "Order is proceed by dealer and cannot be changed"};
-const ErrorCode ServerApi::EC_TRADE_LONG_ONLY = {RET_TRADE_LONG_ONLY, "Allowed only BUY orders"};
-const ErrorCode ServerApi::EC_TRADE_TOO_MANY_REQ = {RET_TRADE_TOO_MANY_REQ, "Too many requests from one client"};
-const ErrorCode ServerApi::EC_TRADE_MODIFY_DENIED = {RET_TRADE_MODIFY_DENIED,
-                                                     "Modification denied because order too close to market"};
-const ErrorCode ServerApi::EC_TRADE_CONTEXT_BUSY = {RET_TRADE_CONTEXT_BUSY, "Trade context busy (for client terminal only)"};
-const ErrorCode ServerApi::EC_TRADE_EXPIRATION_DENIED = {RET_TRADE_EXPIRATION_DENIED, "Expiration specifieng is denied"};
-const ErrorCode ServerApi::EC_TRADE_TOO_MANY_ORDERS = {RET_TRADE_TOO_MANY_ORDERS, "Too many orders"};
-const ErrorCode ServerApi::EC_TRADE_HEDGE_PROHIBITED = {RET_TRADE_HEDGE_PROHIBITED, "Hedge is prohibited"};
+const ErrorCode ServerApi::EC_NO_CONNECT = {6, "No connection"};
+const ErrorCode ServerApi::EC_ACCOUNT_DISABLED = {64, "Account blocked"};
+const ErrorCode ServerApi::EC_BAD_ACCOUNT_INFO = {65, "Bad account info"};
+const ErrorCode ServerApi::EC_TRADE_TIMEOUT = {128, "Trade transatcion timeou expired"};
+const ErrorCode ServerApi::EC_TRADE_BAD_PRICES = {129, "Order has wrong prices"};
+const ErrorCode ServerApi::EC_TRADE_BAD_STOPS = {130, "Wrong stops level"};
+const ErrorCode ServerApi::EC_TRADE_BAD_VOLUME = {131, "Wrong lot size"};
+const ErrorCode ServerApi::EC_TRADE_MARKET_CLOSED = {132, "Market closed"};
+const ErrorCode ServerApi::EC_TRADE_DISABLE = {133, "Trade disabled"};
+const ErrorCode ServerApi::EC_TRADE_NO_MONEY = {134, "No enough money for order execution"};
+const ErrorCode ServerApi::EC_TRADE_PRICE_CHANGED = {135, "Price changed"};
+const ErrorCode ServerApi::EC_TRADE_OFFQUOTES = {136, "No quotes"};
+const ErrorCode ServerApi::EC_TRADE_BROKER_BUSY = {137, "Broker is busy"};
+const ErrorCode ServerApi::EC_TRADE_ORDER_LOCKED = {138, "Order is proceed by dealer and cannot be changed"};
+const ErrorCode ServerApi::EC_TRADE_LONG_ONLY = {139, "Allowed only BUY orders"};
+const ErrorCode ServerApi::EC_TRADE_TOO_MANY_REQ = {140, "Too many requests from one client"};
+const ErrorCode ServerApi::EC_TRADE_MODIFY_DENIED = {144, "Modification denied because order too close to market"};
 
 CServerInterface* ServerApi::s_interface = NULL;
 
@@ -224,7 +218,7 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     //--- check long only
     if (symbol_cfg.long_only != FALSE && (cmd == OP_SELL || cmd == OP_SELL_LIMIT || cmd == OP_SELL_STOP)) {
         LOG("OpenOrder: long only allowed");
-        *error_code = &EC_BUY_ALLOWED_ONLY;
+        *error_code = &EC_TRADE_LONG_ONLY;
         return false;  // long only
     }
 
@@ -574,7 +568,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     //--- check long only
     if (symbol_cfg.long_only != FALSE && (cmd == OP_SELL || cmd == OP_SELL_LIMIT || cmd == OP_SELL_STOP)) {
         LOG("AddOrder: long only allowed");
-        *error_code = &EC_BUY_ALLOWED_ONLY;
+        *error_code = &EC_TRADE_LONG_ONLY;
         return false;  // long only
     }
     //--- check close only

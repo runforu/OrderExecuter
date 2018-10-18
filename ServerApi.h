@@ -37,7 +37,6 @@ public:
     static const ErrorCode EC_CLOSE_ONLY;
     static const ErrorCode EC_WRONG_PASSWORD;
     static const ErrorCode EC_PENDING_ORDER_WITHOUT_OPEN_PRICE;
-    static const ErrorCode EC_BUY_ALLOWED_ONLY;
 
     static const ErrorCode EC_NO_CONNECT;
     static const ErrorCode EC_ACCOUNT_DISABLED;
@@ -56,10 +55,6 @@ public:
     static const ErrorCode EC_TRADE_LONG_ONLY;
     static const ErrorCode EC_TRADE_TOO_MANY_REQ;
     static const ErrorCode EC_TRADE_MODIFY_DENIED;
-    static const ErrorCode EC_TRADE_CONTEXT_BUSY;
-    static const ErrorCode EC_TRADE_EXPIRATION_DENIED;
-    static const ErrorCode EC_TRADE_TOO_MANY_ORDERS;
-    static const ErrorCode EC_TRADE_HEDGE_PROHIBITED;
 
 public:
     static void Initialize(CServerInterface* server_interface);
