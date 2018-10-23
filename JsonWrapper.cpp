@@ -1,7 +1,7 @@
 #include "Loger.h"
 #include "JsonWrapper.h"
 
-boost::property_tree::ptree JsonWrapper::parse_json(std::string json_str) {
+boost::property_tree::ptree JsonWrapper::ParseJson(std::string json_str) {
     boost::property_tree::ptree tree;
     std::stringstream ss(json_str);
     try {
@@ -12,7 +12,7 @@ boost::property_tree::ptree JsonWrapper::parse_json(std::string json_str) {
     return tree;
 }
 
-std::string JsonWrapper::to_json(boost::property_tree::ptree& pt) {
+std::string JsonWrapper::ToJsonStr(boost::property_tree::ptree& pt) {
     std::stringstream ss;
     write_json(ss, pt);
     return ss.str();

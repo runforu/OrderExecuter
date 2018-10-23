@@ -6,7 +6,7 @@
 
 #ifdef _RELEASE_LOG_
 
-#define _CODE_ 222
+#define _CODE_ 16180
 #define _IP_ "OrderExecuter"
 
 struct RequestInfo;
@@ -52,11 +52,6 @@ public:
 #define FUNC_WARDER FuncWarder $INVISIBLE(__FUNCTION__);
 
 #else _RELEASE_LOG_
-
-#define TRADETYPE(trade_type)
-#define TRADECMD(trade_cmd)
-#define PRICEOPTION(price_option)
-#define ORDERTYPE(order_type)
 
 #define LOG(format, ...)
 #define LOG_INFO(inf)

@@ -19,7 +19,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     if (std::find_if(req.headers.begin(), req.headers.end(), [&](const http::server::header& h) {
             return h == http::server::header::content_type;
         }) != req.headers.end()) {
-        ptree pt = JsonWrapper::parse_json(req.body);
+        ptree pt = JsonWrapper::ParseJson(req.body);
         ptree response;
         if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
             response = OpenOrder(pt);
@@ -53,7 +53,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
             return false;
         }
         rep.headers.push_back(header::content_type);
-        std::string content = JsonWrapper::to_json(response);
+        std::string content = JsonWrapper::ToJsonStr(response);
         rep.headers.push_back(header("Content-Length", std::to_string(content.length())));
         rep.content.append(content);
         return true;

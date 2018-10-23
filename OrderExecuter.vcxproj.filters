@@ -85,10 +85,55 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="OrderExecuter.def" />
+    <None Include="test\AddOrder.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\ChangePassword.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\CheckPassword.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\CloseOrder.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\Deposit.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\GetClosedOrders.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\GetMargin.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\GetOpenOrders.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\GetOrder.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\GetPendingOrders.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\GetUserRecord.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\OpenOrder.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\UpdateOrder.json">
+      <Filter>test</Filter>
+    </None>
+    <None Include="test\UpdateUserRecord.json">
+      <Filter>test</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="http_server">
       <UniqueIdentifier>{12f33921-58c3-4b2c-9351-d59ad9a91ddc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="test">
+      <UniqueIdentifier>{dea1fe68-300c-4039-8ce3-bd46471347db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

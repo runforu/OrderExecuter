@@ -222,6 +222,20 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="OrderExecuter.def" />
+    <None Include="test\AddOrder.json" />
+    <None Include="test\ChangePassword.json" />
+    <None Include="test\CheckPassword.json" />
+    <None Include="test\CloseOrder.json" />
+    <None Include="test\Deposit.json" />
+    <None Include="test\GetClosedOrders.json" />
+    <None Include="test\GetMargin.json" />
+    <None Include="test\GetOpenOrders.json" />
+    <None Include="test\GetOrder.json" />
+    <None Include="test\GetPendingOrders.json" />
+    <None Include="test\GetUserRecord.json" />
+    <None Include="test\OpenOrder.json" />
+    <None Include="test\UpdateOrder.json" />
+    <None Include="test\UpdateUserRecord.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
