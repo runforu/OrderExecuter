@@ -57,6 +57,19 @@ CServerInterface* ServerApi::Api() throw(...) {
     return s_interface;
 }
 
+#ifdef UNIT_TEST
+
+void ServerApi::UnitTest() {
+    _beginthread(TestEntry, 0, 0);
+}
+
+void ServerApi::TestEntry(void* parameter) {
+    for (int cmd = OP_BUY; cmd <= OP_SELL_STOP; cmd++) {
+        TestRoutine(cmd);
+    }
+    _endthread();
+}
+
 void ServerApi::TestRoutine(int cmd) {
     FUNC_WARDER;
 
@@ -157,16 +170,7 @@ void ServerApi::TestPrice(int cmd, double* open_price, double* close_price, doub
     LOG("open_price = %f, close_price = %f, sl = %f, tp = %f,", *open_price, *close_price, *sl, *tp);
 }
 
-void ServerApi::TestEntry(void* parameter) {
-    for (int cmd = OP_BUY; cmd <= OP_SELL_STOP; cmd++) {
-        TestRoutine(cmd);
-    }
-    _endthread();
-}
-
-void ServerApi::UnitTest() {
-    _beginthread(TestEntry, 0, 0);
-}
+#endif
 
 bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
                           double sl, double tp, const char* comment, const ErrorCode** error_code, int* order) {
@@ -842,7 +846,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
         *error_code = &EC_BAD_PARAMETER;
         return false;
     }
-
+    
     //--- get order
     if (s_interface->OrdersGet(order, &trade_record) == FALSE) {
         LOG("CloseOrder: OrdersGet failed");

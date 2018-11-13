@@ -126,7 +126,6 @@ void Loger::out(const int code, const char* ip, const TradeRecord* trade_record)
                "                        close_time =       %d\n"
                "                        gw_volume =        %d\n"
                "                        expiration =       %d\n"
-               "                        reason =           %s\n"
                "                        commission =       %f\n"
                "                        commission_agent = %f\n"
                "                        storage =          %f\n"
@@ -144,7 +143,7 @@ void Loger::out(const int code, const char* ip, const TradeRecord* trade_record)
                trade_record->order, trade_record->login, trade_record->symbol, trade_record->digits,
                TradeCmdStr(trade_record->cmd), trade_record->volume, trade_record->open_time, trade_record->state,
                trade_record->open_price, trade_record->sl, trade_record->tp, trade_record->close_time, trade_record->gw_volume,
-               trade_record->expiration, trade_record->reason, trade_record->commission, trade_record->commission_agent,
+               trade_record->expiration,  trade_record->commission, trade_record->commission_agent,
                trade_record->storage, trade_record->close_price, trade_record->profit, trade_record->taxes, trade_record->magic,
                trade_record->comment, trade_record->gw_order, trade_record->activation, trade_record->gw_open_price,
                trade_record->gw_close_price, trade_record->margin_rate, trade_record->timestamp);

@@ -62,16 +62,21 @@ public:
 
     static bool AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
                          double sl, double tp, const char* comment, const ErrorCode** error_code, int* order);
+
     static bool UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, const char* comment,
                             const ErrorCode** error_code);
+
     static bool CloseOrder(const char* ip, const int order, double close_price, const char* comment,
                            const ErrorCode** error_code);
+
     static bool Deposit(const int login, const char* ip, const double value, const char* comment, double* balance,
                         const ErrorCode** error_code);
+
     static bool OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
                           double sl, double tp, const char* comment, const ErrorCode** error_code, int* order);
 
     static bool GetUserRecord(int user, UserRecord* user_record, const ErrorCode** error_code);
+
     static bool UpdateUserRecord(int user, const char* group, const char* name, const char* phone, const char* email,
                                  int enable, int leverage, const ErrorCode** error_code);
 
@@ -93,6 +98,7 @@ public:
 
 private:
     static bool GetUserInfo(const int login, UserInfo* user_info, const ErrorCode** error_code);
+
     static bool GetCurrentPrice(const char* symbol, const char* group, double* prices, const ErrorCode** error_code);
 
     ServerApi(){};
