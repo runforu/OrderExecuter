@@ -52,6 +52,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         } else {
             return false;
         }
+        rep.status = reply::ok;
         rep.headers.push_back(header::content_type);
         std::string content = JsonWrapper::ToJsonStr(response);
         rep.headers.push_back(header("Content-Length", std::to_string(content.length())));
