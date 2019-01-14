@@ -1,7 +1,7 @@
 {
     "request":"Deposit",
     "login": 5,
-	"ip": "0.0.0.0",
-	"value": -100000,
-	"comment": "test Deposit"
+    "ip": "0.0.0.0",
+    "value": 10,
+    "comment": "test Deposit"
 }

@@ -9,6 +9,7 @@
 #include "Processor.h"
 #include "RequestHandlerProviderImp.h"
 #include "http_server/server.h"
+#include "ServerApi.h"
 #include "../include/MT4ServerAPI.h"
 
 Processor& Processor::Instance() {

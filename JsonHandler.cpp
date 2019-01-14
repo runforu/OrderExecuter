@@ -2,11 +2,11 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
+#include "JsonHandler.h"
+#include "JsonWrapper.h"
 #include "Loger.h"
 #include "ServerApi.h"
 #include "common.h"
-#include "JsonHandler.h"
-#include "JsonWrapper.h"
 
 using namespace boost::property_tree;
 using namespace http::server;
@@ -17,43 +17,58 @@ int JsonHandler::get_priority() const {
 
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
     if (std::find_if(req.headers.begin(), req.headers.end(), [&](const http::server::header& h) {
-            return h == http::server::header::content_type;
+            return h == http::server::header::json_content_type;
         }) != req.headers.end()) {
         ptree pt = JsonWrapper::ParseJson(req.body);
+
         ptree response;
-        if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
-            response = OpenOrder(pt);
-        } else if (pt.get<std::string>("request", "").compare("AddOrder") == 0) {
-            response = AddOrder(pt);
-        } else if (pt.get<std::string>("request", "").compare("UpdateOrder") == 0) {
-            response = UpdateOrder(pt);
-        } else if (pt.get<std::string>("request", "").compare("CloseOrder") == 0) {
-            response = CloseOrder(pt);
-        } else if (pt.get<std::string>("request", "").compare("Deposit") == 0) {
-            response = Deposit(pt);
-        } else if (pt.get<std::string>("request", "").compare("GetUserRecord") == 0) {
-            response = GetUserRecord(pt);
-        } else if (pt.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
-            response = UpdateUserRecord(pt);
-        } else if (pt.get<std::string>("request", "").compare("ChangePassword") == 0) {
-            response = ChangePassword(pt);
-        } else if (pt.get<std::string>("request", "").compare("CheckPassword") == 0) {
-            response = CheckPassword(pt);
-        } else if (pt.get<std::string>("request", "").compare("GetMargin") == 0) {
-            response = GetMargin(pt);
-        } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
-            response = GetOrder(pt);
-        } else if (pt.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
-            response = GetOpenOrders(pt);
-        } else if (pt.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
-            response = GetPendingOrders(pt);
-        } else if (pt.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
-            response = GetClosedOrders(pt);
+        if (!pt.empty()) {
+            rep.status = reply::ok;
+            if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
+                response = OpenOrder(pt);
+            } else if (pt.get<std::string>("request", "").compare("AddOrder") == 0) {
+                response = AddOrder(pt);
+            } else if (pt.get<std::string>("request", "").compare("UpdateOrder") == 0) {
+                response = UpdateOrder(pt);
+            } else if (pt.get<std::string>("request", "").compare("CloseOrder") == 0) {
+                response = CloseOrder(pt);
+            } else if (pt.get<std::string>("request", "").compare("Deposit") == 0) {
+                response = Deposit(pt);
+            } else if (pt.get<std::string>("request", "").compare("GetUserRecord") == 0) {
+                response = GetUserRecord(pt);
+            } else if (pt.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
+                response = UpdateUserRecord(pt);
+            } else if (pt.get<std::string>("request", "").compare("ChangePassword") == 0) {
+                response = ChangePassword(pt);
+            } else if (pt.get<std::string>("request", "").compare("CheckPassword") == 0) {
+                response = CheckPassword(pt);
+            } else if (pt.get<std::string>("request", "").compare("GetMargin") == 0) {
+                response = GetMargin(pt);
+            } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
+                response = GetOrder(pt);
+            } else if (pt.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
+                response = GetOpenOrders(pt);
+            } else if (pt.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
+                response = GetPendingOrders(pt);
+            } else if (pt.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
+                response = GetClosedOrders(pt);
+            } else if (pt.get<std::string>("request", "").compare("IsOpening") == 0) {
+                response = IsOpening(pt);
+            } else if (pt.get<std::string>("request", "").compare("TradeTime") == 0) {
+                response = TradeTime(pt);
+            } else if (pt.get<std::string>("request", "").compare("GetSymbolList") == 0) {
+                response = GetSymbolList(pt);
+            } else {
+                rep.status = reply::bad_request;
+                response.put("json_error", "Not supported json request");
+            }
         } else {
-            return false;
+            // Handle json parse error
+            rep.status = reply::bad_request;
+            response.put("json_error", "Invalid json format");
         }
-        rep.status = reply::ok;
-        rep.headers.push_back(header::content_type);
+
+        rep.headers.push_back(header::json_content_type);
         std::string content = JsonWrapper::ToJsonStr(response);
         rep.headers.push_back(header("Content-Length", std::to_string(content.length())));
         rep.content.append(content);
@@ -309,8 +324,8 @@ ptree JsonHandler::UpdateUserRecord(ptree pt) {
     int leverage = pt.get<int>("leverage", -1);
     const ErrorCode* error_code;
 
-    bool result =
-        ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage, &error_code);
+    bool result = ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage,
+                                              &error_code);
 
     ptree response;
     response.put("request", request);
@@ -389,6 +404,11 @@ boost::property_tree::ptree JsonHandler::GetMargin(boost::property_tree::ptree p
         response.put("freemargin", freemargin);
         response.put("equity", equity);
         response.put("group", user_info.group);
+        response.put("margin_call", user_info.grp.margin_call);
+        response.put("margin_mode", user_info.grp.margin_mode);
+        response.put("margin_stopout", user_info.grp.margin_stopout);
+        response.put("margin_type", user_info.grp.margin_type);
+        response.put("margin_stopout", user_info.grp.margin_stopout);
         response.put("ip", user_info.ip);
         response.put("leverage", user_info.leverage);
         response.put("balance", user_info.balance);
@@ -461,6 +481,126 @@ boost::property_tree::ptree JsonHandler::GetPendingOrders(boost::property_tree::
 boost::property_tree::ptree JsonHandler::GetClosedOrders(boost::property_tree::ptree pt) {
     return _GetClosedOrders(pt,
                             [](TradeRecord& trade) -> bool { return false && trade.cmd < OP_BUY || trade.cmd > OP_SELL_STOP; });
+}
+
+inline boost::property_tree::ptree JsonHandler::IsOpening(boost::property_tree::ptree pt) {
+    LOG(pt.get<std::string>("request", ""));
+
+    std::string request = pt.get<std::string>("request", "");
+    const ErrorCode* error_code;
+    std::string symbol = pt.get<std::string>("symbol", "");
+    int time = pt.get<int>("time", 0);
+    bool is_open = false;
+
+    bool result = ServerApi::IsOpening(symbol.c_str(), time, &is_open, &error_code);
+
+    ptree response;
+    response.put("request", request);
+    response.put("result", result ? "OK" : "ERROR");
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
+    response.put("is_open", is_open);
+    return response;
+}
+
+inline boost::property_tree::ptree JsonHandler::TradeTime(boost::property_tree::ptree pt) {
+    LOG(pt.get<std::string>("request", ""));
+
+    std::string request = pt.get<std::string>("request", "");
+    const ErrorCode* error_code;
+    time_t time = 0;
+
+    bool result = ServerApi::CurrentTradeTime(&time, &error_code);
+
+    ptree response;
+    response.put("request", request);
+    response.put("result", result ? "OK" : "ERROR");
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
+    response.put("trade_time", time);
+
+    return response;
+}
+
+inline boost::property_tree::ptree JsonHandler::GetSymbolList(boost::property_tree::ptree pt) {
+    LOG(pt.get<std::string>("request", ""));
+
+    std::string request = pt.get<std::string>("request", "");
+    const ErrorCode* error_code;
+    const ConSymbol* con_symbols = NULL;
+    int total = 0;
+
+    bool result = ServerApi::GetSymbolList(&total, &con_symbols, &error_code);
+
+    ptree response;
+    response.put("request", request);
+    response.put("result", result ? "OK" : "ERROR");
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
+    response.put("count", total);
+    if (result && con_symbols != NULL) {
+        ptree symbols;
+        for (int i = 0; i < total; i++) {
+            ptree symbol;
+            symbol.put("symbol", con_symbols[i].symbol);
+            symbol.put("description", con_symbols[i].description);
+            symbol.put("source", con_symbols[i].source);
+            symbol.put("currency", con_symbols[i].currency);
+            symbol.put("type", con_symbols[i].type);
+            symbol.put("digits", con_symbols[i].digits);
+            symbol.put("trade", con_symbols[i].trade);
+            symbol.put("background_color", con_symbols[i].background_color);
+            symbol.put("count", con_symbols[i].count);
+            symbol.put("count_original", con_symbols[i].count_original);
+            symbol.put("realtime", con_symbols[i].realtime);
+            symbol.put("starting", con_symbols[i].starting);
+            symbol.put("expiration", con_symbols[i].expiration);
+            symbol.put("sessions", con_symbols[i].sessions);
+            symbol.put("profit_mode", con_symbols[i].profit_mode);
+            symbol.put("filter", con_symbols[i].filter);
+            symbol.put("filter_counter", con_symbols[i].filter_counter);
+            symbol.put("filter_limit", con_symbols[i].filter_limit);
+            symbol.put("filter_smoothing", con_symbols[i].filter_smoothing);
+            symbol.put("logging", con_symbols[i].logging);
+            symbol.put("spread", con_symbols[i].spread);
+            symbol.put("spread_balance", con_symbols[i].spread_balance);
+            symbol.put("exemode", con_symbols[i].exemode);
+            symbol.put("swap_enable", con_symbols[i].swap_enable);
+            symbol.put("swap_type", con_symbols[i].swap_type);
+            symbol.put("swap_long", con_symbols[i].swap_long);
+            symbol.put("swap_short", con_symbols[i].swap_short);
+            symbol.put("swap_rollover3days", con_symbols[i].swap_rollover3days);
+            symbol.put("contract_size", con_symbols[i].contract_size);
+            symbol.put("tick_value", con_symbols[i].tick_value);
+            symbol.put("tick_size", con_symbols[i].tick_size);
+            symbol.put("stops_level", con_symbols[i].stops_level);
+            symbol.put("gtc_pendings", con_symbols[i].gtc_pendings);
+            symbol.put("margin_mode", con_symbols[i].margin_mode);
+            symbol.put("margin_initial", con_symbols[i].margin_initial);
+            symbol.put("margin_maintenance", con_symbols[i].margin_maintenance);
+            symbol.put("margin_hedged", con_symbols[i].margin_hedged);
+            symbol.put("margin_divider", con_symbols[i].margin_divider);
+            symbol.put("point", con_symbols[i].point);
+            symbol.put("multiply", con_symbols[i].multiply);
+            symbol.put("bid_tickvalue", con_symbols[i].bid_tickvalue);
+            symbol.put("ask_tickvalue", con_symbols[i].ask_tickvalue);
+            symbol.put("long_only", con_symbols[i].long_only);
+            symbol.put("instant_max_volume", con_symbols[i].instant_max_volume);
+            symbol.put("margin_currency", con_symbols[i].margin_currency);
+            symbol.put("freeze_level", con_symbols[i].freeze_level);
+            symbol.put("margin_hedged_strong", con_symbols[i].margin_hedged_strong);
+            symbol.put("value_date", con_symbols[i].value_date);
+            symbol.put("quotes_delay", con_symbols[i].quotes_delay);
+            symbol.put("swap_openprice", con_symbols[i].swap_openprice);
+            symbol.put("swap_variation_margin", con_symbols[i].swap_variation_margin);
+
+            symbols.push_back(std::make_pair("", symbol));
+        }
+        response.add_child("orders", symbols);
+    }
+
+    // no need free con_symbols
+    return response;
 }
 
 boost::property_tree::ptree JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter_out) {

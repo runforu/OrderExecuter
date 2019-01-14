@@ -1,7 +1,7 @@
 #include "Config.h"
-#include "ServerApi.h"
 #include "Loger.h"
 #include "Processor.h"
+#include "ServerApi.h"
 
 PluginInfo ExtPluginInfo = {"Order Executer", 1, "DH Copyrigh.", {0}};
 
@@ -62,4 +62,14 @@ int APIENTRY MtSrvStartup(CServerInterface* server) {
 
 void APIENTRY MtSrvCleanup() {
     Processor::Instance().Shutdown();
+}
+
+int APIENTRY MtSrvSymbolsAdd(const ConSymbol* con_symbol) {
+    ServerApi::SymbolChanged();
+    return TRUE;
+}
+
+int APIENTRY MtSrvSymbolsDelete(const ConSymbol* con_symbol) {
+    ServerApi::SymbolChanged();
+    return TRUE;
 }

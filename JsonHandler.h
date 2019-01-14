@@ -28,6 +28,9 @@ private:
     inline boost::property_tree::ptree GetOpenOrders(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree GetPendingOrders(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree GetClosedOrders(boost::property_tree::ptree pt);
+    inline boost::property_tree::ptree IsOpening(boost::property_tree::ptree pt);
+    inline boost::property_tree::ptree TradeTime(boost::property_tree::ptree pt);
+    inline boost::property_tree::ptree GetSymbolList(boost::property_tree::ptree pt);
 
 private:
     boost::property_tree::ptree _GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter);

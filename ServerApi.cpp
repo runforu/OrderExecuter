@@ -6,14 +6,6 @@
 #include "common.h"
 #include "../include/MT4ServerAPI.h"
 
-#define MESSAGE_COPY(message, src)                       \
-    {                                                    \
-        if (message != NULL && src != NULL) {            \
-            strncpy(message, src, MESSAGE_MAX_SIZE - 1); \
-            message[MESSAGE_MAX_SIZE - 1] = 0;           \
-        }                                                \
-    }
-
 const ErrorCode ServerApi::EC_OK = {0, "SUCCESS"};
 const ErrorCode ServerApi::EC_UNKNOWN_ERROR = {-1, "Unkown error"};
 const ErrorCode ServerApi::EC_BAD_PARAMETER = {-2, "Bad parameters"};
@@ -48,12 +40,14 @@ const ErrorCode ServerApi::EC_TRADE_TOO_MANY_REQ = {140, "Too many requests from
 const ErrorCode ServerApi::EC_TRADE_MODIFY_DENIED = {144, "Modification denied because order too close to market"};
 
 CServerInterface* ServerApi::s_interface = NULL;
+ConSymbol ServerApi::s_symbols[MAX_SYMBOL_COUNT] = {0};
+int ServerApi::s_symbol_count = 0;
 
 void ServerApi::Initialize(CServerInterface* server_interface) {
     s_interface = server_interface;
 }
 
-CServerInterface* ServerApi::Api() throw(...) {
+CServerInterface* ServerApi::Api() {
     return s_interface;
 }
 
@@ -521,6 +515,65 @@ bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, Tr
     return true;
 }
 
+bool ServerApi::IsOpening(const char* symbol, time_t time, bool* result, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        *error_code = &EC_INVALID_SERVER_INTERFACE;
+        return false;
+    }
+
+    if (time == 0) {
+        time = s_interface->TradeTime();
+    }
+
+    ConSymbol con_symbol = {0};
+    if (s_interface->SymbolsGet(symbol, &con_symbol) == FALSE) {
+        *result = false;
+        *error_code = &EC_SYMBOL_NOT_FOUND;
+        return false;
+    }
+
+    *result = s_interface->TradesCheckSessions(&con_symbol, time) == TRUE;
+    *error_code = &EC_OK;
+    return true;
+}
+
+bool ServerApi::CurrentTradeTime(time_t* time, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
+    *time = s_interface->TradeTime();
+    *error_code = &EC_OK;
+    return true;
+}
+
+bool ServerApi::GetSymbolList(int* total, const ConSymbol** const symbols, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
+    if (s_symbol_count == 0) {
+        UpdateSymbolList();
+    }
+
+    *total = s_symbol_count;
+    *symbols = s_symbols;
+    *error_code = &EC_OK;
+    return true;
+}
+
+void ServerApi::SymbolChanged() {
+    s_symbol_count = 0;
+}
+
+bool ServerApi::UpdateSymbolList() {
+    FUNC_WARDER;
+
+    s_symbol_count = 0;
+    while (s_interface->SymbolsNext(s_symbol_count, &s_symbols[s_symbol_count]) != FALSE) {
+        s_symbol_count++;
+    }
+    return true;
+}
+
 bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
                          double sl, double tp, const char* comment, const ErrorCode** error_code, int* order) {
     FUNC_WARDER;
@@ -846,7 +899,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
         *error_code = &EC_BAD_PARAMETER;
         return false;
     }
-    
+
     //--- get order
     if (s_interface->OrdersGet(order, &trade_record) == FALSE) {
         LOG("CloseOrder: OrdersGet failed");
@@ -994,12 +1047,10 @@ bool ServerApi::GetUserInfo(const int login, UserInfo* user_info, const ErrorCod
     COPY_STR(user_info->group, user_record.group);
     COPY_STR(user_info->name, user_record.name);
 
-    ConGroup grpcfg = {0};
-    if (s_interface->GroupsGet(user_info->group, &grpcfg) == FALSE) {
+    if (s_interface->GroupsGet(user_info->group, &user_info->grp) == FALSE) {
         *error_code = &EC_GROUP_NOT_FOUND;
         return false;
     }
-    user_info->grp = grpcfg;
 
     *error_code = &EC_OK;
     return true;

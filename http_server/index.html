@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta name="generator"
-    content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39" />
     <title>Help</title>
+    <meta charset="utf-8"> 
     <style type="text/css">
       i {color:#FF0000}
     </style>
@@ -77,9 +76,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request": "OpenOrder",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -112,9 +111,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request": "AddOrder",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -144,9 +143,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"UpdateOrder",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -174,9 +173,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"CloseOrder",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -194,7 +193,7 @@
     "request":"Deposit",
     "login": 5,
     "ip": "0.0.0.0",
-    "balance": 1212,
+    "value": 1212,
     "comment": "test Deposit"
 }</code>
 </pre>
@@ -204,9 +203,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"Deposit",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -233,9 +232,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"ChangePassword",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -262,9 +261,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"CheckPassword",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -288,7 +287,7 @@
     "name":"test",
     "phone":"12323232323",
     "email":"abc@bcd.com",
-    "enable":true,
+    "enable":"true",
     "leverage": 20
 }</code>
 </pre>
@@ -298,9 +297,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"UpdateUserRecord",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS"
 }</code>
 </pre>
     </div>
@@ -324,18 +323,22 @@
     <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
-    "request":"GetMargin",
-    "result": "ok",
+    "request": "GetMargin",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
-    "margin":"1000.00"
-    "freemargin":"2000.0"
-    "equity":"1000.00"
-    "group":"group"
-    "ip":"0.0.0.0"
-    "leverage":"100"
-    "balance":"1000.00"
-    "credit":"2000.00"
+    "error_des": "SUCCESS",
+    "margin": "0",
+    "freemargin": "100000000",
+    "equity": "100000000",
+    "group": "lmoa-main",
+    "margin_call": "97",
+    "margin_mode": "1",
+    "margin_stopout": "50",
+    "margin_type": "0",
+    "ip": "",
+    "leverage": "100",
+    "balance": "100000000",
+    "credit": "0"
 }</code>
 </pre>
     </div>
@@ -361,9 +364,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetOrder",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS",
     "order" : 122,  
     "login":5,
     "symbol":"USDJPY",
@@ -416,9 +419,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetOpenOrders",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS",
     "orders" : [{
         "order" : 122,
         "login":5,
@@ -505,9 +508,9 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetClosedOrders",
-    "result": "ok",
+    "result": "OK",
     "error_code": "0",
-    "error_des": "success"
+    "error_des": "SUCCESS",
     "orders" : [{
         "order" : 122,
         "login":5,
@@ -594,51 +597,245 @@
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetUserRecord"
-    "result":0,
-    "message":"success",
-        "login": 5,
-        "group": "test",
-        "password": "test",
-        "enable": 5,
-        "enable_change_password": 5,
-        "enable_read_only": 5,
-        "enable_otp": 5,
-        "password_investor": "test",
-        "password_phone": "test",
-        "name": "test",
-        "country": "test",
-        "city": "test",
-        "state": "test",
-        "zipcode": "test",
-        "address": "test",
-        "lead_source": "test",
-        "phone": "test",
-        "email": "test",
-        "comment": "test",
-        "id": "test",
-        "status": "test",
-        "regdate": 111111111,
-        "lastdate": 111111111,
-        "leverage": 5,
-        "agent_account": 5,
-        "timestamp": 111111111,
-        "last_ip": 5,
-        "balance": 100.22,
-        "prevmonthbalance": 100.22,
-        "prevbalance": 100.22,
-        "credit": 100.22,
-        "interestrate": 100.22,
-        "taxes": 100.22,
-        "prevmonthequity": 100.22,
-        "prevequity": 100.22,
-        "otp_secret": "test",
-        "secure_reserved": "test",
-        "send_reports": 5,
-        "mqid": 5,
-        "user_color": 121212
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS",
+    "login": 5,
+    "group": "test",
+    "password": "test",
+    "enable": 5,
+    "enable_change_password": 5,
+    "enable_read_only": 5,
+    "enable_otp": 5,
+    "password_investor": "test",
+    "password_phone": "test",
+    "name": "test",
+    "country": "test",
+    "city": "test",
+    "state": "test",
+    "zipcode": "test",
+    "address": "test",
+    "lead_source": "test",
+    "phone": "test",
+    "email": "test",
+    "comment": "test",
+    "id": "test",
+    "status": "test",
+    "regdate": 111111111,
+    "lastdate": 111111111,
+    "leverage": 5,
+    "agent_account": 5,
+    "timestamp": 111111111,
+    "last_ip": 5,
+    "balance": 100.22,
+    "prevmonthbalance": 100.22,
+    "prevbalance": 100.22,
+    "credit": 100.22,
+    "interestrate": 100.22,
+    "taxes": 100.22,
+    "prevmonthequity": 100.22,
+    "prevequity": 100.22,
+    "otp_secret": "test",
+    "secure_reserved": "test",
+    "send_reports": 5,
+    "mqid": 5,
+    "user_color": 121212
 }</code>
 </pre>
     </div>
+    
+        
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> trade time</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "TradeTime",
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "TradeTime",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS",
+    "trade_time": "1542757323"
+}</code>
+</pre>
+    </div>
+    
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Is</i> market opening</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "IsOpening",
+    "symbol": "USDJPY",
+    "time": 0
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "IsOpening",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS",
+    "is_open": "true"
+}</code>
+</pre>
+    </div>
+    
+    
+        <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> Symbol list</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "GetSymbolList"
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "GetSymbolList",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS",
+    "count": "31",
+    "orders": [
+        {
+            "symbol": "EURUSD",
+            "description": "Euro vs US Dollar（欧元\/美元）",
+            "source": "",
+            "currency": "EUR",
+            "type": "0",
+            "digits": "5",
+            "trade": "2",
+            "background_color": "15794160",
+            "count": "9",
+            "count_original": "0",
+            "realtime": "1",
+            "starting": "0",
+            "expiration": "0",
+            "sessions": "6F470F94",
+            "profit_mode": "0",
+            "filter": "100",
+            "filter_counter": "2",
+            "filter_limit": "0.01",
+            "filter_smoothing": "0",
+            "logging": "1",
+            "spread": "0",
+            "spread_balance": "0",
+            "exemode": "2",
+            "swap_enable": "1",
+            "swap_type": "0",
+            "swap_long": "0",
+            "swap_short": "0",
+            "swap_rollover3days": "3",
+            "contract_size": "100000",
+            "tick_value": "0",
+            "tick_size": "0",
+            "stops_level": "40",
+            "gtc_pendings": "1",
+            "margin_mode": "0",
+            "margin_initial": "100000",
+            "margin_maintenance": "0",
+            "margin_hedged": "50000",
+            "margin_divider": "1",
+            "point": "1.0000000000000001e-05",
+            "multiply": "100000",
+            "bid_tickvalue": "0",
+            "ask_tickvalue": "0",
+            "long_only": "0",
+            "instant_max_volume": "0",
+            "margin_currency": "EUR",
+            "freeze_level": "0",
+            "margin_hedged_strong": "0",
+            "value_date": "0",
+            "quotes_delay": "0",
+            "swap_openprice": "0",
+            "swap_variation_margin": "0"
+        },,
+        {
+            "symbol": "CHINA300",
+            "description": "CSI 300 Index（沪深300）",
+            "source": "",
+            "currency": "USD",
+            "type": "10",
+            "digits": "2",
+            "trade": "0",
+            "background_color": "15794160",
+            "count": "4",
+            "count_original": "30",
+            "realtime": "1",
+            "starting": "0",
+            "expiration": "0",
+            "sessions": "6F47F274",
+            "profit_mode": "1",
+            "filter": "0",
+            "filter_counter": "2",
+            "filter_limit": "0",
+            "filter_smoothing": "0",
+            "logging": "0",
+            "spread": "0",
+            "spread_balance": "0",
+            "exemode": "2",
+            "swap_enable": "1",
+            "swap_type": "2",
+            "swap_long": "0",
+            "swap_short": "0",
+            "swap_rollover3days": "3",
+            "contract_size": "1000",
+            "tick_value": "0",
+            "tick_size": "0",
+            "stops_level": "40",
+            "gtc_pendings": "1",
+            "margin_mode": "4",
+            "margin_initial": "1000",
+            "margin_maintenance": "0",
+            "margin_hedged": "500",
+            "margin_divider": "1",
+            "point": "0.01",
+            "multiply": "100",
+            "bid_tickvalue": "0",
+            "ask_tickvalue": "0",
+            "long_only": "0",
+            "instant_max_volume": "0",
+            "margin_currency": "USD",
+            "freeze_level": "0",
+            "margin_hedged_strong": "0",
+            "value_date": "0",
+            "quotes_delay": "0",
+            "swap_openprice": "0",
+            "swap_variation_margin": "0"
+        }
+    ]
+}
+</code>
+</pre>
+    </div>
+    
     <br />
     <br />
     <script src="./prism.js"></script>

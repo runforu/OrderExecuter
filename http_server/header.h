@@ -27,7 +27,7 @@ public:
     }
 
 public:
-    static const header content_type;
+    static const header json_content_type;
 
     std::string name;
     std::string value;

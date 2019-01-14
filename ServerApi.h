@@ -6,7 +6,8 @@
 
 #define UNIT_TEST
 
-#define MESSAGE_MAX_SIZE 32
+#define MAX_SYMBOL_COUNT 256
+
 #define PRICE_PRECISION 1E-8
 
 struct UserInfo;
@@ -14,6 +15,7 @@ struct UserRecord;
 struct TradeRecord;
 struct CServerInterface;
 struct ErrorCode;
+struct ConSymbol;
 
 struct ErrorCode {
     int m_code;
@@ -96,10 +98,20 @@ public:
     static bool GetClosedOrders(int user, time_t from, time_t to, int* total, TradeRecord** orders,
                                 const ErrorCode** error_code);
 
+    static bool IsOpening(const char* symbol, time_t time, bool* result, const ErrorCode** error_code);
+
+    static bool CurrentTradeTime(time_t* time, const ErrorCode** error_code);
+
+    static bool GetSymbolList(int* total, const ConSymbol** const symbols, const ErrorCode** error_code);
+
+    static void SymbolChanged();
+
 private:
     static bool GetUserInfo(const int login, UserInfo* user_info, const ErrorCode** error_code);
 
     static bool GetCurrentPrice(const char* symbol, const char* group, double* prices, const ErrorCode** error_code);
+
+    static bool UpdateSymbolList();
 
     ServerApi(){};
     ~ServerApi(){};
@@ -108,6 +120,8 @@ private:
 
 private:
     static CServerInterface* s_interface;
+    static ConSymbol s_symbols[MAX_SYMBOL_COUNT];
+    static int s_symbol_count;
 
 #ifdef UNIT_TEST
 public:

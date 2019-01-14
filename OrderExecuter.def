@@ -4,4 +4,6 @@ EXPORTS
     MtSrvAbout
     MtSrvStartup
     MtSrvCleanup
+    MtSrvSymbolsAdd
+    MtSrvSymbolsDelete
 
