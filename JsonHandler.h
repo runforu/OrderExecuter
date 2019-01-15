@@ -25,6 +25,7 @@ private:
     boost::property_tree::ptree CheckPassword(boost::property_tree::ptree pt);
     boost::property_tree::ptree GetMargin(boost::property_tree::ptree pt);
     boost::property_tree::ptree GetOrder(boost::property_tree::ptree pt);
+    boost::property_tree::ptree JsonHandler::AddUser(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree GetOpenOrders(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree GetPendingOrders(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree GetClosedOrders(boost::property_tree::ptree pt);

@@ -92,6 +92,7 @@
       </AdditionalIncludeDirectories>
       <PrecompiledHeaderFile />
       <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
+      <AssemblerOutput>NoListing</AssemblerOutput>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>

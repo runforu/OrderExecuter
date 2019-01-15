@@ -10,7 +10,7 @@ const ErrorCode ServerApi::EC_OK = {0, "SUCCESS"};
 const ErrorCode ServerApi::EC_UNKNOWN_ERROR = {-1, "Unkown error"};
 const ErrorCode ServerApi::EC_BAD_PARAMETER = {-2, "Bad parameters"};
 const ErrorCode ServerApi::EC_BAD_TIME_SPAN = {-3, "Bad time span"};
-const ErrorCode ServerApi::EC_INVALID_USER_ID = {-4, "Invalid user id"};
+const ErrorCode ServerApi::EC_INVALID_USER_ID = {-4, "Invalid user ID"};
 const ErrorCode ServerApi::EC_INVALID_SERVER_INTERFACE = {-5, "No server interface"};
 const ErrorCode ServerApi::EC_GROUP_NOT_FOUND = {-6, "User group not found"};
 const ErrorCode ServerApi::EC_GET_PRICE_ERROR = {-7, "Fail to gurrent price"};
@@ -20,6 +20,7 @@ const ErrorCode ServerApi::EC_CHANGE_OPEN_PRICE = {-10, "Open price not allowed 
 const ErrorCode ServerApi::EC_CLOSE_ONLY = {-11, "Update order is not allowed [close only]"};
 const ErrorCode ServerApi::EC_WRONG_PASSWORD = {-12, "Password at lest 6 characters"};
 const ErrorCode ServerApi::EC_PENDING_ORDER_WITHOUT_OPEN_PRICE = {-13, "Pending order without open price"};
+const ErrorCode ServerApi::EC_USER_ID_EXISTING = {-14, "User ID already used"};
 
 const ErrorCode ServerApi::EC_NO_CONNECT = {6, "No connection"};
 const ErrorCode ServerApi::EC_ACCOUNT_DISABLED = {64, "Account blocked"};
@@ -85,15 +86,15 @@ void ServerApi::TestRoutine(int cmd) {
 
     Sleep(time_ms);
     TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    OpenOrder(login, ip, symbol, cmd, volume, open_price, 0, 0, NULL, error_code, &order);
+    OpenOrder(login, ip, symbol, cmd, volume, open_price, 0, 0, -1, NULL, error_code, &order);
 
     Sleep(time_ms);
     TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    UpdateOrder(ip, order, 0, sl, tp, NULL, error_code);
+    UpdateOrder(ip, order, 0, sl, tp, -1, NULL, error_code);
 
     Sleep(time_ms);
     TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    UpdateOrder(ip, order, open_price, sl, tp, NULL, error_code);
+    UpdateOrder(ip, order, open_price, sl, tp, -1, NULL, error_code);
 
     Sleep(time_ms);
     TestPrice(cmd, &open_price, &close_price, &sl, &tp);
@@ -101,7 +102,7 @@ void ServerApi::TestRoutine(int cmd) {
 
     Sleep(time_ms);
     TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    AddOrder(login, ip, symbol, cmd, volume, open_price, 0, 0, NULL, error_code, &order);
+    AddOrder(login, ip, symbol, cmd, volume, open_price, 0, 0, -1, NULL, error_code, &order);
 
     Sleep(time_ms);
     TestPrice(cmd, &open_price, &close_price, &sl, &tp);
@@ -167,7 +168,8 @@ void ServerApi::TestPrice(int cmd, double* open_price, double* close_price, doub
 #endif
 
 bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                          double sl, double tp, const char* comment, const ErrorCode** error_code, int* order) {
+                          double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
+                          int* order) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -252,6 +254,10 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
         trade_trans_info.tp = tp;
     }
 
+    if (expiration != -1 && cmd >= OP_BUY_LIMIT && cmd <= OP_SELL_STOP) {
+        trade_trans_info.expiration = expiration;
+    }
+
     double prices[2] = {0};
     GetCurrentPrice(symbol, user_info.group, prices, error_code);
     if (open_price <= PRICE_PRECISION) {
@@ -307,6 +313,8 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
 }
 
 bool ServerApi::GetUserRecord(int user, UserRecord* user_record, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -328,6 +336,8 @@ bool ServerApi::GetUserRecord(int user, UserRecord* user_record, const ErrorCode
 
 bool ServerApi::UpdateUserRecord(int user, const char* group, const char* name, const char* phone, const char* email,
                                  int enable, int leverage, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -348,13 +358,13 @@ bool ServerApi::UpdateUserRecord(int user, const char* group, const char* name, 
     if (group != NULL && strnlen_s(group, sizeof(user_record.group)) != 0) {
         COPY_STR(user_record.group, group);
     }
-    if (group != NULL && strnlen_s(name, sizeof(user_record.name)) != 0) {
+    if (name != NULL && strnlen_s(name, sizeof(user_record.name)) != 0) {
         COPY_STR(user_record.name, name);
     }
-    if (group != NULL && strnlen_s(phone, sizeof(user_record.phone)) != 0) {
+    if (phone != NULL && strnlen_s(phone, sizeof(user_record.phone)) != 0) {
         COPY_STR(user_record.phone, phone);
     }
-    if (group != NULL && strnlen_s(email, sizeof(user_record.email)) != 0) {
+    if (email != NULL && strnlen_s(email, sizeof(user_record.email)) != 0) {
         COPY_STR(user_record.email, email);
     }
     if (enable != -1) {
@@ -373,6 +383,8 @@ bool ServerApi::UpdateUserRecord(int user, const char* group, const char* name, 
 }
 
 bool ServerApi::ChangePassword(int user, const char* password, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -398,6 +410,8 @@ bool ServerApi::ChangePassword(int user, const char* password, const ErrorCode**
 }
 
 bool ServerApi::CheckPassword(int user, const char* password, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -419,6 +433,8 @@ bool ServerApi::CheckPassword(int user, const char* password, const ErrorCode** 
 
 bool ServerApi::GetMargin(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
                           const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -439,6 +455,8 @@ bool ServerApi::GetMargin(int user, UserInfo* user_info, double* margin, double*
 }
 
 bool ServerApi::GetOrder(int order, TradeRecord* trade_record, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -459,6 +477,8 @@ bool ServerApi::GetOrder(int order, TradeRecord* trade_record, const ErrorCode**
 }
 
 bool ServerApi::GetOpenOrders(int user, int* total, TradeRecord** orders, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -485,6 +505,8 @@ bool ServerApi::GetOpenOrders(int user, int* total, TradeRecord** orders, const 
 
 bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, TradeRecord** orders,
                                 const ErrorCode** error_code) {
+    FUNC_WARDER;
+
     if (s_interface == NULL) {
         *error_code = &EC_INVALID_SERVER_INTERFACE;
         return false;
@@ -494,16 +516,19 @@ bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, Tr
         return false;
     }
     if (from == -1) {
-        from = s_interface->TradeTime() - 7 * 24 * 60 * 60;
+        from = 0;
     }
     if (to == -1) {
         to = s_interface->TradeTime();
     }
 
+    //--- Do not check the time span.
+    /*
     if (to - from > 7 * 24 * 60 * 60) {
         *error_code = &EC_BAD_TIME_SPAN;
         return false;
     }
+    */
 
     int users[1] = {user};
     if ((*orders = s_interface->OrdersGetClosed(from, to, users, 1, total)) == FALSE) {
@@ -560,6 +585,79 @@ bool ServerApi::GetSymbolList(int* total, const ConSymbol** const symbols, const
     return true;
 }
 
+bool ServerApi::AddUser(int login, const char* name, const char* password, const char* group, const char* phone,
+                        const char* email, const char* lead_source, int leverage, const ErrorCode** error_code, int* user) {
+    FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        *error_code = &EC_INVALID_SERVER_INTERFACE;
+        return false;
+    }
+
+    UserRecord user_record = {0};
+    ConGroup group_cfg = {0};
+
+    if (login <= 0) {
+        *error_code = &EC_INVALID_USER_ID;
+        return false;
+    }
+
+    if (s_interface->ClientsUserInfo(login, &user_record) == TRUE) {
+        *error_code = &EC_USER_ID_EXISTING;
+        return false;
+    }
+
+    user_record.login = login;
+
+    if (name != NULL && strnlen_s(name, sizeof(user_record.name)) != 0) {
+        COPY_STR(user_record.name, name);
+    } else {
+        *error_code = &EC_BAD_PARAMETER;
+        return false;
+    }
+
+    if (password != NULL && strnlen_s(password, sizeof(user_record.password)) != 0) {
+        COPY_STR(user_record.password, password);
+    } else {
+        *error_code = &EC_BAD_PARAMETER;
+        return false;
+    }
+
+    if (group != NULL && strnlen_s(group, sizeof(user_record.group)) != 0 &&
+        s_interface->GroupsGet(group, &group_cfg) == TRUE) {
+        COPY_STR(user_record.group, group);
+    } else {
+        *error_code = &EC_GROUP_NOT_FOUND;
+        return false;
+    }
+
+    if (phone != NULL && strnlen_s(phone, sizeof(user_record.phone)) != 0) {
+        COPY_STR(user_record.phone, phone);
+    }
+
+    if (email != NULL && strnlen_s(email, sizeof(user_record.email)) != 0) {
+        COPY_STR(user_record.email, email);
+    }
+
+    if (lead_source != NULL && strnlen_s(lead_source, sizeof(user_record.lead_source)) != 0) {
+        COPY_STR(user_record.lead_source, lead_source);
+    }
+
+    // user is enabled as default
+    user_record.enable = 1;
+
+    user_record.leverage = leverage > 0 ? leverage : group_cfg.default_leverage;
+
+    if (s_interface->ClientsAddUser(&user_record) == FALSE) {
+        *error_code = &EC_UNKNOWN_ERROR;
+        return false;
+    }
+
+    *user = user_record.login;
+    *error_code = &EC_OK;
+    return true;
+}
+
 void ServerApi::SymbolChanged() {
     s_symbol_count = 0;
 }
@@ -575,7 +673,8 @@ bool ServerApi::UpdateSymbolList() {
 }
 
 bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                         double sl, double tp, const char* comment, const ErrorCode** error_code, int* order) {
+                         double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
+                         int* order) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -718,6 +817,10 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     trade_record.sl = trade_trans_info.sl;
     trade_record.tp = trade_trans_info.tp;
 
+    if (expiration != -1 && cmd >= OP_BUY_LIMIT && cmd <= OP_SELL_STOP) {
+        trade_record.expiration = expiration;
+    }
+
     //--- check stops
     if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("AddOrder: invalid stops");
@@ -738,8 +841,8 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     return true;
 }
 
-bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, const char* comment,
-                            const ErrorCode** error_code) {
+bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, time_t expiration,
+                            const char* comment, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -866,6 +969,10 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
         LOG("UpdateOrder: invalid stops");
         *error_code = &EC_TRADE_BAD_STOPS;
         return false;  // invalid stops
+    }
+
+    if (expiration != -1 && trade_record.cmd >= OP_BUY_LIMIT && trade_record.cmd <= OP_SELL_STOP) {
+        trade_trans_info.expiration = expiration;
     }
 
     COPY_STR(trade_record.comment, comment);

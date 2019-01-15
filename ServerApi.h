@@ -39,6 +39,7 @@ public:
     static const ErrorCode EC_CLOSE_ONLY;
     static const ErrorCode EC_WRONG_PASSWORD;
     static const ErrorCode EC_PENDING_ORDER_WITHOUT_OPEN_PRICE;
+    static const ErrorCode EC_USER_ID_EXISTING;
 
     static const ErrorCode EC_NO_CONNECT;
     static const ErrorCode EC_ACCOUNT_DISABLED;
@@ -63,9 +64,10 @@ public:
     static CServerInterface* Api();
 
     static bool AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                         double sl, double tp, const char* comment, const ErrorCode** error_code, int* order);
+                         double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
+                         int* order);
 
-    static bool UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, const char* comment,
+    static bool UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, time_t expiration, const char* comment,
                             const ErrorCode** error_code);
 
     static bool CloseOrder(const char* ip, const int order, double close_price, const char* comment,
@@ -75,7 +77,8 @@ public:
                         const ErrorCode** error_code);
 
     static bool OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                          double sl, double tp, const char* comment, const ErrorCode** error_code, int* order);
+                          double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
+                          int* order);
 
     static bool GetUserRecord(int user, UserRecord* user_record, const ErrorCode** error_code);
 
@@ -103,6 +106,9 @@ public:
     static bool CurrentTradeTime(time_t* time, const ErrorCode** error_code);
 
     static bool GetSymbolList(int* total, const ConSymbol** const symbols, const ErrorCode** error_code);
+
+    static bool AddUser(int login, const char* name, const char* password, const char* group, const char* phone,
+                        const char* email, const char* lead_source, int leverage, const ErrorCode** error_code, int* user);
 
     static void SymbolChanged();
 

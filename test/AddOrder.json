@@ -8,5 +8,6 @@
 	"open_price": 112.75,
 	"sl": 0,
 	"tp": 0,
+    "expiration": 10,
 	"comment": "test AddOrder"
 }

@@ -1,0 +1,11 @@
+{
+    "request": "AddUser",
+    "login": 8,
+    "name":"test_user",   
+    "password":"123456", 
+    "group":"lmoa-main",
+    "phone":"12323232323",
+    "email":"abc@bcd.com",
+    "leverage": -1,    
+    "lead_source":"source"
+}
