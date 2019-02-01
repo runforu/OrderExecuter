@@ -136,7 +136,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_WIN32_WINNT=0x0501;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
@@ -177,7 +177,11 @@
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="FileHandler.cpp" />
+    <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="ErrorCode.cpp" />
+    <ClCompile Include="EventCenter.cpp" />
+    <ClCompile Include="DefaultHandler.cpp" />
+    <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="http_server\connection.cpp" />
     <ClCompile Include="http_server\header.cpp" />
     <ClCompile Include="http_server\mime_types.cpp" />
@@ -188,17 +192,21 @@
     <ClCompile Include="http_server\server_property.cpp" />
     <ClCompile Include="JsonHandler.cpp" />
     <ClCompile Include="JsonWrapper.cpp" />
+    <ClCompile Include="ManagerApi.cpp" />
+    <ClCompile Include="MiscJsonHandler.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="Loger.cpp" />
     <ClCompile Include="OrderExecuter.cpp" />
     <ClCompile Include="RequestHandlerProviderImp.cpp" />
     <ClCompile Include="ServerApi.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileHandler.h" />
+    <ClInclude Include="Environment.h" />
+    <ClInclude Include="ErrorCode.h" />
+    <ClInclude Include="EventCenter.h" />
+    <ClInclude Include="DefaultHandler.h" />
     <ClInclude Include="http_server\connection.h" />
     <ClInclude Include="http_server\header.h" />
     <ClInclude Include="http_server\mime_types.h" />
@@ -212,6 +220,8 @@
     <ClInclude Include="http_server\server_property.h" />
     <ClInclude Include="JsonHandler.h" />
     <ClInclude Include="JsonWrapper.h" />
+    <ClInclude Include="ManagerApi.h" />
+    <ClInclude Include="MiscJsonHandler.h" />
     <ClInclude Include="Processor.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="Config.h" />

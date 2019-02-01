@@ -46,10 +46,41 @@
     const ErrorCode EC_TRADE_LONG_ONLY = {139, "Allowed only BUY orders"};
     const ErrorCode EC_TRADE_TOO_MANY_REQ = {140, "Too many requests from one client"};
     const ErrorCode EC_TRADE_MODIFY_DENIED = {144, "Modification denied because order too close to market"};
+    
+    const ErrorCode ErrorCode::EC_MAN_ERROR = { 256, "Manager API error" };
+    const ErrorCode ErrorCode::EC_MAN_NO_CONNECT = { 257, "Manager API No connection" };
+    const ErrorCode ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE = { 257, "Manager API No available interface to perform the request" };
 </code>
 </pre>
     </div>
-  
+        
+    <br />
+    <hr />
+    <br />
+<pre class=" language-c line-numbers">
+<code>
+// RequestChart parameter "period": 1, 5, 15, 30, 60, 240, 1440, 10080, 43200
+enum { PERIOD_M1 = 1,           // 1-minute
+       PERIOD_M5 = 5,           // 5-minute.
+       PERIOD_M15 = 15,         // 15-minute.
+       PERIOD_M30 = 30,         // 30-minute.
+       PERIOD_H1 = 60,          // One-hour.
+       PERIOD_H4 = 240,         // 4-hour.
+       PERIOD_D1 = 1440,        // Daily
+       PERIOD_W1 = 10080,       // Weekly
+       PERIOD_MN1 = 43200       // Monthly
+       };
+       
+// RequestChart parameter "mode": "CHART_RANGE_IN", "CHART_RANGE_OUT", "CHART_RANGE_LAST"       
+enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartInfo::to
+       CHART_RANGE_OUT,       // Data from the ranges "the beginning of history" - ChartInfo::from and ChartInfo::to - the end of history
+       CHART_RANGE_LAST       // Data from the range ChartInfo::from - the end of history.
+       };       
+</code>
+</pre>
+    </div>
+
+    
     <br />
     <hr />
     <br />
@@ -875,6 +906,58 @@
 }</code>
 </pre>
     </div>
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> rate infos</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "RequestChart",
+    "symbol": "USDJPY",
+    "period": 30,
+    "mode": "CHART_RANGE_IN",
+    "start": 1,
+    "end": 1,
+    "timestamp": 1
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "count": "2",
+    "timesign": "1528063336",
+    "rate_infos": [
+        {
+            "open_price": "109480",
+            "high": "60",
+            "low": "-10",
+            "close": "30",
+            "time": "1528070400",
+            "volume": "112"
+        },
+        {
+            "open_price": "109500",
+            "high": "40",
+            "low": "-10",
+            "close": "40",
+            "time": "1528072200",
+            "volume": "73"
+        }
+    ],
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS"
+}</code>
+</pre>
+    </div>
+    
+    
     
     <br />
     <br />

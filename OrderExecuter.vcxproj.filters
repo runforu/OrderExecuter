@@ -4,7 +4,6 @@
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="Config.cpp" />
-    <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="Loger.cpp" />
     <ClCompile Include="OrderExecuter.cpp" />
     <ClCompile Include="RequestHandlerProviderImp.cpp" />
@@ -30,12 +29,18 @@
     <ClCompile Include="http_server\mime_types.cpp">
       <Filter>http_server</Filter>
     </ClCompile>
-    <ClCompile Include="FileHandler.cpp" />
     <ClCompile Include="JsonWrapper.cpp" />
     <ClCompile Include="http_server\reply.cpp">
       <Filter>http_server</Filter>
     </ClCompile>
     <ClCompile Include="JsonHandler.cpp" />
+    <ClCompile Include="ErrorCode.cpp" />
+    <ClCompile Include="ManagerApi.cpp" />
+    <ClCompile Include="EventCenter.cpp" />
+    <ClCompile Include="DefaultHandler.cpp" />
+    <ClCompile Include="MiscJsonHandler.cpp" />
+    <ClCompile Include="Environment.cpp" />
+    <ClCompile Include="FileUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Processor.h" />
@@ -73,7 +78,6 @@
     <ClInclude Include="http_server\mime_types.h">
       <Filter>http_server</Filter>
     </ClInclude>
-    <ClInclude Include="FileHandler.h" />
     <ClInclude Include="JsonWrapper.h" />
     <ClInclude Include="http_server\request.h">
       <Filter>http_server</Filter>
@@ -82,6 +86,12 @@
       <Filter>http_server</Filter>
     </ClInclude>
     <ClInclude Include="JsonHandler.h" />
+    <ClInclude Include="ErrorCode.h" />
+    <ClInclude Include="ManagerApi.h" />
+    <ClInclude Include="EventCenter.h" />
+    <ClInclude Include="DefaultHandler.h" />
+    <ClInclude Include="MiscJsonHandler.h" />
+    <ClInclude Include="Environment.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OrderExecuter.def" />

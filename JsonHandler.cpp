@@ -2,11 +2,13 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
+#include "ErrorCode.h"
 #include "JsonHandler.h"
 #include "JsonWrapper.h"
 #include "Loger.h"
 #include "ServerApi.h"
 #include "common.h"
+#include "../include/MT4ServerAPI.h"
 
 using namespace boost::property_tree;
 using namespace http::server;
@@ -15,70 +17,69 @@ int JsonHandler::get_priority() const {
     return 100;
 }
 
+bool JsonHandler::can_handle(const request& req) {
+    return std::find_if(req.headers.begin(), req.headers.end(), [&](const http::server::header& h) {
+               return h == http::server::header::json_content_type;
+           }) != req.headers.end();
+}
+
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
-    if (std::find_if(req.headers.begin(), req.headers.end(), [&](const http::server::header& h) {
-            return h == http::server::header::json_content_type;
-        }) != req.headers.end()) {
-        ptree pt = JsonWrapper::ParseJson(req.body);
-        LOG(req.body);
+    ptree pt = JsonWrapper::ParseJson(req.body);
+    LOG("JsonHandler -> %s", req.body.c_str());
 
-        ptree response;
-        if (!pt.empty()) {
-            rep.status = reply::ok;
-            if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
-                response = OpenOrder(pt);
-            } else if (pt.get<std::string>("request", "").compare("AddOrder") == 0) {
-                response = AddOrder(pt);
-            } else if (pt.get<std::string>("request", "").compare("UpdateOrder") == 0) {
-                response = UpdateOrder(pt);
-            } else if (pt.get<std::string>("request", "").compare("CloseOrder") == 0) {
-                response = CloseOrder(pt);
-            } else if (pt.get<std::string>("request", "").compare("Deposit") == 0) {
-                response = Deposit(pt);
-            } else if (pt.get<std::string>("request", "").compare("GetUserRecord") == 0) {
-                response = GetUserRecord(pt);
-            } else if (pt.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
-                response = UpdateUserRecord(pt);
-            } else if (pt.get<std::string>("request", "").compare("AddUser") == 0) {
-                response = AddUser(pt);
-            } else if (pt.get<std::string>("request", "").compare("ChangePassword") == 0) {
-                response = ChangePassword(pt);
-            } else if (pt.get<std::string>("request", "").compare("CheckPassword") == 0) {
-                response = CheckPassword(pt);
-            } else if (pt.get<std::string>("request", "").compare("GetMargin") == 0) {
-                response = GetMargin(pt);
-            } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
-                response = GetOrder(pt);
-            } else if (pt.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
-                response = GetOpenOrders(pt);
-            } else if (pt.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
-                response = GetPendingOrders(pt);
-            } else if (pt.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
-                response = GetClosedOrders(pt);
-            } else if (pt.get<std::string>("request", "").compare("IsOpening") == 0) {
-                response = IsOpening(pt);
-            } else if (pt.get<std::string>("request", "").compare("TradeTime") == 0) {
-                response = TradeTime(pt);
-            } else if (pt.get<std::string>("request", "").compare("GetSymbolList") == 0) {
-                response = GetSymbolList(pt);
-            } else {
-                rep.status = reply::bad_request;
-                response.put("json_error", "Not supported json request");
-            }
+    ptree response;
+    if (!pt.empty()) {
+        rep.status = reply::ok;
+        if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
+            response = OpenOrder(pt);
+        } else if (pt.get<std::string>("request", "").compare("AddOrder") == 0) {
+            response = AddOrder(pt);
+        } else if (pt.get<std::string>("request", "").compare("UpdateOrder") == 0) {
+            response = UpdateOrder(pt);
+        } else if (pt.get<std::string>("request", "").compare("CloseOrder") == 0) {
+            response = CloseOrder(pt);
+        } else if (pt.get<std::string>("request", "").compare("Deposit") == 0) {
+            response = Deposit(pt);
+        } else if (pt.get<std::string>("request", "").compare("GetUserRecord") == 0) {
+            response = GetUserRecord(pt);
+        } else if (pt.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
+            response = UpdateUserRecord(pt);
+        } else if (pt.get<std::string>("request", "").compare("AddUser") == 0) {
+            response = AddUser(pt);
+        } else if (pt.get<std::string>("request", "").compare("ChangePassword") == 0) {
+            response = ChangePassword(pt);
+        } else if (pt.get<std::string>("request", "").compare("CheckPassword") == 0) {
+            response = CheckPassword(pt);
+        } else if (pt.get<std::string>("request", "").compare("GetMargin") == 0) {
+            response = GetMargin(pt);
+        } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
+            response = GetOrder(pt);
+        } else if (pt.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
+            response = GetOpenOrders(pt);
+        } else if (pt.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
+            response = GetPendingOrders(pt);
+        } else if (pt.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
+            response = GetClosedOrders(pt);
+        } else if (pt.get<std::string>("request", "").compare("IsOpening") == 0) {
+            response = IsOpening(pt);
+        } else if (pt.get<std::string>("request", "").compare("TradeTime") == 0) {
+            response = TradeTime(pt);
+        } else if (pt.get<std::string>("request", "").compare("GetSymbolList") == 0) {
+            response = GetSymbolList(pt);
         } else {
-            // Handle json parse error
-            rep.status = reply::bad_request;
-            response.put("json_error", "Invalid json format");
+            return false;
         }
-
-        rep.headers.push_back(header::json_content_type);
-        std::string content = JsonWrapper::ToJsonStr(response);
-        rep.headers.push_back(header("Content-Length", std::to_string(content.length())));
-        rep.content.append(content);
-        return true;
+    } else {
+        // Handle json parse error
+        rep.status = reply::bad_request;
+        response.put("json_error", "Invalid json format");
     }
 
-    return false;
+    rep.headers.push_back(header::json_content_type);
+    std::string content = JsonWrapper::ToJsonStr(response);
+    rep.headers.push_back(header("Content-Length", std::to_string(content.length())));
+    rep.content.append(content);
+    return true;
 }
 
 ptree JsonHandler::OpenOrder(ptree pt) {
@@ -427,16 +428,17 @@ boost::property_tree::ptree JsonHandler::GetOrder(boost::property_tree::ptree pt
 }
 
 boost::property_tree::ptree JsonHandler::GetOpenOrders(boost::property_tree::ptree pt) {
-    return _GetOpenOrders(pt, [](TradeRecord& trade) -> bool { return trade.cmd < OP_BUY || trade.cmd > OP_SELL; });
+    return _GetOpenOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL; });
 }
 
 boost::property_tree::ptree JsonHandler::GetPendingOrders(boost::property_tree::ptree pt) {
-    return _GetOpenOrders(pt, [](TradeRecord& trade) -> bool { return trade.cmd < OP_BUY_LIMIT || trade.cmd > OP_SELL_STOP; });
+    return _GetOpenOrders(pt,
+                          [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY_LIMIT || trade->cmd > OP_SELL_STOP; });
 }
 
 boost::property_tree::ptree JsonHandler::GetClosedOrders(boost::property_tree::ptree pt) {
-    return _GetClosedOrders(pt,
-                            [](TradeRecord& trade) -> bool { return false && trade.cmd < OP_BUY || trade.cmd > OP_SELL_STOP; });
+    return _GetClosedOrders(
+        pt, [](TradeRecord* trade) -> bool { return false && trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; });
 }
 
 inline boost::property_tree::ptree JsonHandler::IsOpening(boost::property_tree::ptree pt) {
@@ -573,7 +575,7 @@ boost::property_tree::ptree JsonHandler::_GetOpenOrders(boost::property_tree::pt
         for (int i = 0; i < total; i++) {
             ptree order;
             TradeRecord trade = trade_record[i];
-            if (filter_out(trade)) {
+            if (filter_out(&trade)) {
                 continue;
             }
             count++;
@@ -641,7 +643,7 @@ boost::property_tree::ptree JsonHandler::_GetClosedOrders(boost::property_tree::
         for (int i = 0; i < total; i++) {
             ptree order;
             TradeRecord trade = trade_record[i];
-            if (filter_out(trade)) {
+            if (filter_out(&trade)) {
                 continue;
             }
             count++;

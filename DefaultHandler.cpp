@@ -3,17 +3,17 @@
 #include <iostream>
 #include <sstream>
 #include <string>
-#include "FileHandler.h"
+#include "DefaultHandler.h"
 #include "http_server/mime_types.h"
 #include "http_server/reply.h"
 #include "http_server/request.h"
 #include "http_server/server_property.h"
 
-int FileHandler::get_priority() const {
+int DefaultHandler::get_priority() const {
     return 0;
 }
 
-bool FileHandler::handle(const http::server::request& req, http::server::reply& rep) {
+bool DefaultHandler::handle(const http::server::request& req, http::server::reply& rep) {
     // Decode url to path.
     std::string request_path;
     if (!url_decode(req.uri, request_path)) {
@@ -62,7 +62,7 @@ bool FileHandler::handle(const http::server::request& req, http::server::reply& 
     return true;
 }
 
-bool FileHandler::url_decode(const std::string& in, std::string& out) {
+bool DefaultHandler::url_decode(const std::string& in, std::string& out) {
     out.clear();
     out.reserve(in.size());
     for (std::size_t i = 0; i < in.size(); ++i) {
@@ -85,5 +85,9 @@ bool FileHandler::url_decode(const std::string& in, std::string& out) {
             out += in[i];
         }
     }
+    return true;
+}
+
+bool DefaultHandler::can_handle(const http::server::request& req) {
     return true;
 }

@@ -2,9 +2,10 @@
 #define _CONFIGURATION_H_
 
 #include <time.h>
-#include "../include/MT4ServerAPI.h"
 #include "Synchronizer.h"
 #include "common.h"
+
+struct PluginCfg;
 
 //+------------------------------------------------------------------+
 //| Simple configuration                                             |

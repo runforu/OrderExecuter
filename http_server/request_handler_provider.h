@@ -12,6 +12,7 @@ class request_handler_provider {
 public:
     virtual ~request_handler_provider(){};
     virtual std::vector<request_handler*> get_handlers() = 0;
+    virtual request_handler* get_default_handlers() = 0;
 };
 
 }  // namespace server

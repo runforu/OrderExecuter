@@ -8,8 +8,8 @@
 #include "Loger.h"
 #include "Processor.h"
 #include "RequestHandlerProviderImp.h"
-#include "http_server/server.h"
 #include "ServerApi.h"
+#include "http_server/server.h"
 #include "../include/MT4ServerAPI.h"
 
 Processor& Processor::Instance() {
@@ -18,6 +18,7 @@ Processor& Processor::Instance() {
 }
 
 void Processor::Initialize(const char* port, const char* root, const char* num_threads) {
+    FUNC_WARDER;
     m_thread = boost::thread(boost::bind(&Processor::StartServer, this, port, root, num_threads));
 }
 

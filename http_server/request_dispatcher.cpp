@@ -8,6 +8,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
+#include <algorithm>
 #include <boost/lexical_cast.hpp>
 #include <fstream>
 #include <iostream>
@@ -26,10 +27,23 @@ namespace server {
 request_dispatcher::request_dispatcher() {}
 
 void request_dispatcher::dispatch_request(const request& req, reply& rep) {
+    std::vector<request_handler*> handlers;
     for (auto item : provider->get_handlers()) {
+        if (item->can_handle(req)) {
+            handlers.push_back(item);
+        }
+    }
+
+    std::sort(handlers.begin(), handlers.end(),
+              [](request_handler * left, request_handler * right) { return right->get_priority() < left->get_priority(); });
+
+    for (auto item : handlers) {
         if (item->handle(req, rep)) {
             return;
         }
+    }
+    if (provider->get_default_handlers()->can_handle(req)) {
+        provider->get_default_handlers()->handle(req, rep);
     }
     // no handler found
     return;

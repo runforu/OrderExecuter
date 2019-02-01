@@ -1,11 +1,13 @@
-#include "RequestHandlerProviderImp.h"
-#include "FileHandler.h"
-#include "http_server/request_handler.h"
+#include "DefaultHandler.h"
 #include "JsonHandler.h"
+#include "MiscJsonHandler.h"
+#include "RequestHandlerProviderImp.h"
+#include "http_server/request_handler.h"
 
 RequestHandlerProviderImp::RequestHandlerProviderImp() {
     m_request_handlers.push_back(new JsonHandler());
-    m_request_handlers.push_back(new FileHandler());
+    m_request_handlers.push_back(new MiscJsonHandler());
+    m_default_handler = new DefaultHandler();
 }
 
 RequestHandlerProviderImp::~RequestHandlerProviderImp() {
@@ -16,8 +18,13 @@ RequestHandlerProviderImp::~RequestHandlerProviderImp() {
             *it = NULL;
         }
     }
+    delete m_default_handler;
 }
 
 std::vector<http::server::request_handler*> RequestHandlerProviderImp::get_handlers() {
     return m_request_handlers;
+}
+
+http::server::request_handler* RequestHandlerProviderImp::get_default_handlers() {
+    return m_default_handler;
 }

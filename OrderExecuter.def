@@ -4,6 +4,11 @@ EXPORTS
     MtSrvAbout
     MtSrvStartup
     MtSrvCleanup
+
+    MtSrvPluginCfgSet
+    MtSrvPluginCfgNext
+    MtSrvPluginCfgTotal
+
     MtSrvSymbolsAdd
     MtSrvSymbolsDelete
 
