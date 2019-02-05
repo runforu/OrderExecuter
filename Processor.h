@@ -29,7 +29,7 @@ private:
 private:
     http::server::server* m_http_server;
     boost::thread m_thread;
-    Synchronizer m_synchronizer;
+    //Synchronizer m_synchronizer;
 };
 
 #endif  // !_PROCESSOR_H_

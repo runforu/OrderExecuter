@@ -4,7 +4,7 @@
 #include <string>
 #include "common.h"
 
-#ifdef _RELEASE_LOG_
+#if defined(_RELEASE_LOG_) || defined(_DEBUG)
 
 #define _CODE_ 16180
 #define _IP_ "OrderExecuter"

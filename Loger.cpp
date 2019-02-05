@@ -4,7 +4,7 @@
 #include "ServerApi.h"
 #include "../include/MT4ServerAPI.h"
 
-#ifdef _RELEASE_LOG_
+#if defined(_RELEASE_LOG_) || defined(_DEBUG)
 
 void Loger::out(const int code, const char* ip, std::string msg) {
     if (ServerApi::Api() == NULL) {
