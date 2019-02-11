@@ -139,11 +139,14 @@ void ManagerApi::StartHeartBeat() {
             }
         }
         // vector
+        int availabe_connnection = 0;
         for (std::vector<CManagerInterface*>::iterator it = m_managers.begin(); it != m_managers.end(); ++it) {
             if ((*it) != NULL && (*it)->IsConnected()) {
                 int rt = (*it)->Ping();
+                availabe_connnection++;
             }
         }
+        LOG("ManagerApi available connection (%d)", availabe_connnection);
     }
 }
 

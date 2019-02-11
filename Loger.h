@@ -2,8 +2,8 @@
 #define _LOGER_H_
 
 #include <string>
-#include "common.h"
 #include "Synchronizer.h"
+#include "common.h"
 
 #if defined(_RELEASE_LOG_) || defined(_DEBUG)
 

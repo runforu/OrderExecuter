@@ -1,6 +1,7 @@
 #ifndef _SYNCHRONIZER_H_
 #define _SYNCHRONIZER_H_
 
+#include <winsock2.h>
 #include <windows.h>
 
 class Synchronizer {

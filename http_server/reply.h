@@ -12,9 +12,9 @@
 #define _HTTP_SERVER_REPLY_H_
 
 #include <boost/asio.hpp>
-#include <windows.h>
 #include <string>
 #include <vector>
+#include <windows.h>
 #include "header.h"
 
 namespace http {
