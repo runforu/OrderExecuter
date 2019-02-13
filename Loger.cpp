@@ -21,7 +21,7 @@ void Loger::out(const int code, const char* ip, int value) {
 }
 
 void Loger::out(const int code, const char* ip, double value) {
-    Loger::out(code, ip, "%f", value);
+    Loger::out(code, ip, "%.15f", value);
 }
 
 void Loger::out(const int code, const char* ip, const char* msg, ...) {
