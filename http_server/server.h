@@ -32,13 +32,13 @@ public:
 
     /// Construct the server to listen on the specified TCP address and port, and
     /// serve up files from the given directory.
-    explicit server(const std::string& address, const std::string& port, const std::string& doc_root,
-                    std::size_t thread_pool_size, request_handler_provider* handlers);
+    explicit server(const std::string& address, const std::string& port, std::size_t thread_pool_size,
+                    request_handler_provider* handlers);
 
     /// Run the server's io_context loop.
     void run();
 
-private:  
+private:
     /// Initiate an asynchronous accept operation.
     void start_accept();
 

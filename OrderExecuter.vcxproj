@@ -189,7 +189,6 @@
     <ClCompile Include="http_server\request_dispatcher.cpp" />
     <ClCompile Include="http_server\request_parser.cpp" />
     <ClCompile Include="http_server\server.cpp" />
-    <ClCompile Include="http_server\server_property.cpp" />
     <ClCompile Include="JsonHandler.cpp" />
     <ClCompile Include="JsonWrapper.cpp" />
     <ClCompile Include="ManagerApi.cpp" />
@@ -217,7 +216,6 @@
     <ClInclude Include="http_server\request_handler_provider.h" />
     <ClInclude Include="http_server\request_parser.h" />
     <ClInclude Include="http_server\server.h" />
-    <ClInclude Include="http_server\server_property.h" />
     <ClInclude Include="JsonHandler.h" />
     <ClInclude Include="JsonWrapper.h" />
     <ClInclude Include="ManagerApi.h" />

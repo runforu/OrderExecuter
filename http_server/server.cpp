@@ -8,23 +8,22 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include "server.h"
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <iostream>
 #include <vector>
-#include "server_property.h"
+#include "server.h"
 
 namespace http {
 namespace server {
 
-server::server(const std::string& address, const std::string& port, const std::string& doc_root, std::size_t thread_pool_size,
+server::server(const std::string& address, const std::string& port, std::size_t thread_pool_size,
                request_handler_provider* handlers)
-    : thread_pool_size_(thread_pool_size),
-      acceptor_(io_context_),
-      new_connection_(),
-      request_dispatcher_() {
+    : thread_pool_size_(thread_pool_size), acceptor_(io_context_), new_connection_(), request_dispatcher_() {
+    // Set the requestion handler providers.
+    request_dispatcher_.set_request_handler_provider(handlers);
+
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
     boost::asio::ip::tcp::resolver resolver(io_context_);
     boost::asio::ip::tcp::endpoint endpoint = *resolver.resolve(address, port).begin();
@@ -32,10 +31,6 @@ server::server(const std::string& address, const std::string& port, const std::s
     acceptor_.set_option(boost::asio::ip::tcp::acceptor::reuse_address(true));
     acceptor_.bind(endpoint);
     acceptor_.listen();
-
-    server_property::s_doc_root = doc_root;
-
-    request_dispatcher_.set_request_handler_provider(handlers);
 
     start_accept();
 }

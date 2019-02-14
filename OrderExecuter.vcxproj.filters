@@ -20,9 +20,6 @@
     <ClCompile Include="http_server\server.cpp">
       <Filter>http_server</Filter>
     </ClCompile>
-    <ClCompile Include="http_server\server_property.cpp">
-      <Filter>http_server</Filter>
-    </ClCompile>
     <ClCompile Include="http_server\header.cpp">
       <Filter>http_server</Filter>
     </ClCompile>
@@ -67,9 +64,6 @@
       <Filter>http_server</Filter>
     </ClInclude>
     <ClInclude Include="http_server\server.h">
-      <Filter>http_server</Filter>
-    </ClInclude>
-    <ClInclude Include="http_server\server_property.h">
       <Filter>http_server</Filter>
     </ClInclude>
     <ClInclude Include="http_server\header.h">

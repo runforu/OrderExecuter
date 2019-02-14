@@ -17,9 +17,9 @@ Processor& Processor::Instance() {
     return _instance;
 }
 
-void Processor::Initialize(const char* port, const char* root, const char* num_threads) {
+void Processor::Initialize(const char* port, const char* num_threads) {
     FUNC_WARDER;
-    m_thread = boost::thread(boost::bind(&Processor::StartServer, this, port, root, num_threads));
+    m_thread = boost::thread(boost::bind(&Processor::StartServer, this, port, num_threads));
 }
 
 void Processor::Shutdown() {
@@ -29,13 +29,13 @@ void Processor::Shutdown() {
     m_thread.join();
 }
 
-void Processor::StartServer(const char* port, const char* root, const char* num_threads) {
-    LOG("http server port: %s, root: %s, threads: %s", port, root, num_threads);
+void Processor::StartServer(const char* port, const char* num_threads) {
+    LOG("http server port: %s, threads: %s", port, num_threads);
     try {
         // Initialise the server.
         RequestHandlerProviderImp provider;
         std::size_t number = boost::lexical_cast<std::size_t>(num_threads);
-        m_http_server = new http::server::server("0.0.0.0", port, root, number, &provider);
+        m_http_server = new http::server::server("0.0.0.0", port, number, &provider);
 
         // Run the server until stopped.
         m_http_server->run();

@@ -8,19 +8,17 @@
 
 PluginInfo ExtPluginInfo = {"Order Executer", 1, "DH Copyrigh.", {0}};
 
-static char DocRootPath[256];
-
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID /*lpReserved*/) {
     switch (reason) {
         case DLL_PROCESS_ATTACH:
             char tmp[256], *cp;
             GetModuleFileName((HMODULE)hModule, tmp, sizeof(tmp) - 5);
             //--- set root path
-            COPY_STR(DocRootPath, tmp);
-            if ((cp = strrchr(DocRootPath, '\\')) != NULL) {
+            COPY_STR(Environment::s_module_path, tmp);
+            if ((cp = strrchr(Environment::s_module_path, '\\')) != NULL) {
                 *(cp + 1) = 0;
-                strncpy(Environment::s_module_path, DocRootPath, sizeof(DocRootPath));
-                strcat(DocRootPath, "root\\");
+                COPY_STR(Environment::s_doc_root, Environment::s_module_path);
+                strcat(Environment::s_doc_root, "root\\");
             }
             //--- create configuration filename
             if ((cp = strrchr(tmp, '.')) != NULL) {
@@ -59,7 +57,9 @@ int APIENTRY MtSrvStartup(CServerInterface* server) {
 
     ServerApi::Initialize(server);
 
-    Processor::Instance().Initialize("8080", DocRootPath, "512");
+    Processor::Instance().Initialize("8080", "512");
+
+    Environment::Log();
 
     return (TRUE);
 }

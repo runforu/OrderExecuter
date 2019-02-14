@@ -4,10 +4,10 @@
 #include <sstream>
 #include <string>
 #include "DefaultHandler.h"
+#include "Environment.h"
 #include "http_server/mime_types.h"
 #include "http_server/reply.h"
 #include "http_server/request.h"
-#include "http_server/server_property.h"
 
 int DefaultHandler::get_priority() const {
     return 0;
@@ -41,7 +41,7 @@ bool DefaultHandler::handle(const http::server::request& req, http::server::repl
     }
 
     // Open the file to send back.
-    std::string full_path = http::server::server_property::s_doc_root + request_path;
+    std::string full_path = Environment::s_doc_root + request_path;
     std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
     if (!is) {
         rep = http::server::reply::stock_reply(http::server::reply::not_found);
