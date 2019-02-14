@@ -34,14 +34,16 @@ void ManagerApi::Initialize(CManagerInterface* man) {
     int res = RET_ERROR;
 
     if ((res = man->Connect(server)) != RET_OK || (res = man->Login(login, password)) != RET_OK) {
-        LOG("Single Initialize error: %s", man->ErrorDescription(res));
+        LOG("Manager interface initialize error: %s", man->ErrorDescription(res));
         man->Disconnect();
     }
-    LOG("Single Initialize success");
+    LOG("New manager interface initialized.");
 }
 
 const ErrorCode* ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32_t start, __time32_t end,
                                           __time32_t timestamp, boost::property_tree::ptree& result) {
+    FUNC_WARDER;
+
     if (!IsValid()) {
         return &ErrorCode::EC_MAN_ERROR;
     }
@@ -152,7 +154,7 @@ void ManagerApi::StartHeartBeat() {
 
 inline ManagerApi::ManagerApi() : m_running(1), m_factory() {
     char buf[256] = {0};
-    strncpy(buf, Environment::s_module_path, sizeof(buf));
+    COPY_STR(buf, Environment::s_module_path, sizeof(buf));
     strcat(buf, "mtmanapi.moa");
     m_factory.Init(buf);
 
