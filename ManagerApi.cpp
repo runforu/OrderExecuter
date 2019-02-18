@@ -154,7 +154,7 @@ void ManagerApi::StartHeartBeat() {
 
 inline ManagerApi::ManagerApi() : m_running(1), m_factory() {
     char buf[256] = {0};
-    COPY_STR(buf, Environment::s_module_path, sizeof(buf));
+    COPY_STR(buf, Environment::s_module_path);
     strcat(buf, "mtmanapi.moa");
     m_factory.Init(buf);
 
