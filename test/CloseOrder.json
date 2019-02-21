@@ -1,7 +1,0 @@
-{
-    "request": "CloseOrder",
-    "ip": "0.0.0.0",
-    "order": 10223650,
-    "close_price": 0.0,
-    "comment": "test CloseOrder"
-}
