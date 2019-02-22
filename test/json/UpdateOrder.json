@@ -1,9 +1,0 @@
-{
-    "request":"UpdateOrder",
-	"ip": "0.0.0.0",
-	"order": 10220048,
-	"open_price": 0.0,
-	"sl": 111.75,
-	"tp": 113.75,
-	"comment": "test UpdateOrder"
-}

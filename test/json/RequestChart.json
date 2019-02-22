@@ -1,9 +1,0 @@
-{
-    "request": "RequestChart",
-    "symbol": "USDJPY",
-    "period": 1,
-    "mode": "CHART_RANGE_IN",
-    "start": 0,
-    "end": 1548992369,
-    "timestamp": 1
-}
