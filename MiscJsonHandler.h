@@ -14,7 +14,8 @@ public:
     virtual ~MiscJsonHandler() {}
 
 private:
-    boost::property_tree::ptree RequestChart(boost::property_tree::ptree pt);
+    // free the memory; the chart data may be huge, so avoid using ptree.
+    void RequestChart(boost::property_tree::ptree pt, std::string& content);
 
 private:
 };

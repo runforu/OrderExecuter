@@ -83,51 +83,7 @@ void request1() {
     sync_client(url, content1);
 }
 
-void emulate(boost::property_tree::ptree& tree) {
-    int total = 10000;
-    tree.put("count", total);
-    tree.put("timesign", 1);
-    boost::property_tree::ptree rate_infos;
-    for (int i = 0; i < total; i++) {
-        boost::property_tree::ptree rate_info;
-        rate_info.put("open_price", 1.2);
-        rate_info.put("high", 1);
-        rate_info.put("low", 1);
-        rate_info.put("close", 1);
-        rate_info.put("time", 1);
-        rate_info.put("volume", 111);
-        rate_infos.push_back(std::make_pair("", rate_info));
-    }
-    tree.add_child("rate_infos", rate_infos);
-}
-
 int main() {
-    /*
-    int chunk = 1024 * 1024;
-    boost::property_tree::ptree tree;
-    for (int i = 0; i < 3000; i++) {
-        int* p = (int*)malloc(chunk);
-        if (p == NULL) {
-            chunk /= 2;
-        }
-    }
-    try {
-        tree.put("aaaaaaaaa", "bbbbbbbbbbbbbb");
-        tree.put("aaaasaaaaa", "bbbbbbbbbbbbbb");
-    } catch (...) {
-        std::cerr << "create thread error: "  << std::endl;
-    }
-
-    getchar();
-    return 0;
-    */
-    boost::property_tree::ptree tree[256];
-    for (int i = 0; i < 256; i++) {
-        emulate(tree[i]);
-    }
-    getchar();
-    return 0;
-
     std::vector<boost::thread> vt;
 
     for (int i = 0; i < 10000; i++) {

@@ -40,23 +40,26 @@ void ManagerApi::Initialize(CManagerInterface* man) {
     LOG("New manager interface initialized.");
 }
 
-const ErrorCode* ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32_t start, __time32_t end,
-                                          __time32_t timestamp, boost::property_tree::ptree& result) {
+RateInfo* ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32_t start, __time32_t end,
+                                   __time32_t* timestamp, int* total, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (!IsValid()) {
-        return &ErrorCode::EC_MAN_ERROR;
+        *error_code = &ErrorCode::EC_MAN_ERROR;
+        return NULL;
     }
 
     CManagerInterface* man = GetInterface();
     int count = 2;
     while (man == NULL) {
         if (count--) {
-            return &ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE;
+            *error_code = &ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE;
+            return NULL;
         }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(16));
+        boost::this_thread::sleep(boost::posix_time::milliseconds(8));
         if (!IsValid()) {
-            return &ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE;
+            *error_code = &ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE;
+            return NULL;
         }
         man = GetInterface();
     }
@@ -67,34 +70,20 @@ const ErrorCode* ManagerApi::RequestChart(const char* symbol, int period, int mo
     ci.mode = mode;
     ci.start = start;
     ci.end = end;
-    ci.timesign = timestamp;
+    ci.timesign = *timestamp;
 
-    __time32_t timesign;
-    int total = 0;
-    RateInfo* ri = man->ChartRequest(&ci, &timesign, &total);
+    RateInfo* ri = man->ChartRequest(&ci, timestamp, total);
     if (ri != NULL) {
-        result.put("count", total);
-        result.put("timesign", timesign);
-        boost::property_tree::ptree rate_infos;
-        for (int i = 0; i < total; i++) {
-            boost::property_tree::ptree rate_info;
-            rate_info.put("open_price", ri[i].open);
-            rate_info.put("high", ri[i].high);
-            rate_info.put("low", ri[i].low);
-            rate_info.put("close", ri[i].close);
-            rate_info.put("time", ri[i].ctm);
-            rate_info.put("volume", ri[i].vol);
-            rate_infos.push_back(std::make_pair("", rate_info));
-        }
-        result.add_child("rate_infos", rate_infos);
+        void* rate_info = malloc((*total) * sizeof(RateInfo));
+        memcpy(rate_info, ri, (*total) * sizeof(RateInfo));
         man->MemFree(ri);
         LOG("ManagerApi::RequestChart complete.");
-        PutInterface(man);
-        return &ErrorCode::EC_OK;
+        *error_code = &ErrorCode::EC_OK;
     } else {
-        PutInterface(man);
-        return &ErrorCode::EC_MAN_ERROR;
+        *error_code = &ErrorCode::EC_MAN_ERROR;
     }
+    PutInterface(man);
+    return NULL;
 }
 
 CManagerInterface* ManagerApi::GetInterface() {

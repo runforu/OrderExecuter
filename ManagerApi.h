@@ -13,8 +13,8 @@ class ManagerApi {
 public:
     static ManagerApi &Instance();
 
-    const ErrorCode *RequestChart(const char *symbol, int period, int mode, __time32_t start, __time32_t end,
-                                  __time32_t timestamp, boost::property_tree::ptree &result);
+    RateInfo *RequestChart(const char *symbol, int period, int mode, __time32_t start, __time32_t end, __time32_t *timestamp,
+                           int *total, const ErrorCode **error_code);
 
 private:
     bool IsValid() {
