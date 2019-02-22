@@ -1,0 +1,12 @@
+{
+    "request": "OpenOrder",
+    "login": "5",
+    "ip": "0.0.0.0",
+    "symbol": "USDJPY",
+    "cmd": "OP_BUY",
+    "volume": 1,
+    "open_price": 110.0,
+    "sl": 0.0,
+    "tp": 0.0,
+    "comment": "test OpenOrder"
+}
