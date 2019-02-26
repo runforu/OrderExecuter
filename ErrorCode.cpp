@@ -16,6 +16,7 @@ const ErrorCode ErrorCode::EC_CLOSE_ONLY = { -11, "Update order is not allowed [
 const ErrorCode ErrorCode::EC_WRONG_PASSWORD = { -12, "Password at lest 6 characters" };
 const ErrorCode ErrorCode::EC_PENDING_ORDER_WITHOUT_OPEN_PRICE = { -13, "Pending order without open price" };
 const ErrorCode ErrorCode::EC_USER_ID_EXISTING = { -14, "User ID already used" };
+const ErrorCode ErrorCode::EC_NO_MEMORY = { -15, "No memory to perform the request" };
 
 const ErrorCode ErrorCode::EC_NO_CONNECT = { 6, "No connection" };
 const ErrorCode ErrorCode::EC_ACCOUNT_DISABLED = { 64, "Account blocked" };

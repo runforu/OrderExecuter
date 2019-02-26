@@ -57,7 +57,7 @@ int sync_client(const std::string& url, const std::string& m_content) {
         boost::system::error_code error;
         boost::asio::read(socket, response, boost::asio::transfer_at_least(1), error);
         std::cout << "Request complete. \n";
-        // socket.close();
+        socket.close();
     } catch (std::exception& e) {
         std::cout << "Exception: " << e.what() << "\n";
     }
@@ -70,37 +70,60 @@ static std::string content(
     "\"end\": 1548992369, \"timestamp\": 1 }");
 
 static std::string content1(
-    "{ \"request\": \"OpenOrder\", \"login\": \"5\", \"ip\": \"0.0.0.0\", \"symbol\": \"USDJPY\", \"cmd\": \"OP_BUY\", "
+    "{ \"request\": \"OpenOrder\", \"login\": \"6\", \"ip\": \"0.0.0.0\", \"symbol\": \"USDJPY\", \"cmd\": \"OP_BUY\", "
     "\"volume\": 1, \"open_price\": 110.0, \"sl\": 0.0, \"tp\": 0.0, \"comment\": \"test OpenOrder\" }");
+
+static std::string content2("{ \"request\": \"GetOpenOrders\", \"login\": \"5\"}");
+
+static std::string content3("{\"request\": \"IsOpening\", \"symbol\" : \"USDJPY\",\"time\" : 0}");
 
 static std::string url("http://120.79.58.246:8080");
 
-void request() {
+void RequestChart() {
     sync_client(url, content);
 }
 
-void request1() {
+void OpenOrder() {
     sync_client(url, content1);
 }
 
+void GetOpenOrders() {
+    sync_client(url, content2);
+}
+
+void IsOpening() {
+    sync_client(url, content3);
+}
+
 int main() {
+    std::string s;
+    s.reserve(46137444);
+    std::cout << s.capacity() << std::endl;
+    // return 0;
+
     std::vector<boost::thread> vt;
 
-    for (int i = 0; i < 10000; i++) {
-        try {
-            vt.push_back(boost::thread(request));
-            vt.push_back(boost::thread(request1));
-        } catch (boost::exception& e) {
-            std::cerr << "create thread error: " << boost::current_exception_diagnostic_information() << std::endl;
+    for (int j = 0; j < 1; j++) {
+        for (int i = 0; i < 1000; i++) {
+            try {
+                // vt.push_back(boost::thread(RequestChart));
+                // vt.push_back(boost::thread(OpenOrder));
+                vt.push_back(boost::thread(GetOpenOrders));
+                // vt.push_back(boost::thread(IsOpening));
+            } catch (boost::exception& e) {
+                std::cerr << "create thread error: " << boost::current_exception_diagnostic_information() << std::endl;
+            }
         }
-    }
 
-    for (std::vector<boost::thread>::iterator it = vt.begin(); it != vt.end(); it++) {
-        try {
-            (*it).join();
-        } catch (boost::exception& e) {
-            std::cerr << "join error: " << boost::current_exception_diagnostic_information() << std::endl;
+        for (std::vector<boost::thread>::iterator it = vt.begin(); it != vt.end(); it++) {
+            try {
+                (*it).join();
+            } catch (boost::exception& e) {
+                std::cerr << "join error: " << boost::current_exception_diagnostic_information() << std::endl;
+            }
         }
+
+        vt.clear();
     }
 
     std::cout << "test complete.\n";

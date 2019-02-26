@@ -27,58 +27,87 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     ptree pt = JsonWrapper::ParseJson(req.body);
     LOG("JsonHandler -> %s", req.body.c_str());
 
-    ptree response;
     if (!pt.empty()) {
         rep.status = reply::ok;
         if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
+            ptree response;
             response = OpenOrder(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("AddOrder") == 0) {
+            ptree response;
             response = AddOrder(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("UpdateOrder") == 0) {
+            ptree response;
             response = UpdateOrder(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("CloseOrder") == 0) {
+            ptree response;
             response = CloseOrder(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("Deposit") == 0) {
+            ptree response;
             response = Deposit(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("GetUserRecord") == 0) {
+            ptree response;
             response = GetUserRecord(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
+            ptree response;
             response = UpdateUserRecord(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("AddUser") == 0) {
+            ptree response;
             response = AddUser(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("ChangePassword") == 0) {
+            ptree response;
             response = ChangePassword(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("CheckPassword") == 0) {
+            ptree response;
             response = CheckPassword(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("GetMargin") == 0) {
+            ptree response;
             response = GetMargin(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
+            ptree response;
             response = GetOrder(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
-            response = GetOpenOrders(pt);
+            GetOpenOrders(pt, rep.content);
         } else if (pt.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
-            response = GetPendingOrders(pt);
+            GetPendingOrders(pt, rep.content);
         } else if (pt.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
-            response = GetClosedOrders(pt);
+            GetClosedOrders(pt, rep.content);
         } else if (pt.get<std::string>("request", "").compare("IsOpening") == 0) {
+            ptree response;
             response = IsOpening(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("TradeTime") == 0) {
+            ptree response;
             response = TradeTime(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("GetSymbolList") == 0) {
+            ptree response;
             response = GetSymbolList(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else {
             return false;
         }
     } else {
         // Handle json parse error
         rep.status = reply::bad_request;
+        ptree response;
         response.put("json_error", "Invalid json format");
+        rep.content.append(JsonWrapper::ToJsonStr(response));
     }
 
     rep.headers.push_back(header::json_content_type);
-    std::string content = JsonWrapper::ToJsonStr(response);
-    rep.headers.push_back(header("Content-Length", std::to_string(content.length())));
-    rep.content.append(content);
+    rep.headers.push_back(header("Content-Length", std::to_string(rep.content.length())));
     return true;
 }
 
@@ -427,18 +456,18 @@ boost::property_tree::ptree JsonHandler::GetOrder(boost::property_tree::ptree pt
     return response;
 }
 
-boost::property_tree::ptree JsonHandler::GetOpenOrders(boost::property_tree::ptree pt) {
-    return _GetOpenOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL; });
+void JsonHandler::GetOpenOrders(boost::property_tree::ptree pt, std::string& response) {
+    return _GetOpenOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL; }, response);
 }
 
-boost::property_tree::ptree JsonHandler::GetPendingOrders(boost::property_tree::ptree pt) {
-    return _GetOpenOrders(pt,
-                          [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY_LIMIT || trade->cmd > OP_SELL_STOP; });
+void JsonHandler::GetPendingOrders(boost::property_tree::ptree pt, std::string& response) {
+    return _GetOpenOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY_LIMIT || trade->cmd > OP_SELL_STOP; },
+                          response);
 }
 
-boost::property_tree::ptree JsonHandler::GetClosedOrders(boost::property_tree::ptree pt) {
-    return _GetClosedOrders(
-        pt, [](TradeRecord* trade) -> bool { return false && trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; });
+void JsonHandler::GetClosedOrders(boost::property_tree::ptree pt, std::string& response) {
+    _GetClosedOrders(pt, [](TradeRecord* trade) -> bool { return false && trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; },
+                     response);
 }
 
 inline boost::property_tree::ptree JsonHandler::IsOpening(boost::property_tree::ptree pt) {
@@ -555,7 +584,7 @@ inline boost::property_tree::ptree JsonHandler::GetSymbolList(boost::property_tr
     return response;
 }
 
-boost::property_tree::ptree JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter_out) {
+void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter_out, std::string& response) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     const ErrorCode* error_code;
@@ -565,63 +594,50 @@ boost::property_tree::ptree JsonHandler::_GetOpenOrders(boost::property_tree::pt
 
     bool result = ServerApi::GetOpenOrders(login, &total, &trade_record, &error_code);
 
-    ptree response;
-    response.put("request", request);
-    response.put("result", result ? "OK" : "ERROR");
-    response.put("error_code", error_code->m_code);
-    response.put("error_des", error_code->m_des);
-    if (result && trade_record != NULL) {
-        ptree orders;
-        for (int i = 0; i < total; i++) {
-            ptree order;
-            TradeRecord trade = trade_record[i];
-            if (filter_out(&trade)) {
-                continue;
+    try {
+        // reduce re-allocate memory
+        LOG("%d", total);
+        response.reserve(total * 500 + 128);
+        response.append("{");
+        response.append("\"request\":\"").append(request).append("\",");
+        response.append("\"result\":\"").append(result ? "OK" : "ERROR").append("\",");
+        response.append("\"error_code\":").append(std::to_string(error_code->m_code)).append(",");
+        response.append("\"error_des\":\"").append(error_code->m_des).append("\",");
+        response.append("\"orders\":").append("[");
+        if (result && trade_record != NULL) {
+            for (int i = 0; i < total; i++) {
+                TradeRecord* trade = trade_record + i;;
+                if (filter_out(trade)) {
+                    continue;
+                }
+                count++;
+                AppendTradeRecordJsonStr(trade, response);
+                response.append(",");
             }
-            count++;
-            order.put("order", trade.order);
-            order.put("login", trade.login);
-            order.put("symbol", trade.symbol);
-            order.put("digits", trade.digits);
-            order.put("cmd", TradeCmdStr(trade.cmd));
-            order.put("volume", trade.volume);
-            order.put("open_time", trade.open_time);
-            order.put("state", ToTradeRecordStateStr(trade.state));
-            order.put("open_price", trade.open_price);
-            order.put("sl", trade.sl);
-            order.put("tp", trade.tp);
-            order.put("close_time", trade.close_time);
-            order.put("gw_volume", trade.gw_volume);
-            order.put("expiration", trade.expiration);
-            order.put("commission", trade.commission);
-            order.put("commission_agent", trade.commission_agent);
-            order.put("storage", trade.storage);
-            order.put("close_price", trade.close_price);
-            order.put("profit", NormalizeDouble(trade.profit, 2));
-            order.put("taxes", trade.taxes);
-            order.put("magic", trade.magic);
-            order.put("comment", trade.comment);
-            order.put("gw_order", trade.gw_order);
-            order.put("activation", trade.activation);
-            order.put("gw_open_price", trade.gw_open_price);
-            order.put("gw_close_price", trade.gw_close_price);
-            order.put("margin_rate", trade.margin_rate);
-            order.put("timestamp", trade.timestamp);
-            orders.push_back(std::make_pair("", order));
+            if (count > 0) {
+                response.pop_back();
+            }
         }
-        response.put("count", count);
-        response.add_child("orders", orders);
+        response.append("],");
+        response.append("\"count\":").append(std::to_string(count));
+        response.append("}");
+    } catch (...) {
+        LOG("No memory to perform get open orders");
+        response.clear();
+        response.append("{");
+        response.append("\"request\":\"").append(request).append("\",");
+        response.append("\"result\":\"").append(ErrorCode::EC_NO_MEMORY.m_code == 0 ? "OK" : "ERROR").append("\",");
+        response.append("\"error_code\":").append(std::to_string(ErrorCode::EC_NO_MEMORY.m_code)).append(",");
+        response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}");
     }
 
     if (trade_record != NULL) {
         HEAP_FREE(trade_record);
         trade_record = NULL;
     }
-
-    return response;
 }
 
-boost::property_tree::ptree JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter_out) {
+void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter_out, std::string& response) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int from = pt.get<int>("from", -1);
@@ -633,58 +649,77 @@ boost::property_tree::ptree JsonHandler::_GetClosedOrders(boost::property_tree::
 
     bool result = ServerApi::GetClosedOrders(login, from, to, &total, &trade_record, &error_code);
 
-    ptree response;
-    response.put("request", request);
-    response.put("result", result ? "OK" : "ERROR");
-    response.put("error_code", error_code->m_code);
-    response.put("error_des", error_code->m_des);
-    if (result && trade_record != NULL) {
-        ptree orders;
-        for (int i = 0; i < total; i++) {
-            ptree order;
-            TradeRecord trade = trade_record[i];
-            if (filter_out(&trade)) {
-                continue;
+    try {
+        response.reserve(total * 500 + 128);
+        response.append("{");
+        response.append("\"request\":\"").append(request).append("\",");
+        response.append("\"result\":\"").append(result ? "OK" : "ERROR").append("\",");
+        response.append("\"error_code\":").append(std::to_string(error_code->m_code)).append(",");
+        response.append("\"error_des\":\"").append(error_code->m_des).append("\",");
+        response.append("\"orders\":").append("[");
+        if (result && trade_record != NULL) {
+            for (int i = 0; i < total; i++) {
+                ptree order;
+                TradeRecord* trade = trade_record + i;
+                if (filter_out(trade)) {
+                    continue;
+                }
+                count++;
+                AppendTradeRecordJsonStr(trade, response);
+                response.append(",");
             }
-            count++;
-            order.put("order", trade.order);
-            order.put("login", trade.login);
-            order.put("symbol", trade.symbol);
-            order.put("digits", trade.digits);
-            order.put("cmd", TradeCmdStr(trade.cmd));
-            order.put("volume", trade.volume);
-            order.put("open_time", trade.open_time);
-            order.put("state", ToTradeRecordStateStr(trade.state));
-            order.put("open_price", trade.open_price);
-            order.put("sl", trade.sl);
-            order.put("tp", trade.tp);
-            order.put("close_time", trade.close_time);
-            order.put("gw_volume", trade.gw_volume);
-            order.put("expiration", trade.expiration);
-            order.put("commission", trade.commission);
-            order.put("commission_agent", trade.commission_agent);
-            order.put("storage", trade.storage);
-            order.put("close_price", trade.close_price);
-            order.put("profit", NormalizeDouble(trade.profit, 2));
-            order.put("taxes", trade.taxes);
-            order.put("magic", trade.magic);
-            order.put("comment", trade.comment);
-            order.put("gw_order", trade.gw_order);
-            order.put("activation", trade.activation);
-            order.put("gw_open_price", trade.gw_open_price);
-            order.put("gw_close_price", trade.gw_close_price);
-            order.put("margin_rate", trade.margin_rate);
-            order.put("timestamp", trade.timestamp);
-            orders.push_back(std::make_pair("", order));
+            if (count > 0) {
+                response.pop_back();
+            }
         }
-        response.put("count", count);
-        response.add_child("orders", orders);
+        response.append("],");
+        response.append("\"count\":").append(std::to_string(count));
+        response.append("}");
+    } catch (...) {
+        LOG("No memory to perform get closed orders");
+        response.clear();
+        response.append("{");
+        response.append("\"request\":\"").append(request).append("\",");
+        response.append("\"result\":\"").append(ErrorCode::EC_NO_MEMORY.m_code == 0 ? "OK" : "ERROR").append("\",");
+        response.append("\"error_code\":").append(std::to_string(ErrorCode::EC_NO_MEMORY.m_code)).append(",");
+        response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}");
     }
 
     if (trade_record != NULL) {
         HEAP_FREE(trade_record);
         trade_record = NULL;
     }
+}
 
-    return response;
+void JsonHandler::AppendTradeRecordJsonStr(TradeRecord* trade, std::string& response) {
+    response.append("{");
+    response.append("\"order\":").append(std::to_string(trade->order)).append(",");
+    response.append("\"login\":").append(std::to_string(trade->login)).append(",");
+    response.append("\"symbol\":\"").append(trade->symbol).append("\",");
+    response.append("\"digits\":").append(std::to_string(trade->digits)).append(",");
+    response.append("\"cmd\":\"").append(TradeCmdStr(trade->cmd)).append("\",");
+    response.append("\"volume\":").append(std::to_string(trade->volume)).append(",");
+    response.append("\"open_time\":").append(std::to_string(trade->open_time)).append(",");
+    response.append("\"state\":\"").append(ToTradeRecordStateStr(trade->state)).append("\",");
+    response.append("\"open_price\":").append(std::to_string(trade->open_price)).append(",");
+    response.append("\"sl\":").append(std::to_string(trade->sl)).append(",");
+    response.append("\"tp\":").append(std::to_string(trade->tp)).append(",");
+    response.append("\"close_time\":").append(std::to_string(trade->close_time)).append(",");
+    response.append("\"gw_volume\":").append(std::to_string(trade->gw_volume)).append(",");
+    response.append("\"expiration\":").append(std::to_string(trade->expiration)).append(",");
+    response.append("\"commission\":").append(std::to_string(trade->commission)).append(",");
+    response.append("\"commission_agent\":").append(std::to_string(trade->commission_agent)).append(",");
+    response.append("\"storage\":").append(std::to_string(trade->storage)).append(",");
+    response.append("\"close_price\":").append(std::to_string(trade->close_price)).append(",");
+    response.append("\"profit\":").append(std::to_string(NormalizeDouble(trade->profit, 2))).append(",");
+    response.append("\"taxes\":").append(std::to_string(trade->taxes)).append(",");
+    response.append("\"magic\":").append(std::to_string(trade->magic)).append(",");
+    response.append("\"comment\":\"").append(trade->comment).append("\",");
+    response.append("\"gw_order\":").append(std::to_string(trade->gw_order)).append(",");
+    response.append("\"activation\":").append(std::to_string(trade->activation)).append(",");
+    response.append("\"gw_open_price\":").append(std::to_string(trade->gw_open_price)).append(",");
+    response.append("\"gw_close_price\":").append(std::to_string(trade->gw_close_price)).append(",");
+    response.append("\"margin_rate\":").append(std::to_string(trade->margin_rate)).append(",");
+    response.append("\"timestamp\":").append(std::to_string(trade->timestamp));
+    response.append("}");
 }

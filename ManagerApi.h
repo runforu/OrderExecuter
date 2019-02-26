@@ -13,8 +13,9 @@ class ManagerApi {
 public:
     static ManagerApi &Instance();
 
-    RateInfo *RequestChart(const char *symbol, int period, int mode, __time32_t start, __time32_t end, __time32_t *timestamp,
-                           int *total, const ErrorCode **error_code);
+    // for performance and low memory footprint
+    void RequestChart(const char *symbol, int period, int mode, __time32_t start, __time32_t end, __time32_t *timestamp,
+                      std::string &json_str);
 
 private:
     bool IsValid() {
@@ -41,6 +42,8 @@ private:
     ManagerApi(ManagerApi const &) {}
 
     void operator=(ManagerApi const &) {}
+
+    void ErrorCodeToString(const ErrorCode* ec, std::string& str);
 
 private:
     CManagerFactory m_factory;

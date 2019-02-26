@@ -60,41 +60,5 @@ void MiscJsonHandler::RequestChart(ptree pt, std::string& content) {
     }
 
     char* json_str = NULL;
-    const ErrorCode* error_code;
-    int total = 0;
-    RateInfo* rate_info =
-        ManagerApi::Instance().RequestChart(symbol.c_str(), period, mode, start, end, &timestamp, &total, &error_code);
-    if (rate_info == NULL) {
-        content.reserve(256);
-        content.append("{");
-        content.append("\"result\":\"").append(error_code->m_code == 0 ? "OK" : "ERROR").append("\",");
-        content.append("\"error_code\":").append(std::to_string(error_code->m_code)).append(",");
-        content.append("\"error_des\":\"").append(error_code->m_des).append("\"");
-        content.append("}");
-    } else {
-        // max length of a RateInfo json is less than 128, the other info is less than 256
-        content.reserve(total * 128 + 256);
-        content.append("{");
-        content.append("\"result\":\"").append(error_code->m_code == 0 ? "OK" : "ERROR").append("\",");
-        content.append("\"error_code\":").append(std::to_string(error_code->m_code)).append(",");
-        content.append("\"error_des\":\"").append(error_code->m_des).append("\",");
-        content.append("\"count\":").append(std::to_string(total)).append(",");
-        content.append("\"timesign\":").append(std::to_string(timestamp)).append(",");
-        content.append("\"rate_infos\":").append("[");
-        for (int i = 0; i < total; i++) {
-            content.append("{");
-            content.append("\"open_price\":").append(std::to_string(rate_info[i].open)).append(",");
-            content.append("\"high\":").append(std::to_string(rate_info[i].high)).append(",");
-            content.append("\"low\":").append(std::to_string(rate_info[i].low)).append(",");
-            content.append("\"close\":").append(std::to_string(rate_info[i].close)).append(",");
-            content.append("\"time\":").append(std::to_string(rate_info[i].ctm)).append(",");
-            content.append("\"volume\":").append(std::to_string(rate_info[i].vol));
-            content.append("}");
-            if (i != total - 1) {
-                content.append(",");
-            }
-        }
-        content.append("]}");
-        free(rate_info);
-    }
+    ManagerApi::Instance().RequestChart(symbol.c_str(), period, mode, start, end, &timestamp, content);
 }

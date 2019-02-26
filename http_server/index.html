@@ -28,6 +28,7 @@
     const ErrorCode EC_WRONG_PASSWORD = {-12, "Password at lest 6 characters"};
     const ErrorCode EC_PENDING_ORDER_WITHOUT_OPEN_PRICE = {-13, "Pending order without open price"};
     const ErrorCode EC_USER_ID_EXISTING = { -14, "User ID already used" };
+    const ErrorCode EC_NO_MEMORY = { -15, "No memory to perform the request" };
     
     const ErrorCode EC_NO_CONNECT = {6, "No connection"};
     const ErrorCode EC_ACCOUNT_DISABLED = {64, "Account blocked"};
@@ -454,6 +455,93 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetOpenOrders",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS",
+    "orders" : [{
+        "order" : 122,
+        "login":5,
+        "symbol":"USDJPY",
+        "digits":5,
+        "cmd":5,
+        "volume":5,
+        "open_time":1212312,
+        "state":5,
+        "open_price":97.3,
+        "sl":97.3,
+        "tp":97.3,
+        "close_time":1212312,
+        "gw_volume":5,
+        "expiration":1212312,
+        "commission":97.3,
+        "commission_agent":97.3,
+        "storage":97.3,
+        "close_price":97.3,
+        "profit":97.3,
+        "taxes":97.3,
+        "magic":5,
+        "comment":"USDJPY",
+        "gw_order":5,
+        "activation":5,
+        "gw_open_price":97,
+        "gw_close_price":97,
+        "margin_rate":97.3,
+        "timestamp":1212312
+    },
+    {
+        "order" : 1222,
+        "login":5,
+        "symbol":"USDJPY",
+        "digits":5,
+        "cmd":5,
+        "volume":5,
+        "open_time":1212312,
+        "state":5,
+        "open_price":97.3,
+        "sl":97.3,
+        "tp":97.3,
+        "close_time":1212312,
+        "gw_volume":5,
+        "expiration":1212312,
+        "commission":97.3,
+        "commission_agent":97.3,
+        "storage":97.3,
+        "close_price":97.3,
+        "profit":97.3,
+        "taxes":97.3,
+        "magic":5,
+        "comment":"USDJPY",
+        "gw_order":5,
+        "activation":5,
+        "gw_open_price":97,
+        "gw_close_price":97,
+        "margin_rate":97.3,
+        "timestamp":1212312
+    }]   
+}</code>
+</pre>
+    </div>
+        
+    
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> pending orders of a user</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetPendingOrders",
+    "login": 5
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetPendingOrders",
     "result": "OK",
     "error_code": "0",
     "error_des": "SUCCESS",

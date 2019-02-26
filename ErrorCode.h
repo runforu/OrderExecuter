@@ -17,6 +17,7 @@ struct ErrorCode {
     static const ErrorCode EC_WRONG_PASSWORD;
     static const ErrorCode EC_PENDING_ORDER_WITHOUT_OPEN_PRICE;
     static const ErrorCode EC_USER_ID_EXISTING;
+    static const ErrorCode EC_NO_MEMORY;
 
     static const ErrorCode EC_NO_CONNECT;
     static const ErrorCode EC_ACCOUNT_DISABLED;

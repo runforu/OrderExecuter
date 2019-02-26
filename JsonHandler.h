@@ -27,16 +27,17 @@ private:
     boost::property_tree::ptree GetMargin(boost::property_tree::ptree pt);
     boost::property_tree::ptree GetOrder(boost::property_tree::ptree pt);
     boost::property_tree::ptree AddUser(boost::property_tree::ptree pt);
-    inline boost::property_tree::ptree GetOpenOrders(boost::property_tree::ptree pt);
-    inline boost::property_tree::ptree GetPendingOrders(boost::property_tree::ptree pt);
-    inline boost::property_tree::ptree GetClosedOrders(boost::property_tree::ptree pt);
+    inline void GetOpenOrders(boost::property_tree::ptree pt, std::string& response);
+    inline void GetPendingOrders(boost::property_tree::ptree pt, std::string& response);
+    inline void GetClosedOrders(boost::property_tree::ptree pt, std::string& response);
     inline boost::property_tree::ptree IsOpening(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree TradeTime(boost::property_tree::ptree pt);
     inline boost::property_tree::ptree GetSymbolList(boost::property_tree::ptree pt);
 
 private:
-    boost::property_tree::ptree _GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter);
-    boost::property_tree::ptree _GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter);
+    void _GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter, std::string& response);
+    void _GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter, std::string& response);
+    void AppendTradeRecordJsonStr(TradeRecord* trade_record, std::string& response);
 };
 
 #endif  // !_JSON_HANDLER_H_

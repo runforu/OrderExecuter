@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string.h>
+#include <string>
 #include <utility>
 #include "Config.h"
 #include "Environment.h"
@@ -40,26 +40,26 @@ void ManagerApi::Initialize(CManagerInterface* man) {
     LOG("New manager interface initialized.");
 }
 
-RateInfo* ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32_t start, __time32_t end,
-                                   __time32_t* timestamp, int* total, const ErrorCode** error_code) {
+void ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32_t start, __time32_t end, __time32_t* timestamp,
+                              std::string& json_str) {
     FUNC_WARDER;
 
     if (!IsValid()) {
-        *error_code = &ErrorCode::EC_MAN_ERROR;
-        return NULL;
+        ErrorCodeToString(&ErrorCode::EC_MAN_ERROR, json_str);
+        return;
     }
 
     CManagerInterface* man = GetInterface();
     int count = 2;
     while (man == NULL) {
         if (count--) {
-            *error_code = &ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE;
-            return NULL;
+            ErrorCodeToString(&ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE, json_str);
+            return;
         }
         boost::this_thread::sleep(boost::posix_time::milliseconds(8));
         if (!IsValid()) {
-            *error_code = &ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE;
-            return NULL;
+            ErrorCodeToString(&ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE, json_str);
+            return;
         }
         man = GetInterface();
     }
@@ -72,18 +72,46 @@ RateInfo* ManagerApi::RequestChart(const char* symbol, int period, int mode, __t
     ci.end = end;
     ci.timesign = *timestamp;
 
-    RateInfo* ri = man->ChartRequest(&ci, timestamp, total);
+    void* rate_info = NULL;
+    int total = 0;
+    RateInfo* ri = man->ChartRequest(&ci, timestamp, &total);
     if (ri != NULL) {
-        void* rate_info = malloc((*total) * sizeof(RateInfo));
-        memcpy(rate_info, ri, (*total) * sizeof(RateInfo));
+        LOG("ManagerApi::RequestChart complete %d.", total);
+        // avarage length of a RateInfo json is less than 100, the max length of other info is less than 256
+        try {
+            json_str.reserve(total * 100 + 256);
+            json_str.append("{");
+            json_str.append("\"result\":\"").append(ErrorCode::EC_OK.m_code == 0 ? "OK" : "ERROR").append("\",");
+            json_str.append("\"error_code\":").append(std::to_string(ErrorCode::EC_OK.m_code)).append(",");
+            json_str.append("\"error_des\":\"").append(ErrorCode::EC_OK.m_des).append("\",");
+            json_str.append("\"count\":").append(std::to_string(total)).append(",");
+            json_str.append("\"timesign\":").append(std::to_string(*timestamp)).append(",");
+            json_str.append("\"rate_infos\":").append("[");
+            for (int i = 0; i < total; i++) {
+                json_str.append("{");
+                json_str.append("\"open_price\":").append(std::to_string(ri[i].open)).append(",");
+                json_str.append("\"high\":").append(std::to_string(ri[i].high)).append(",");
+                json_str.append("\"low\":").append(std::to_string(ri[i].low)).append(",");
+                json_str.append("\"close\":").append(std::to_string(ri[i].close)).append(",");
+                json_str.append("\"time\":").append(std::to_string(ri[i].ctm)).append(",");
+                json_str.append("\"volume\":").append(std::to_string(ri[i].vol));
+                json_str.append("}");
+                if (i != total - 1) {
+                    json_str.append(",");
+                }
+            }
+            json_str.append("]}");
+        }
+        catch (...) {
+            ErrorCodeToString(&ErrorCode::EC_MAN_ERROR, json_str);
+            LOG("No memory to perform the action");
+        }
         man->MemFree(ri);
-        LOG("ManagerApi::RequestChart complete.");
-        *error_code = &ErrorCode::EC_OK;
+        LOG("memory = %d, capability = %d, size = %d", (sizeof(RateInfo) * total), json_str.capacity(), json_str.size());
     } else {
-        *error_code = &ErrorCode::EC_MAN_ERROR;
+        ErrorCodeToString(&ErrorCode::EC_MAN_ERROR, json_str);
     }
     PutInterface(man);
-    return NULL;
 }
 
 CManagerInterface* ManagerApi::GetInterface() {
@@ -183,4 +211,13 @@ inline ManagerApi::~ManagerApi() {
     }
     m_factory.WinsockCleanup();
     LOG("ManagerApi::~ManagerApi()");
+}
+
+void ManagerApi::ErrorCodeToString(const ErrorCode* ec, std::string& str) {
+    str.reserve(127);
+    str.append("{");
+    str.append("\"result\":\"").append(ec->m_code == 0 ? "OK" : "ERROR").append("\",");
+    str.append("\"error_code\":").append(std::to_string(ec->m_code)).append(",");
+    str.append("\"error_des\":\"").append(ec->m_des).append("\"");
+    str.append("}");
 }
