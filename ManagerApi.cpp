@@ -103,6 +103,7 @@ void ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32
             json_str.append("]}");
         }
         catch (...) {
+            json_str.clear();
             ErrorCodeToString(&ErrorCode::EC_MAN_ERROR, json_str);
             LOG("No memory to perform the action");
         }
