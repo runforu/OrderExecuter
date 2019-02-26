@@ -1,10 +1,10 @@
 #include <process.h>
 #include <stdlib.h>
 #include "Config.h"
+#include "ErrorCode.h"
 #include "Loger.h"
 #include "ServerApi.h"
 #include "common.h"
-#include "ErrorCode.h"
 #include "../include/MT4ServerAPI.h"
 
 CServerInterface* ServerApi::s_interface = NULL;
@@ -762,6 +762,8 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     //--- check margin
     if (cmd == OP_BUY || cmd == OP_SELL) {
         margin = s_interface->TradesMarginCheck(&user_info, &trade_trans_info, &profit, &free_margin, &prev_margin);
+        LOG("AddOrder: TradesMarginCheck  margin = %d, profit = %d, free_margin = %d, prev_margin = %d", margin, profit,
+            free_margin, prev_margin);
         if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg.margin_hedged_strong != FALSE || prev_margin <= margin)) {
             LOG("AddOrder: not enough margin");
             *error_code = &ErrorCode::EC_TRADE_NO_MONEY;

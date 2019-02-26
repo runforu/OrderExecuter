@@ -10,7 +10,7 @@ class JsonWrapper {
 public:
     static boost::property_tree::ptree ParseJson(std::string json_str);
 
-    static std::string ToJsonStr(boost::property_tree::ptree& pt);
+    static std::string ToJsonStr(boost::property_tree::ptree& pt, bool pretty = false);
 };
 
 #endif  // !_HTTP_SERVER_JSON_HELPER_H_

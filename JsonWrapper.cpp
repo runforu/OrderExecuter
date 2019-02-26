@@ -12,8 +12,8 @@ boost::property_tree::ptree JsonWrapper::ParseJson(std::string json_str) {
     return tree;
 }
 
-std::string JsonWrapper::ToJsonStr(boost::property_tree::ptree& pt) {
+std::string JsonWrapper::ToJsonStr(boost::property_tree::ptree& pt, bool pretty) {
     std::stringstream ss;
-    write_json(ss, pt);
+    write_json(ss, pt, pretty);
     return ss.str();
 }
