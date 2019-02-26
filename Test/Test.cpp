@@ -109,8 +109,8 @@ int main() {
             try {
                 // vt.push_back(boost::thread(RequestChart));
                 // vt.push_back(boost::thread(OpenOrder));
-                //vt.push_back(boost::thread(GetOpenOrders));
-                vt.push_back(boost::thread(GetClosedOrders));
+                vt.push_back(boost::thread(GetOpenOrders));
+                //vt.push_back(boost::thread(GetClosedOrders));
                 // vt.push_back(boost::thread(IsOpening));
             } catch (boost::exception& e) {
                 std::cerr << "create thread error: " << boost::current_exception_diagnostic_information() << std::endl;

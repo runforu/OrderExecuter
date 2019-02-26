@@ -629,6 +629,7 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
         response.append("\"request\":\"").append(request).append("\",");
         response.append("\"result\":\"").append(ErrorCode::EC_NO_MEMORY.m_code == 0 ? "OK" : "ERROR").append("\",");
         response.append("\"error_code\":").append(std::to_string(ErrorCode::EC_NO_MEMORY.m_code)).append(",");
+        response.append("\"total\":").append(std::to_string(total)).append(",");
         response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}");
     }
 
@@ -686,6 +687,7 @@ void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut fil
         response.append("\"request\":\"").append(request).append("\",");
         response.append("\"result\":\"").append(ErrorCode::EC_NO_MEMORY.m_code == 0 ? "OK" : "ERROR").append("\",");
         response.append("\"error_code\":").append(std::to_string(ErrorCode::EC_NO_MEMORY.m_code)).append(",");
+        response.append("\"total\":").append(std::to_string(total)).append(",");
         response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}");
     }
 
