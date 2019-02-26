@@ -7,8 +7,6 @@
 #include "Loger.h"
 #include "ManagerApi.h"
 
-char ManagerApiDllPath[256];
-
 ManagerApi& ManagerApi::Instance() {
     static ManagerApi _instance;
     return _instance;
