@@ -585,6 +585,8 @@ inline boost::property_tree::ptree JsonHandler::GetSymbolList(boost::property_tr
 }
 
 void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter_out, std::string& response) {
+    FUNC_WARDER;
+
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     const ErrorCode* error_code;
@@ -596,7 +598,6 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
 
     try {
         // reduce re-allocate memory
-        LOG("%d", total);
         response.reserve(total * 500 + 128);
         response.append("{");
         response.append("\"request\":\"").append(request).append("\",");
@@ -622,7 +623,7 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
         response.append("\"count\":").append(std::to_string(count));
         response.append("}");
     } catch (...) {
-        LOG("No memory to perform get open orders");
+        LOG("No memory to perform getting open orders");
         response.clear();
         response.append("{");
         response.append("\"request\":\"").append(request).append("\",");
@@ -638,6 +639,8 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
 }
 
 void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter_out, std::string& response) {
+    FUNC_WARDER;
+
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int from = pt.get<int>("from", -1);
@@ -650,6 +653,7 @@ void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut fil
     bool result = ServerApi::GetClosedOrders(login, from, to, &total, &trade_record, &error_code);
 
     try {
+        LOG("Closed orders: %d", total);
         response.reserve(total * 500 + 128);
         response.append("{");
         response.append("\"request\":\"").append(request).append("\",");
@@ -676,7 +680,7 @@ void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut fil
         response.append("\"count\":").append(std::to_string(count));
         response.append("}");
     } catch (...) {
-        LOG("No memory to perform get closed orders");
+        LOG("No memory to perform getting closed orders");
         response.clear();
         response.append("{");
         response.append("\"request\":\"").append(request).append("\",");

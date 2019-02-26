@@ -65,34 +65,35 @@ int sync_client(const std::string& url, const std::string& m_content) {
     return 0;
 }
 
-static std::string content(
-    "{ \"request\": \"RequestChart\", \"symbol\": \"USDJPY\", \"period\": 1, \"mode\": \"CHART_RANGE_IN\", \"start\": 0, "
-    "\"end\": 1548992369, \"timestamp\": 1 }");
-
-static std::string content1(
-    "{ \"request\": \"OpenOrder\", \"login\": \"6\", \"ip\": \"0.0.0.0\", \"symbol\": \"USDJPY\", \"cmd\": \"OP_BUY\", "
-    "\"volume\": 1, \"open_price\": 110.0, \"sl\": 0.0, \"tp\": 0.0, \"comment\": \"test OpenOrder\" }");
-
-static std::string content2("{ \"request\": \"GetOpenOrders\", \"login\": \"5\"}");
-
-static std::string content3("{\"request\": \"IsOpening\", \"symbol\" : \"USDJPY\",\"time\" : 0}");
-
 static std::string url("http://120.79.58.246:8080");
 
 void RequestChart() {
+    static std::string content(
+        "{ \"request\": \"RequestChart\", \"symbol\": \"USDJPY\", \"period\": 1, \"mode\": \"CHART_RANGE_IN\", \"start\": 0, "
+        "\"end\": 1548992369, \"timestamp\": 1 }");
     sync_client(url, content);
 }
 
 void OpenOrder() {
-    sync_client(url, content1);
+    static std::string content(
+        "{ \"request\": \"OpenOrder\", \"login\": \"6\", \"ip\": \"0.0.0.0\", \"symbol\": \"USDJPY\", \"cmd\": \"OP_BUY\", "
+        "\"volume\": 1, \"open_price\": 110.0, \"sl\": 0.0, \"tp\": 0.0, \"comment\": \"test OpenOrder\" }");
+    sync_client(url, content);
 }
 
 void GetOpenOrders() {
-    sync_client(url, content2);
+    static std::string content("{ \"request\": \"GetOpenOrders\", \"login\": 5}");
+    sync_client(url, content);
+}
+
+void GetClosedOrders() {
+    static std::string content("{ \"request\": \"GetClosedOrders\", \"login\": 5}");
+    sync_client(url, content);
 }
 
 void IsOpening() {
-    sync_client(url, content3);
+    static std::string content("{\"request\": \"IsOpening\", \"symbol\" : \"USDJPY\",\"time\" : 0}");
+    sync_client(url, content);
 }
 
 int main() {
@@ -103,12 +104,13 @@ int main() {
 
     std::vector<boost::thread> vt;
 
-    for (int j = 0; j < 1; j++) {
+    for (int j = 0; j < 10; j++) {
         for (int i = 0; i < 1000; i++) {
             try {
                 // vt.push_back(boost::thread(RequestChart));
                 // vt.push_back(boost::thread(OpenOrder));
-                vt.push_back(boost::thread(GetOpenOrders));
+                //vt.push_back(boost::thread(GetOpenOrders));
+                vt.push_back(boost::thread(GetClosedOrders));
                 // vt.push_back(boost::thread(IsOpening));
             } catch (boost::exception& e) {
                 std::cerr << "create thread error: " << boost::current_exception_diagnostic_information() << std::endl;
