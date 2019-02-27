@@ -98,7 +98,7 @@ void ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32
                     json_str.append(",");
                 }
             }
-            json_str.append("]}");
+            json_str.append("]}\r\n");
         }
         catch (...) {
             json_str.clear();
@@ -218,5 +218,5 @@ void ManagerApi::ErrorCodeToString(const ErrorCode* ec, std::string& str) {
     str.append("\"result\":\"").append(ec->m_code == 0 ? "OK" : "ERROR").append("\",");
     str.append("\"error_code\":").append(std::to_string(ec->m_code)).append(",");
     str.append("\"error_des\":\"").append(ec->m_des).append("\"");
-    str.append("}");
+    str.append("}\r\n");
 }

@@ -621,7 +621,7 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
         }
         response.append("],");
         response.append("\"count\":").append(std::to_string(count));
-        response.append("}");
+        response.append("}\r\n");
     } catch (...) {
         LOG("No memory to perform getting open orders");
         response.clear();
@@ -630,7 +630,7 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
         response.append("\"result\":\"").append(ErrorCode::EC_NO_MEMORY.m_code == 0 ? "OK" : "ERROR").append("\",");
         response.append("\"error_code\":").append(std::to_string(ErrorCode::EC_NO_MEMORY.m_code)).append(",");
         response.append("\"total\":").append(std::to_string(total)).append(",");
-        response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}");
+        response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}\r\n");
     }
 
     if (trade_record != NULL) {
@@ -679,7 +679,7 @@ void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut fil
         }
         response.append("],");
         response.append("\"count\":").append(std::to_string(count));
-        response.append("}");
+        response.append("}\r\n");
     } catch (...) {
         LOG("No memory to perform getting closed orders");
         response.clear();
@@ -688,7 +688,7 @@ void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut fil
         response.append("\"result\":\"").append(ErrorCode::EC_NO_MEMORY.m_code == 0 ? "OK" : "ERROR").append("\",");
         response.append("\"error_code\":").append(std::to_string(ErrorCode::EC_NO_MEMORY.m_code)).append(",");
         response.append("\"total\":").append(std::to_string(total)).append(",");
-        response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}");
+        response.append("\"error_des\":\"").append(ErrorCode::EC_NO_MEMORY.m_des).append("\"}\r\n");
     }
 
     if (trade_record != NULL) {

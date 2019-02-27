@@ -97,20 +97,15 @@ void IsOpening() {
 }
 
 int main() {
-    std::string s;
-    s.reserve(46137444);
-    std::cout << s.capacity() << std::endl;
-    // return 0;
-
     std::vector<boost::thread> vt;
 
     for (int j = 0; j < 10; j++) {
         for (int i = 0; i < 1000; i++) {
             try {
-                // vt.push_back(boost::thread(RequestChart));
+                vt.push_back(boost::thread(RequestChart));
                 // vt.push_back(boost::thread(OpenOrder));
-                vt.push_back(boost::thread(GetOpenOrders));
-                //vt.push_back(boost::thread(GetClosedOrders));
+                // vt.push_back(boost::thread(GetOpenOrders));
+                // vt.push_back(boost::thread(GetClosedOrders));
                 // vt.push_back(boost::thread(IsOpening));
             } catch (boost::exception& e) {
                 std::cerr << "create thread error: " << boost::current_exception_diagnostic_information() << std::endl;
@@ -129,5 +124,4 @@ int main() {
     }
 
     std::cout << "test complete.\n";
-    getchar();
 }
