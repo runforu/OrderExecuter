@@ -885,19 +885,19 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
         return false;
     }
 
-    if (sl > PRICE_PRECISION) {
+    if (sl - trade_record.sl > PRICE_PRECISION || trade_record.sl - sl > PRICE_PRECISION) {
         trade_trans_info.sl = sl;
         trade_record.sl = sl;
         LOG("UpdateOrder: sl is set to %f", sl);
     }
 
-    if (tp > PRICE_PRECISION) {
+    if (tp - trade_record.tp > PRICE_PRECISION || trade_record.tp - tp > PRICE_PRECISION) {
         trade_trans_info.tp = tp;
         trade_record.tp = tp;
         LOG("UpdateOrder: tp is set to %f", tp);
     }
 
-    if (open_price > PRICE_PRECISION) {
+    if (open_price - trade_record.open_price > PRICE_PRECISION || trade_record.open_price - open_price > PRICE_PRECISION) {
         // modification of open price is forbidden
         if (trade_record.cmd == OP_BUY || trade_record.cmd == OP_SELL) {
             LOG("UpdateOrder: modification of open price [%f] is forbidden", open_price);
