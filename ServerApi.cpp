@@ -526,7 +526,7 @@ bool ServerApi::IsOpening(const char* symbol, time_t time, bool* result, const E
         return false;
     }
 
-    *result = s_interface->TradesCheckSessions(&con_symbol, time) == TRUE;
+    *result = (s_interface->TradesCheckSessions(&con_symbol, time) == TRUE);
     *error_code = &ErrorCode::EC_OK;
     return true;
 }
