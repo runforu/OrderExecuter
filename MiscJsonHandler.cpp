@@ -59,6 +59,5 @@ void MiscJsonHandler::RequestChart(ptree pt, std::string& content) {
         mode = CHART_RANGE_LAST;
     }
 
-    char* json_str = NULL;
     ManagerApi::Instance().RequestChart(symbol.c_str(), period, mode, start, end, &timestamp, content);
 }
