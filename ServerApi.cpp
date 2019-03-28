@@ -198,15 +198,15 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
 
     //--- check secutiry
     if (int rt = s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
-        LOG("OpenOrder: trade disabled or market closed");
+        LOG("OpenOrder: trade disabled or market closed %d", rt);
         if (rt == RET_ERROR) {
             *error_code = &ErrorCode::EC_BAD_PARAMETER;
         } else if (rt == RET_TRADE_DISABLE) {
             *error_code = &ErrorCode::EC_TRADE_DISABLE;
-        } else if (rt == RET_TRADE_OFFQUOTES) {
+        } else {
             *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
         }
-        return false;  // trade disabled, market closed, or no prices for long time
+        return false;
     }
 
     //--- prepare transaction
