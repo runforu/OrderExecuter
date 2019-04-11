@@ -1066,14 +1066,13 @@ bool ServerApi::IsQuoteAlive(const char* symbol, const ErrorCode** error_code) {
     int offquote_time = 300;
     if (Config::Instance().HasKey(symbol)) {
         Config::Instance().GetInteger(symbol, &offquote_time, "300");
-        LOG("IsQuoteAlive:get symbol offquote");
     } else {
         Config::Instance().GetInteger("default off quote time", &offquote_time, "300");
-        LOG("IsQuoteAlive:get default offquote");
     }
 
     if (s_interface->TradeTime() - last_time > offquote_time) {
-        LOG("IsQuoteAlive: last quote is too far %d, %d, %d", s_interface->TradeTime(), last_time, offquote_time);
+        LOG("IsQuoteAlive: last quote is too old. trade_time: %d, quote_time: %d, offquote_time: %d", s_interface->TradeTime(),
+            last_time, offquote_time);
         *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
         return false;
     }
