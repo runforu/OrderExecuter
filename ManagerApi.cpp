@@ -23,12 +23,12 @@ void ManagerApi::Initialize(CManagerInterface* man) {
     }
 
     char server[128] = {0};
-    Config::Instance().GetString("server", server, sizeof(server) - 1, "localhost:4433");
+    Config::Instance().GetString("Manager.Api.Server!reboot", server, sizeof(server) - 1, "localhost:4433");
     int login = 4;
-    Config::Instance().GetInteger("manager", &login, "4");
+    Config::Instance().GetInteger("Manager.Api.Login!reboot", &login, "4");
     char password[16] = {0};
-    Config::Instance().GetString("password", password, sizeof(password) - 1, "12345678");
-
+    Config::Instance().GetString("Manager.Api.Password!reboot", password, sizeof(password) - 1, "12345678");
+    LOG("ManagerApi::Initialize %s", password);
     int res = RET_ERROR;
 
     if ((res = man->Connect(server)) != RET_OK || (res = man->Login(login, password)) != RET_OK) {

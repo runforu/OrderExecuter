@@ -19,121 +19,6 @@ CServerInterface* ServerApi::Api() {
     return s_interface;
 }
 
-#ifdef UNIT_TEST
-
-void ServerApi::UnitTest() {
-    _beginthread(TestEntry, 0, 0);
-}
-
-void ServerApi::TestEntry(void* parameter) {
-    for (int cmd = OP_BUY; cmd <= OP_SELL_STOP; cmd++) {
-        TestRoutine(cmd);
-    }
-    _endthread();
-}
-
-void ServerApi::TestRoutine(int cmd) {
-    FUNC_WARDER;
-
-    if (s_interface == NULL) {
-        return;
-    }
-
-    int order = 0;
-    const char* symbol = "USDJPY";
-    const char* ip = "127.0.0.1";
-    const char* group = "lmoa-main";
-    const int login = 5;
-    int volume = 100;
-    long time_ms = 1000;
-    const ErrorCode** error_code;
-
-    LOG("-----------------------------------------%s-----------------------", TradeCmdStr(cmd));
-    double open_price, close_price, sl, tp;
-
-    Sleep(time_ms);
-    TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    OpenOrder(login, ip, symbol, cmd, volume, open_price, 0, 0, -1, NULL, error_code, &order);
-
-    Sleep(time_ms);
-    TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    UpdateOrder(ip, order, 0, sl, tp, -1, NULL, error_code);
-
-    Sleep(time_ms);
-    TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    UpdateOrder(ip, order, open_price, sl, tp, -1, NULL, error_code);
-
-    Sleep(time_ms);
-    TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    CloseOrder(ip, order, open_price, NULL, error_code);
-
-    Sleep(time_ms);
-    TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    AddOrder(login, ip, symbol, cmd, volume, open_price, 0, 0, -1, NULL, error_code, &order);
-
-    Sleep(time_ms);
-    TestPrice(cmd, &open_price, &close_price, &sl, &tp);
-    CloseOrder(ip, order, close_price, NULL, error_code);
-}
-
-void ServerApi::TestPrice(int cmd, double* open_price, double* close_price, double* sl, double* tp) {
-    if (s_interface == NULL) {
-        return;
-    }
-
-    double prices[2];
-    double deviation = 0.043;
-    const ErrorCode* error_code;
-    GetCurrentPrice("USDJPY", "lmoa-main", prices, &error_code);
-    switch (cmd) {
-        // market order sl, tp based on close price; pending order sl, tp based on open price
-        case OP_BUY:
-            *open_price = prices[1];
-            *close_price = prices[0];
-            *sl = *close_price - deviation;
-            *tp = *close_price + deviation;
-            break;
-        case OP_SELL:
-            *open_price = prices[0];
-            *close_price = prices[1];
-            *sl = *close_price + deviation;
-            *tp = *close_price - deviation;
-            break;
-        case OP_BUY_LIMIT:
-            // open price = ask - ConSymbol.stops_level
-            *open_price = prices[1] - deviation;
-            *close_price = prices[1];
-            *sl = *open_price - deviation;
-            *tp = *open_price + deviation;
-            break;
-        case OP_SELL_LIMIT:
-            // open price = bid + ConSymbol.stops_level
-            *open_price = prices[0] + deviation;
-            *close_price = prices[1];
-            *sl = *open_price + deviation;
-            *tp = *open_price - deviation;
-            break;
-        case OP_BUY_STOP:
-            // open price = ask + ConSymbol.stops_level
-            *open_price = prices[1] + deviation;
-            *close_price = prices[0];
-            *sl = *open_price - deviation;
-            *tp = *open_price + deviation;
-            break;
-        case OP_SELL_STOP:
-            // open price = bid - ConSymbol.stops_level
-            *open_price = prices[0] - deviation;
-            *close_price = prices[1];
-            *sl = *open_price + deviation;
-            *tp = *open_price - deviation;
-            break;
-    }
-
-    LOG("open_price = %f, close_price = %f, sl = %f, tp = %f,", *open_price, *close_price, *sl, *tp);
-}
-
-#endif
-
 bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
                           double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
                           int* order) {
@@ -264,6 +149,11 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
         LOG("OpenOrder: invalid stops");
         *error_code = &ErrorCode::EC_TRADE_BAD_STOPS;
         return false;  // invalid stops
+    }
+
+    //--- check off quote
+    if ((cmd == OP_BUY || cmd == OP_SELL) && !IsQuoteAlive(symbol, error_code)) {
+        return false;
     }
 
     //--- open order with margin check
@@ -797,6 +687,11 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
         return false;  // invalid stops
     }
 
+    //--- check off quote
+    if ((cmd == OP_BUY || cmd == OP_SELL) && !IsQuoteAlive(symbol, error_code)) {
+        return false;
+    }
+
     //--- add order into database directly
     LOG_INFO(&trade_record);
     if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
@@ -1146,6 +1041,40 @@ bool ServerApi::GetCurrentPrice(const char* symbol, const char* group, double* p
 
     if (s_interface->HistoryPricesGroup(symbol, &grpcfg, prices) != RET_OK) {
         *error_code = &ErrorCode::EC_GET_PRICE_ERROR;
+        return false;
+    }
+
+    *error_code = &ErrorCode::EC_OK;
+    return true;
+}
+
+bool ServerApi::IsQuoteAlive(const char* symbol, const ErrorCode** error_code) {
+    if (s_interface == NULL) {
+        *error_code = &ErrorCode::EC_INVALID_SERVER_INTERFACE;
+        return false;
+    }
+
+    time_t last_time;
+    double prices[2];
+    int direction;
+    if (s_interface->HistoryPrices(symbol, prices, &last_time, &direction) != RET_OK) {
+        LOG("IsQuoteAlive: HistoryPrices failed");
+        *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
+        return false;
+    }
+
+    int offquote_time = 300;
+    if (Config::Instance().HasKey(symbol)) {
+        Config::Instance().GetInteger(symbol, &offquote_time, "300");
+        LOG("IsQuoteAlive:get symbol offquote");
+    } else {
+        Config::Instance().GetInteger("default off quote time", &offquote_time, "300");
+        LOG("IsQuoteAlive:get default offquote");
+    }
+
+    if (s_interface->TradeTime() - last_time > offquote_time) {
+        LOG("IsQuoteAlive: last quote is too far %d, %d, %d", s_interface->TradeTime(), last_time, offquote_time);
+        *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
         return false;
     }
 

@@ -4,8 +4,6 @@
 #include <exception>
 #include <string>
 
-#define UNIT_TEST
-
 #define MAX_SYMBOL_COUNT 256
 
 #define PRICE_PRECISION 1E-8
@@ -26,8 +24,8 @@ public:
                          double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
                          int* order);
 
-    static bool UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, time_t expiration, const char* comment,
-                            const ErrorCode** error_code);
+    static bool UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, time_t expiration,
+                            const char* comment, const ErrorCode** error_code);
 
     static bool CloseOrder(const char* ip, const int order, double close_price, const char* comment,
                            const ErrorCode** error_code);
@@ -76,6 +74,8 @@ private:
 
     static bool GetCurrentPrice(const char* symbol, const char* group, double* prices, const ErrorCode** error_code);
 
+    static bool IsQuoteAlive(const char* symbol, const ErrorCode** error_code);
+
     static bool UpdateSymbolList();
 
     ServerApi(){};
@@ -87,16 +87,6 @@ private:
     static CServerInterface* s_interface;
     static ConSymbol s_symbols[MAX_SYMBOL_COUNT];
     static int s_symbol_count;
-
-#ifdef UNIT_TEST
-public:
-    static void UnitTest();
-
-private:
-    static void TestEntry(void* parameter);
-    static void TestRoutine(int cmd);
-    static void TestPrice(int cmd, double* open_price, double* close_price, double* sl, double* tp);
-#endif
 };
 
 #endif  // !_SERVERAPIADAPTER_H_

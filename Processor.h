@@ -15,7 +15,8 @@ class Processor {
 public:
     static Processor& Instance();
 
-    void Initialize(const char* port, const char* num_threads);
+    void Initialize();
+
     void Shutdown();
 
 private:
@@ -27,6 +28,9 @@ private:
     void StartServer(const char* port, const char* num_threads);
 
 private:
+    char m_server_port[8];
+    char m_max_thread[8];
+
     http::server::server* m_http_server;
     boost::thread m_thread;
     // Synchronizer m_synchronizer;

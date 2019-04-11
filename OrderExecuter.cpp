@@ -57,7 +57,7 @@ int APIENTRY MtSrvStartup(CServerInterface* server) {
 
     ServerApi::Initialize(server);
 
-    Processor::Instance().Initialize("8080", "512");
+    Processor::Instance().Initialize();
 
     Environment::Log();
 
@@ -71,7 +71,6 @@ void APIENTRY MtSrvCleanup() {
 int APIENTRY MtSrvPluginCfgSet(const PluginCfg* values, const int total) {
     LOG("MtSrvPluginCfgSet total = %d.", total);
     int res = Config::Instance().Set(values, total);
-    EventCenter::Instance().Post(EventCenter::EV_CONFIG_CHANGED);
     return (res);
 }
 

@@ -17,9 +17,14 @@ Processor& Processor::Instance() {
     return _instance;
 }
 
-void Processor::Initialize(const char* port, const char* num_threads) {
+void Processor::Initialize() {
     FUNC_WARDER;
-    m_thread = boost::thread(boost::bind(&Processor::StartServer, this, port, num_threads));
+
+    // Init the http server settings
+    Config::Instance().GetString("Http.Server.port!reboot", m_server_port, sizeof(m_server_port) - 1, "8080");
+    Config::Instance().GetString("Max.Http.Threads!reboot", m_max_thread, sizeof(m_max_thread) - 1, "512");
+    LOG("Processor::Initialize %s, %s",m_server_port, m_max_thread);
+    m_thread = boost::thread(boost::bind(&Processor::StartServer, this, m_server_port, m_max_thread));
 }
 
 void Processor::Shutdown() {
