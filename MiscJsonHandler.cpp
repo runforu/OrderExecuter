@@ -46,6 +46,7 @@ bool MiscJsonHandler::handle(const http::server::request& req, http::server::rep
 void MiscJsonHandler::RequestChart(ptree pt, std::string& content) {
     std::string request = pt.get<std::string>("request", "");
     std::string symbol = pt.get<std::string>("symbol", "");
+    int login = pt.get<int>("login", -1);
     int period = pt.get<int>("period", 30);
     std::string mode_str = pt.get<std::string>("mode", "CHART_RANGE_IN");
     __time32_t start = pt.get<__time32_t>("start", -1);
@@ -59,5 +60,5 @@ void MiscJsonHandler::RequestChart(ptree pt, std::string& content) {
         mode = CHART_RANGE_LAST;
     }
 
-    ManagerApi::Instance().RequestChart(symbol.c_str(), period, mode, start, end, &timestamp, content);
+    ManagerApi::Instance().RequestChart(login, symbol.c_str(), period, mode, start, end, &timestamp, content);
 }

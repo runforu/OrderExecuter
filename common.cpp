@@ -1,5 +1,6 @@
-#include "../include/MT4ServerAPI.h"
+#include "ServerApi.h"
 #include "common.h"
+#include "../include/MT4ServerAPI.h"
 
 static const double ExtDecimalArray[9] = {1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 10000000.0, 100000000.0};
 
@@ -262,4 +263,20 @@ const char* ToTradeRecordStateStr(int state) {
     static const char* string[] = {"TS_OPEN_NORMAL", "TS_OPEN_REMAND", "TS_OPEN_RESTORED", "TS_CLOSED_NORMAL",
                                    "TS_CLOSED_PART", "TS_CLOSED_BY",   "TS_DELETED"};
     return string[state];
+}
+
+int GetSpreadDiff(int login, const char* symbol) {
+    UserRecord user_record;
+    if (ServerApi::Api()->ClientsUserInfo(login, &user_record) == FALSE) {
+        return 0;
+    }
+    ConGroup con_group;
+    if (ServerApi::Api()->GroupsGet(user_record.group, &con_group) == FALSE) {
+        return 0;
+    }
+    ConSymbol con_symbol;
+    if (ServerApi::Api()->SymbolsGet(symbol, &con_symbol) == FALSE) {
+        return 0;
+    }
+    return con_group.secgroups[con_symbol.type].spread_diff;
 }

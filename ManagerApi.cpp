@@ -6,6 +6,7 @@
 #include "ErrorCode.h"
 #include "Loger.h"
 #include "ManagerApi.h"
+#include "common.h"
 
 ManagerApi& ManagerApi::Instance() {
     static ManagerApi _instance;
@@ -28,7 +29,6 @@ void ManagerApi::Initialize(CManagerInterface* man) {
     Config::Instance().GetInteger("Manager.Api.Login!reboot", &login, "4");
     char password[16] = {0};
     Config::Instance().GetString("Manager.Api.Password!reboot", password, sizeof(password) - 1, "12345678");
-    LOG("ManagerApi::Initialize %s", password);
     int res = RET_ERROR;
 
     if ((res = man->Connect(server)) != RET_OK || (res = man->Login(login, password)) != RET_OK) {
@@ -38,8 +38,8 @@ void ManagerApi::Initialize(CManagerInterface* man) {
     LOG("New manager interface initialized.");
 }
 
-void ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32_t start, __time32_t end, __time32_t* timestamp,
-                              std::string& json_str) {
+void ManagerApi::RequestChart(int login, const char* symbol, int period, int mode, __time32_t start, __time32_t end,
+                              __time32_t* timestamp, std::string& json_str) {
     FUNC_WARDER;
 
     if (!IsValid()) {
@@ -74,6 +74,10 @@ void ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32
     int total = 0;
     RateInfo* ri = man->ChartRequest(&ci, timestamp, &total);
     if (ri != NULL) {
+        int spread_diff = 0;
+        if (login != -1) {
+            spread_diff = GetSpreadDiff(login, symbol);
+        }
         LOG("ManagerApi::RequestChart complete %d.", total);
         // avarage length of a RateInfo json is less than 100, the max length of other info is less than 256
         try {
@@ -87,7 +91,7 @@ void ManagerApi::RequestChart(const char* symbol, int period, int mode, __time32
             json_str.append("\"rate_infos\":").append("[");
             for (int i = 0; i < total; i++) {
                 json_str.append("{");
-                json_str.append("\"open_price\":").append(std::to_string(ri[i].open)).append(",");
+                json_str.append("\"open_price\":").append(std::to_string(ri[i].open - spread_diff / 2)).append(",");
                 json_str.append("\"high\":").append(std::to_string(ri[i].high)).append(",");
                 json_str.append("\"low\":").append(std::to_string(ri[i].low)).append(",");
                 json_str.append("\"close\":").append(std::to_string(ri[i].close)).append(",");

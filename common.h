@@ -42,4 +42,6 @@ inline int ToCmd(std::string cmd_str, int default_value = -1) {
     return ToCmd(cmd_str.c_str(), default_value);
 }
 
+int GetSpreadDiff(int login, const char* symbol);
+
 #endif  // !_COMMON_H_
