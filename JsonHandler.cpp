@@ -247,13 +247,10 @@ ptree JsonHandler::GetUserRecord(ptree pt) {
     if (result) {
         response.put("login", user_record.login);
         response.put("group", user_record.group);
-        response.put("password", user_record.password);
         response.put("enable", user_record.enable);
         response.put("enable_change_password", user_record.enable_change_password);
         response.put("enable_read_only", user_record.enable_read_only);
         response.put("enable_otp", user_record.enable_otp);
-        response.put("password_investor", user_record.password_investor);
-        response.put("password_phone", user_record.password_phone);
         response.put("name", user_record.name);
         response.put("country", user_record.country);
         response.put("city", user_record.city);
