@@ -81,9 +81,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
 </pre>
     </div>
 
-    
+
     <br />
-    <hr />
+    <br />
     <br />
     <h3>Request to 
     <i>Open</i> an order</h3>
@@ -378,6 +378,45 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
 }</code>
 </pre>
     </div>
+
+
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Get</i> user margin (same with GetMargin)</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"GetMarginInfo",
+    "login": 5
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "GetMargin",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS",
+    "margin": "0",
+    "freemargin": "100000000",
+    "equity": "100000000",
+    "group": "lmoa-main",
+    "margin_call": "97",
+    "margin_mode": "1",
+    "margin_stopout": "50",
+    "margin_type": "0",
+    "ip": "",
+    "leverage": "100",
+    "balance": "100000000",
+    "credit": "0"
+}</code>
+</pre>
+    </div>
     
     
     <br />
@@ -434,8 +473,8 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
 }</code>
 </pre>
     </div>
-    
-    
+
+
     <br />
     <hr />
     <br />
