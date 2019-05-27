@@ -49,6 +49,9 @@ public:
     static bool GetMargin(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
                           const ErrorCode** error_code);
 
+    static bool GetMarginInfo(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
+        const ErrorCode** error_code);
+
     static bool GetOrder(int order, TradeRecord* trade_record, const ErrorCode** error_code);
 
     // free orders using HEAP_FREE

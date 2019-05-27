@@ -25,6 +25,7 @@ private:
     boost::property_tree::ptree ChangePassword(boost::property_tree::ptree pt);
     boost::property_tree::ptree CheckPassword(boost::property_tree::ptree pt);
     boost::property_tree::ptree GetMargin(boost::property_tree::ptree pt);
+    boost::property_tree::ptree GetMarginInfo(boost::property_tree::ptree pt);
     boost::property_tree::ptree GetOrder(boost::property_tree::ptree pt);
     boost::property_tree::ptree AddUser(boost::property_tree::ptree pt);
     inline void GetOpenOrders(boost::property_tree::ptree pt, std::string& response);

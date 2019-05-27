@@ -153,6 +153,7 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
 
     //--- check off quote
     if ((cmd == OP_BUY || cmd == OP_SELL) && !IsQuoteAlive(symbol, error_code)) {
+        LOG("OpenOrder: quote interruped");
         return false;
     }
 
@@ -303,6 +304,33 @@ bool ServerApi::GetMargin(int user, UserInfo* user_info, double* margin, double*
     }
 
     if (s_interface->TradesMarginGet(user, user_info, margin, freemargin, equity) == FALSE) {
+        *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
+        return false;
+    }
+
+    *error_code = &ErrorCode::EC_OK;
+    return true;
+}
+
+bool ServerApi::GetMarginInfo(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
+                              const ErrorCode** error_code) {
+    FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        *error_code = &ErrorCode::EC_INVALID_SERVER_INTERFACE;
+        return false;
+    }
+
+    if (user < 0 || user_info == NULL || margin == NULL || freemargin == NULL || equity == NULL) {
+        *error_code = &ErrorCode::EC_BAD_PARAMETER;
+        return false;
+    }
+
+    if (GetUserInfo(user, user_info, error_code) == FALSE) {
+        return false;
+    }
+
+    if (s_interface->TradesMarginInfo(user_info, margin, freemargin, equity) == FALSE) {
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         return false;
     }
@@ -689,6 +717,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
 
     //--- check off quote
     if ((cmd == OP_BUY || cmd == OP_SELL) && !IsQuoteAlive(symbol, error_code)) {
+        LOG("AddOrder: quote interrupted");
         return false;
     }
 
@@ -906,6 +935,12 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
         return false;  // error
     }
 
+    // check offquote
+    if (!IsQuoteAlive(trade_record.symbol, error_code)) {
+        LOG("CloseOrder: quote interruped");
+        return false;
+    }
+
     //--- prepare transaction
     trade_trans_info.order = order;
     double prices[2] = {0};
@@ -936,13 +971,15 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
 
     //--- check secutiry
     if (int rt = s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
-        LOG("OrdersUpdateClose: trade disabled or market closed");
+        LOG("OrdersUpdateClose: trade disabled or market closed %d", rt);
         if (rt == RET_ERROR) {
             *error_code = &ErrorCode::EC_BAD_PARAMETER;
         } else if (rt == RET_TRADE_DISABLE) {
             *error_code = &ErrorCode::EC_TRADE_DISABLE;
         } else if (rt == RET_TRADE_OFFQUOTES) {
             *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
+        } else {
+            *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         }
         return false;  // trade disabled, market closed, or no prices for long time
     }

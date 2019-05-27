@@ -73,6 +73,10 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
             ptree response;
             response = GetMargin(pt);
             rep.content.append(JsonWrapper::ToJsonStr(response));
+        } else if (pt.get<std::string>("request", "").compare("GetMarginInfo") == 0) {
+            ptree response;
+            response = GetMargin(pt);
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
             ptree response;
             response = GetOrder(pt);
@@ -405,6 +409,41 @@ boost::property_tree::ptree JsonHandler::GetMargin(boost::property_tree::ptree p
     return response;
 }
 
+boost::property_tree::ptree JsonHandler::GetMarginInfo(boost::property_tree::ptree pt) {
+    std::string request = pt.get<std::string>("request", "");
+    int login = pt.get<int>("login", -1);
+    const ErrorCode* error_code;
+    UserInfo user_info = { 0 };
+    double margin;
+    double freemargin;
+    double equity;
+
+    bool result = ServerApi::GetMarginInfo(login, &user_info, &margin, &freemargin, &equity, &error_code);
+
+    ptree response;
+    response.put("request", request);
+    response.put("result", result ? "OK" : "ERROR");
+    response.put("error_code", error_code->m_code);
+    response.put("error_des", error_code->m_des);
+    if (result) {
+        response.put("margin", margin);
+        response.put("freemargin", freemargin);
+        response.put("equity", equity);
+        response.put("group", user_info.group);
+        response.put("margin_call", user_info.grp.margin_call);
+        response.put("margin_mode", user_info.grp.margin_mode);
+        response.put("margin_stopout", user_info.grp.margin_stopout);
+        response.put("margin_type", user_info.grp.margin_type);
+        response.put("margin_stopout", user_info.grp.margin_stopout);
+        response.put("ip", user_info.ip);
+        response.put("leverage", user_info.leverage);
+        response.put("balance", user_info.balance);
+        response.put("credit", user_info.credit);
+    }
+
+    return response;
+}
+
 boost::property_tree::ptree JsonHandler::GetOrder(boost::property_tree::ptree pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
@@ -604,7 +643,7 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
         response.append("\"orders\":").append("[");
         if (result && trade_record != NULL) {
             for (int i = 0; i < total; i++) {
-                TradeRecord* trade = trade_record + i;;
+                TradeRecord* trade = trade_record + i;
                 if (filter_out(trade)) {
                     continue;
                 }
