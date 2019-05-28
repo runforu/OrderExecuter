@@ -5,6 +5,7 @@
 #include "ErrorCode.h"
 #include "JsonHandler.h"
 #include "JsonWrapper.h"
+#include "LicenseService.h"
 #include "Loger.h"
 #include "ServerApi.h"
 #include "common.h"
@@ -26,6 +27,18 @@ bool JsonHandler::can_handle(const request& req) {
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
     ptree pt = JsonWrapper::ParseJson(req.body);
     LOG("JsonHandler -> %s", req.body.c_str());
+
+#ifdef no_define//_LICENSE_VERIFICATION_
+    if (!LicenseService::Instance().IsLicenseValid()) {
+        rep.status = reply::bad_request;
+        ptree response;
+        response.put("json_error", "Invalid plugin license");
+        rep.content.append(JsonWrapper::ToJsonStr(response));
+        rep.headers.push_back(header::json_content_type);
+        rep.headers.push_back(header("Content-Length", std::to_string(rep.content.length())));
+        return true;
+    }
+#endif
 
     if (!pt.empty()) {
         rep.status = reply::ok;
@@ -413,7 +426,7 @@ boost::property_tree::ptree JsonHandler::GetMarginInfo(boost::property_tree::ptr
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     const ErrorCode* error_code;
-    UserInfo user_info = { 0 };
+    UserInfo user_info = {0};
     double margin;
     double freemargin;
     double equity;

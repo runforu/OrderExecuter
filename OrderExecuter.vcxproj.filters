@@ -38,6 +38,8 @@
     <ClCompile Include="MiscJsonHandler.cpp" />
     <ClCompile Include="Environment.cpp" />
     <ClCompile Include="FileUtil.cpp" />
+    <ClCompile Include="LicenseService.cpp" />
+    <ClCompile Include="LicenseClient.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Processor.h" />
@@ -86,6 +88,8 @@
     <ClInclude Include="DefaultHandler.h" />
     <ClInclude Include="MiscJsonHandler.h" />
     <ClInclude Include="Environment.h" />
+    <ClInclude Include="LicenseService.h" />
+    <ClInclude Include="LicenseClient.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OrderExecuter.def" />
