@@ -28,7 +28,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     ptree pt = JsonWrapper::ParseJson(req.body);
     LOG("JsonHandler -> %s", req.body.c_str());
 
-#ifdef no_define//_LICENSE_VERIFICATION_
+#ifdef _LICENSE_VERIFICATION_
     if (!LicenseService::Instance().IsLicenseValid()) {
         rep.status = reply::bad_request;
         ptree response;
