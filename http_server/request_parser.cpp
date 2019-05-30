@@ -199,7 +199,7 @@ boost::tribool request_parser::consume(request& req, char input) {
                 return false;
             }
         case expecting_newline_3:
-            if (input == '\n' ) {
+            if (input == '\n') {
                 if (body_length_ == -1) {
                     return true;
                 }
