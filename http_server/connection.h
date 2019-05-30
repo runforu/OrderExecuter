@@ -53,7 +53,7 @@ private:
     request_dispatcher& request_dispatcher_;
 
     /// Buffer for incoming data.
-    boost::array<char, 8192> buffer_;
+    boost::array<char, 4096> buffer_;
 
     /// The incoming request.
     request request_;

@@ -14,7 +14,7 @@
 namespace http {
 namespace server {
 
-request_parser::request_parser() : state_(method_start) {}
+request_parser::request_parser() : state_(method_start), body_length_(-1) {}
 
 void request_parser::reset() {
     state_ = method_start;
@@ -178,6 +178,12 @@ boost::tribool request_parser::consume(request& req, char input) {
         case header_value:
             if (input == '\r') {
                 state_ = expecting_newline_2;
+                if (req.headers.back().name == "Content-Length") {
+                    try {
+                        body_length_ = std::stoi(req.headers.back().value);
+                    } catch (...) {
+                    }
+                }
                 return boost::indeterminate;
             } else if (is_ctl(input)) {
                 return false;
@@ -193,7 +199,22 @@ boost::tribool request_parser::consume(request& req, char input) {
                 return false;
             }
         case expecting_newline_3:
-            return (input == '\n');
+            if (input == '\n' ) {
+                if (body_length_ == -1) {
+                    return true;
+                }
+                state_ = http_body;
+                return boost::indeterminate;
+            } else {
+                return false;
+            }
+        case http_body:
+            req.body.push_back(input);
+            if (body_length_ - req.body.length() == 0) {
+                return true;
+            } else {
+                return boost::indeterminate;
+            }
         default:
             return false;
     }

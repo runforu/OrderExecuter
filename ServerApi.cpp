@@ -379,11 +379,7 @@ bool ServerApi::GetOpenOrders(int user, int* total, TradeRecord** orders, const 
         return false;
     }
 
-    if ((*orders = s_interface->OrdersGetOpen(&user_info, total)) == NULL) {
-        *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
-        return false;
-    }
-
+    *orders = s_interface->OrdersGetOpen(&user_info, total);
     *error_code = &ErrorCode::EC_OK;
     return true;
 }
@@ -416,11 +412,7 @@ bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, Tr
     */
 
     int users[1] = {user};
-    if ((*orders = s_interface->OrdersGetClosed(from, to, users, 1, total)) == FALSE) {
-        *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
-        return false;
-    }
-
+    *orders = s_interface->OrdersGetClosed(from, to, users, 1, total);
     *error_code = &ErrorCode::EC_OK;
     return true;
 }

@@ -61,6 +61,8 @@ private:
     /// Check if a byte is a digit.
     static bool is_digit(int c);
 
+    int body_length_;
+
     /// The current state of the parser.
     enum state {
         method_start,
@@ -82,7 +84,8 @@ private:
         space_before_header_value,
         header_value,
         expecting_newline_2,
-        expecting_newline_3
+        expecting_newline_3,
+        http_body
     } state_;
 };
 

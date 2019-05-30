@@ -35,7 +35,6 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
         boost::tribool result;
         decltype(buffer_.data()) iter;
         boost::tie(result, iter) = request_parser_.parse(request_, buffer_.data(), buffer_.data() + bytes_transferred);
-        request_.body.assign(iter, buffer_.data() + bytes_transferred);
 
         if (result) {
             request_dispatcher_.dispatch_request(request_, reply_);
