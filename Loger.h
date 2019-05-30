@@ -36,7 +36,7 @@ public:
 };
 
 class FuncWarder {
-    char m_function_name[32];
+    char m_function_name[64];
 
 public:
     FuncWarder(const char* name) {

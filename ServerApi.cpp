@@ -379,7 +379,7 @@ bool ServerApi::GetOpenOrders(int user, int* total, TradeRecord** orders, const 
         return false;
     }
 
-    if ((*orders = s_interface->OrdersGetOpen(&user_info, total)) == FALSE) {
+    if ((*orders = s_interface->OrdersGetOpen(&user_info, total)) == NULL) {
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         return false;
     }

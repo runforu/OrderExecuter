@@ -24,7 +24,7 @@ boost::asio::ip::tcp::socket& connection::socket() {
 }
 
 void connection::start() {
-    socket_.async_read_some(boost::asio::buffer(buffer_),
+    boost::asio::async_read(socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
                             boost::asio::bind_executor(strand_, boost::bind(&connection::handle_read, shared_from_this(),
                                                                             boost::asio::placeholders::error,
                                                                             boost::asio::placeholders::bytes_transferred)));
@@ -34,8 +34,7 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
     if (!e) {
         boost::tribool result;
         decltype(buffer_.data()) iter;
-        boost::tie(result, iter) =
-            request_parser_.parse(request_, buffer_.data(), buffer_.data() + bytes_transferred);
+        boost::tie(result, iter) = request_parser_.parse(request_, buffer_.data(), buffer_.data() + bytes_transferred);
         request_.body.assign(iter, buffer_.data() + bytes_transferred);
 
         if (result) {
@@ -51,8 +50,8 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
                 boost::asio::bind_executor(
                     strand_, boost::bind(&connection::handle_write, shared_from_this(), boost::asio::placeholders::error)));
         } else {
-            socket_.async_read_some(
-                boost::asio::buffer(buffer_),
+            boost::asio::async_read(
+                socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
                 boost::asio::bind_executor(
                     strand_, boost::bind(&connection::handle_read, shared_from_this(), boost::asio::placeholders::error,
                                          boost::asio::placeholders::bytes_transferred)));
