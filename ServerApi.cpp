@@ -935,6 +935,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
 
     if (trade_record.cmd >= OP_BUY_LIMIT && trade_record.cmd <= OP_SELL_STOP) {
         LOG("CloseOrder: delete pending order");
+        COPY_STR(trade_record.comment, comment);
         trade_record.close_time = s_interface->TradeTime();
         if (s_interface->OrdersUpdate(&trade_record, &user_info, UPDATE_CLOSE) == FALSE) {
             LOG("CloseOrder: CloseOrder failed");
