@@ -857,7 +857,7 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
     }
 
     if (expiration != -1 && trade_record.cmd >= OP_BUY_LIMIT && trade_record.cmd <= OP_SELL_STOP) {
-        trade_trans_info.expiration = expiration;
+        trade_record.expiration = expiration;
     }
 
     COPY_STR(trade_record.comment, comment);
@@ -933,6 +933,19 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
         return false;
     }
 
+    if (trade_record.cmd >= OP_BUY_LIMIT && trade_record.cmd <= OP_SELL_STOP) {
+        LOG("CloseOrder: delete pending order");
+        trade_record.close_time = s_interface->TradeTime();
+        if (s_interface->OrdersUpdate(&trade_record, &user_info, UPDATE_CLOSE) == FALSE) {
+            LOG("CloseOrder: CloseOrder failed");
+            *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
+            return false;  // error
+        } else {
+            *error_code = &ErrorCode::EC_OK;
+            return true;
+        }
+    }
+
     //--- prepare transaction
     trade_trans_info.order = order;
     double prices[2] = {0};
@@ -947,12 +960,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     trade_trans_info.cmd = trade_record.cmd;
     COPY_STR(trade_trans_info.comment, comment);
     COPY_STR(trade_trans_info.symbol, trade_record.symbol);
-
-    if (trade_record.cmd >= OP_BUY_LIMIT && trade_record.cmd <= OP_SELL_STOP) {
-        trade_trans_info.type = TT_ORDER_DELETE;
-    } else {
-        trade_trans_info.type = TT_ORDER_MK_CLOSE;
-    }
+    trade_trans_info.type = TT_ORDER_MK_CLOSE;
 
     //--- check tick size
     if (s_interface->TradesCheckTickSize(close_price, &symbol_cfg) == FALSE) {

@@ -1,9 +1,10 @@
 {
     "request":"UpdateOrder",
 	"ip": "0.0.0.0",
-	"order": 10220048,
-	"open_price": 0.0,
-	"sl": 111.75,
-	"tp": 113.75,
-	"comment": "test UpdateOrder"
+	"order": 18248354,
+	"open_price": 107.20,
+	"sl": 0,
+	"tp": 0,
+    "expiration": 1559753241,
+	"comment": "update UpdateOrder"
 }

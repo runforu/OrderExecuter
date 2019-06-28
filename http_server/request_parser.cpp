@@ -141,7 +141,7 @@ boost::tribool request_parser::consume(request& req, char input) {
                 return false;
             } else {
                 req.headers.push_back(header());
-                req.headers.back().name.push_back(input);
+                req.headers.back().name.push_back(lower(input));
                 state_ = header_name;
                 return boost::indeterminate;
             }
@@ -165,7 +165,7 @@ boost::tribool request_parser::consume(request& req, char input) {
             } else if (!is_char(input) || is_ctl(input) || is_tspecial(input)) {
                 return false;
             } else {
-                req.headers.back().name.push_back(input);
+                req.headers.back().name.push_back(lower(input));
                 return boost::indeterminate;
             }
         case space_before_header_value:
@@ -178,7 +178,7 @@ boost::tribool request_parser::consume(request& req, char input) {
         case header_value:
             if (input == '\r') {
                 state_ = expecting_newline_2;
-                if (req.headers.back().name == "Content-Length") {
+                if (req.headers.back().name == "content-length") {
                     try {
                         body_length_ = std::stoi(req.headers.back().value);
                     } catch (...) {
@@ -257,6 +257,12 @@ bool request_parser::is_tspecial(int c) {
 
 bool request_parser::is_digit(int c) {
     return c >= '0' && c <= '9';
+}
+
+/// convert char from uppercase to lowercase
+
+char request_parser::lower(char c) {
+    return (c >= 'A' && c <= 'Z') ? (c - 'A' + 'a') : c;
 }
 
 }  // namespace server

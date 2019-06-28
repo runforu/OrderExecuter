@@ -61,6 +61,9 @@ private:
     /// Check if a byte is a digit.
     static bool is_digit(int c);
 
+    /// convert char from uppercase to lowercase
+    static char lower(char c);
+
     int body_length_;
 
     /// The current state of the parser.

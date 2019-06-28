@@ -3,10 +3,11 @@
     "login": 5,
     "ip": "0.0.0.0",
     "symbol": "USDJPY",
-    "cmd": "OP_BUY",
-    "volume": 100,
-    "open_price": 0,
+    "cmd": "OP_BUY_LIMIT",
+    "volume": 1000,
+    "open_price": 107.49,
     "sl": 0,
     "tp": 0,
+    "expiration": 0,
     "comment": "test OpenOrder"
 }
