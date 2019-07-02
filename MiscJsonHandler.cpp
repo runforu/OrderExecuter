@@ -48,9 +48,9 @@ void MiscJsonHandler::RequestChart(ptree pt, std::string& content) {
     int login = pt.get<int>("login", -1);
     int period = pt.get<int>("period", 30);
     std::string mode_str = pt.get<std::string>("mode", "CHART_RANGE_IN");
-    __time32_t start = pt.get<__time32_t>("start", -1);
-    __time32_t end = pt.get<__time32_t>("end", -1);
-    __time32_t timestamp = pt.get<__time32_t>("timestamp", -1);
+    __time32_t start = pt.get<__time32_t>("start", 0);
+    __time32_t end = pt.get<__time32_t>("end", 0);
+    __time32_t timestamp = pt.get<__time32_t>("timestamp", 0);
 
     int mode = CHART_RANGE_IN;
     if (mode_str.compare("CHART_RANGE_OUT") == 0) {

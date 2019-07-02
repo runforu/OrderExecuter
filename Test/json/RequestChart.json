@@ -3,7 +3,7 @@
     "symbol": "USDJPY",
     "period": 1,
     "mode": "CHART_RANGE_IN",
-    "start": 1548991000,
-    "end": 1548991600,
+    "start": 0,
+    "end": 1648991600,
     "timestamp": 1
 }
