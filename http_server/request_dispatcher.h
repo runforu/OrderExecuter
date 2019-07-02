@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include "request_handler_provider.h"
+#include "request_interception.h"
 
 namespace http {
 namespace server {
@@ -33,8 +34,11 @@ public:
 
     void set_request_handler_provider(request_handler_provider* provider);
 
+    void set_request_interception(request_interception* interception);
+
 private:
     request_handler_provider* provider;
+    request_interception* interception_;
 };
 
 }  // namespace server

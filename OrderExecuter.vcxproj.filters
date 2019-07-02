@@ -40,6 +40,7 @@
     <ClCompile Include="FileUtil.cpp" />
     <ClCompile Include="LicenseService.cpp" />
     <ClCompile Include="LicenseClient.cpp" />
+    <ClCompile Include="RequestLoger.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Processor.h" />
@@ -90,6 +91,10 @@
     <ClInclude Include="Environment.h" />
     <ClInclude Include="LicenseService.h" />
     <ClInclude Include="LicenseClient.h" />
+    <ClInclude Include="http_server\request_interception.h">
+      <Filter>http_server</Filter>
+    </ClInclude>
+    <ClInclude Include="RequestLoger.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OrderExecuter.def" />

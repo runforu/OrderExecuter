@@ -26,7 +26,6 @@ bool JsonHandler::can_handle(const request& req) {
 
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
     ptree pt = JsonWrapper::ParseJson(req.body);
-    LOG("JsonHandler -> %s", req.body.c_str());
 
 #ifdef _LICENSE_VERIFICATION_
     if (!LicenseService::Instance().IsLicenseValid()) {

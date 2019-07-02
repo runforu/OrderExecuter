@@ -24,9 +24,17 @@
 namespace http {
 namespace server {
 
-request_dispatcher::request_dispatcher() {}
+request_dispatcher::request_dispatcher() : provider(nullptr), interception_(nullptr) {}
 
 void request_dispatcher::dispatch_request(const request& req, reply& rep) {
+    if (interception_ != nullptr && interception_->handle(req)) {
+        return;
+    }
+
+    if (provider == nullptr) {
+        return;
+    }
+
     std::vector<request_handler*> handlers;
     for (auto item : provider->get_handlers()) {
         if (item->can_handle(req)) {
@@ -35,7 +43,7 @@ void request_dispatcher::dispatch_request(const request& req, reply& rep) {
     }
 
     std::sort(handlers.begin(), handlers.end(),
-              [](request_handler * left, request_handler * right) { return right->get_priority() < left->get_priority(); });
+              [](request_handler* left, request_handler* right) { return right->get_priority() < left->get_priority(); });
 
     for (auto item : handlers) {
         if (item->handle(req, rep)) {
@@ -51,6 +59,10 @@ void request_dispatcher::dispatch_request(const request& req, reply& rep) {
 
 void request_dispatcher::set_request_handler_provider(request_handler_provider* handlers) {
     provider = handlers;
+}
+
+void request_dispatcher::set_request_interception(request_interception* interception) {
+    interception_ = interception;
 }
 
 }  // namespace server

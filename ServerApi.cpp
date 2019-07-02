@@ -158,7 +158,7 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     }
 
     //--- open order with margin check
-    LOG_INFO(&trade_trans_info);
+    // LOG_INFO(&trade_trans_info);
     if ((*order = s_interface->OrdersOpen(&trade_trans_info, &user_info)) == 0) {
         LOG("OpenOrder: OpenOrder failed");
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
@@ -714,7 +714,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     }
 
     //--- add order into database directly
-    LOG_INFO(&trade_record);
+    // LOG_INFO(&trade_record);
     if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
         LOG("AddOrder: OrdersAdd failed");
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
@@ -849,7 +849,7 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
     }
 
     //--- check stops
-    LOG_INFO(&trade_trans_info);
+    // LOG_INFO(&trade_trans_info);
     if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("UpdateOrder: invalid stops");
         *error_code = &ErrorCode::EC_TRADE_BAD_STOPS;
@@ -905,7 +905,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
         return false;  // error
     }
 
-    LOG_INFO(&trade_record);
+    // LOG_INFO(&trade_record);
 
     //--- get group config
     if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
@@ -1000,7 +1000,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     }
 
     //--- close position
-    LOG_INFO(&trade_trans_info);
+    // LOG_INFO(&trade_trans_info);
     if (s_interface->OrdersClose(&trade_trans_info, &user_info) == FALSE) {
         LOG("CloseOrder: CloseOrder failed");
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;

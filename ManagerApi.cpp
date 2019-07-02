@@ -109,7 +109,7 @@ void ManagerApi::RequestChart(int login, const char* symbol, int period, int mod
             LOG("No memory to perform the action");
         }
         man->MemFree(ri);
-        LOG("memory = %d, capability = %d, size = %d", (sizeof(RateInfo) * total), json_str.capacity(), json_str.size());
+        // LOG("memory = %d, capability = %d, size = %d", (sizeof(RateInfo) * total), json_str.capacity(), json_str.size());
     } else {
         ErrorCodeToString(&ErrorCode::EC_MAN_ERROR, json_str);
     }
@@ -198,7 +198,7 @@ inline ManagerApi::ManagerApi() : m_running(1), m_factory() {
     m_thread = boost::thread(boost::bind(&ManagerApi::StartHeartBeat, this));
 }
 
-inline ManagerApi::~ManagerApi() {
+ManagerApi::~ManagerApi() {
     Stop();
     m_thread.join();
 

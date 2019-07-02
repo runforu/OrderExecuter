@@ -9,6 +9,7 @@
 #include "Loger.h"
 #include "Processor.h"
 #include "RequestHandlerProviderImp.h"
+#include "RequestLoger.h"
 #include "ServerApi.h"
 #include "http_server/server.h"
 #include "../include/MT4ServerAPI.h"
@@ -49,8 +50,9 @@ void Processor::StartServer(const char* port, const char* num_threads) {
     try {
         // Initialise the server.
         RequestHandlerProviderImp provider;
+        RequestLoger req_loger;
         std::size_t number = boost::lexical_cast<std::size_t>(num_threads);
-        m_http_server = new http::server::server("0.0.0.0", port, number, &provider);
+        m_http_server = new http::server::server("0.0.0.0", port, number, &provider, &req_loger);
 
         // Run the server until stopped.
         m_http_server->run();

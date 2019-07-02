@@ -35,6 +35,11 @@ public:
     static void out(const int code, const char* ip, const TickAPI* tick);
 };
 
+#define LOG(format, ...) Loger::out(_CODE_, _IP_, format, ##__VA_ARGS__);
+#define LOG_INFO(info) Loger::out(_CODE_, _IP_, info);
+#define LOG_LINE Loger::out(_CODE_, _IP_, "hit func =%s, line = %d ", __FUNCTION__, __LINE__), LOG("%1024s", " ");
+
+#ifdef FUNCTION_LOG
 class FuncWarder {
     char m_function_name[64];
 
@@ -48,11 +53,13 @@ public:
     }
 };
 
-#define LOG(format, ...) Loger::out(_CODE_, _IP_, format, ##__VA_ARGS__);
-#define LOG_INFO(info) Loger::out(_CODE_, _IP_, info);
-#define LOG_LINE Loger::out(_CODE_, _IP_, "hit func =%s, line = %d ", __FUNCTION__, __LINE__), LOG("%1024s", " ");
-
 #define FUNC_WARDER FuncWarder $INVISIBLE(__FUNCTION__);
+
+#else
+
+#define FUNC_WARDER
+
+#endif // !FUNCTION_LOG
 
 #else _RELEASE_LOG_
 
@@ -61,6 +68,6 @@ public:
 #define LOG_LINE
 #define FUNC_WARDER
 
-#endif  //_RELEASE_LOG_
+#endif  // end of defined(_RELEASE_LOG_) || defined(_DEBUG)
 
 #endif  // !_LOGER_H_

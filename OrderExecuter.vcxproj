@@ -293,6 +293,7 @@
     <ClCompile Include="Loger.cpp" />
     <ClCompile Include="OrderExecuter.cpp" />
     <ClCompile Include="RequestHandlerProviderImp.cpp" />
+    <ClCompile Include="RequestLoger.cpp" />
     <ClCompile Include="ServerApi.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -309,6 +310,7 @@
     <ClInclude Include="http_server\request_handler.h" />
     <ClInclude Include="http_server\request_handler_provider.h" />
     <ClInclude Include="http_server\request_parser.h" />
+    <ClInclude Include="http_server\request_interception.h" />
     <ClInclude Include="http_server\server.h" />
     <ClInclude Include="JsonHandler.h" />
     <ClInclude Include="JsonWrapper.h" />
@@ -322,6 +324,7 @@
     <ClInclude Include="FileUtil.h" />
     <ClInclude Include="Loger.h" />
     <ClInclude Include="RequestHandlerProviderImp.h" />
+    <ClInclude Include="RequestLoger.h" />
     <ClInclude Include="ServerApi.h" />
     <ClInclude Include="Synchronizer.h" />
   </ItemGroup>
