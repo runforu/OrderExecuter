@@ -20,10 +20,10 @@ namespace server {
 
 server::server(const std::string& address, const std::string& port, std::size_t thread_pool_size,
                request_handler_provider* handlers, request_interception* interception)
-    : thread_pool_size_(thread_pool_size), acceptor_(io_context_), new_connection_(), request_dispatcher_() {
+    : thread_pool_size_(thread_pool_size), acceptor_(io_context_), new_connection_(), dispatcher_() {
     // Set the requestion handler providers.
-    request_dispatcher_.set_request_handler_provider(handlers);
-    request_dispatcher_.set_request_interception(interception);
+    dispatcher_.set_request_handler_provider(handlers);
+    dispatcher_.set_request_interception(interception);
 
     // Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
     boost::asio::ip::tcp::resolver resolver(io_context_);
@@ -49,7 +49,7 @@ void server::run() {
 }
 
 void server::start_accept() {
-    new_connection_.reset(new connection(io_context_, request_dispatcher_));
+    new_connection_.reset(new connection(io_context_, dispatcher_));
     acceptor_.async_accept(new_connection_->socket(),
                            boost::bind(&server::handle_accept, this, boost::asio::placeholders::error));
 }

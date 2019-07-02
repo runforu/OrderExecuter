@@ -9,6 +9,7 @@
 //
 
 #include <boost/bind.hpp>
+#include <boost/thread.hpp>
 #include <vector>
 #include "connection.h"
 #include "request_dispatcher.h"
@@ -16,8 +17,8 @@
 namespace http {
 namespace server {
 
-connection::connection(boost::asio::io_context& io_context, request_dispatcher& handler)
-    : strand_(io_context), socket_(io_context), request_dispatcher_(handler) {}
+connection::connection(boost::asio::io_context& io_context, request_dispatcher& dispatcher)
+    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher) {}
 
 boost::asio::ip::tcp::socket& connection::socket() {
     return socket_;
@@ -37,7 +38,7 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
         boost::tie(result, iter) = request_parser_.parse(request_, buffer_.data(), buffer_.data() + bytes_transferred);
 
         if (result) {
-            request_dispatcher_.dispatch_request(request_, reply_);
+            dispatcher_.dispatch_request(request_, reply_);
             boost::asio::async_write(
                 socket_, reply_.to_buffers(),
                 boost::asio::bind_executor(

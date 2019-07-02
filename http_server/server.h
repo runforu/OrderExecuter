@@ -59,7 +59,7 @@ private:
     connection_ptr new_connection_;
 
     /// The handler for all incoming requests.
-    request_dispatcher request_dispatcher_;
+    request_dispatcher dispatcher_;
 };
 
 }  // namespace server

@@ -38,7 +38,7 @@ bool MiscJsonHandler::handle(const http::server::request& req, http::server::rep
     }
 
     rep.headers.push_back(header::json_content_type);
-    rep.headers.push_back(header("Content-Length", std::to_string(rep.content.length())));
+    rep.headers.push_back(header(header::content_length, std::to_string(rep.content.length())));
     return true;
 }
 

@@ -34,7 +34,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         response.put("json_error", "Invalid plugin license");
         rep.content.append(JsonWrapper::ToJsonStr(response));
         rep.headers.push_back(header::json_content_type);
-        rep.headers.push_back(header("Content-Length", std::to_string(rep.content.length())));
+        rep.headers.push_back(header(header::content_length, std::to_string(rep.content.length())));
         return true;
     }
 #endif
@@ -123,7 +123,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     }
 
     rep.headers.push_back(header::json_content_type);
-    rep.headers.push_back(header("Content-Length", std::to_string(rep.content.length())));
+    rep.headers.push_back(header(header::content_length, std::to_string(rep.content.length())));
     return true;
 }
 
@@ -695,7 +695,7 @@ void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut fil
     int from = pt.get<int>("from", -1);
     int to = pt.get<int>("to", -1);
     const ErrorCode* error_code;
-    TradeRecord* trade_record;
+    TradeRecord* trade_record = NULL;
     int total = 0;
     int count = 0;
 
