@@ -41,6 +41,9 @@
     <ClCompile Include="LicenseService.cpp" />
     <ClCompile Include="LicenseClient.cpp" />
     <ClCompile Include="RequestLoger.cpp" />
+    <ClCompile Include="http_server\request.cpp">
+      <Filter>http_server</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Processor.h" />

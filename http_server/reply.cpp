@@ -229,5 +229,10 @@ reply reply::stock_reply(reply::status_type status) {
     return rep;
 }
 
+void reply::reset() {
+    content.clear();
+    headers.clear();
+}
+
 }  // namespace server
 }  // namespace http

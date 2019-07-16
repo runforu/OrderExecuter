@@ -85,6 +85,31 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     <br />
     <br />
     <br />
+    <h3>
+    <i>Ping</i> the server</h3>
+    <b>Request</b>
+    <div style="margin-left:60px;width:50%; background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "Ping"
+}</code>
+</pre>
+    </div>
+    <b>Response (the same with request)</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "OpenOrder",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS"
+}</code>
+</pre>
+    </div>
+
+    <br />
+    <br />
+    <br />
     <h3>Request to 
     <i>Open</i> an order</h3>
     <b>Request</b>

@@ -41,7 +41,9 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
 
     if (!pt.empty()) {
         rep.status = reply::ok;
-        if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
+        if (pt.get<std::string>("request", "").compare("Ping") == 0) {
+            rep.content.append("{\"request\":\"Ping\",\"result\":\"OK\",\"error_code\":\"0\",\"error_des\":\"SUCCESS\"}\r\n");
+        } else if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
             ptree response;
             response = OpenOrder(pt);
             rep.content.append(JsonWrapper::ToJsonStr(response));

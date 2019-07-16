@@ -278,6 +278,7 @@
     <ClCompile Include="http_server\header.cpp" />
     <ClCompile Include="http_server\mime_types.cpp" />
     <ClCompile Include="http_server\reply.cpp" />
+    <ClCompile Include="http_server\request.cpp" />
     <ClCompile Include="http_server\request_dispatcher.cpp" />
     <ClCompile Include="http_server\request_parser.cpp" />
     <ClCompile Include="http_server\server.cpp" />

@@ -13,6 +13,7 @@
 
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/deadline_timer.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
@@ -37,6 +38,10 @@ public:
     void start();
 
 private:
+    void do_start();
+
+    void handle_close(const boost::system::error_code& error);
+
     /// Handle completion of a read operation.
     void handle_read(const boost::system::error_code& e, std::size_t bytes_transferred);
 
@@ -63,6 +68,8 @@ private:
 
     /// The reply to be sent back to the client.
     reply reply_;
+
+    boost::asio::deadline_timer timer_;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;
