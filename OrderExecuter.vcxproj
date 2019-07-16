@@ -227,7 +227,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_LICENSE_VERIFICATION_;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
