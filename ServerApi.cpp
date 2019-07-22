@@ -144,6 +144,17 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
         return false;  // invalid volume
     }
 
+    //--- check margin
+    if (cmd == OP_BUY || cmd == OP_SELL) {
+        double profit = 0, margin = 0, free_margin = 0, prev_margin = 0;
+        margin = s_interface->TradesMarginCheck(&user_info, &trade_trans_info, &profit, &free_margin, &prev_margin);
+        if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg.margin_hedged_strong != FALSE || prev_margin <= margin)) {
+            LOG("OpenOrder: not enough margin");
+            *error_code = &ErrorCode::EC_TRADE_NO_MONEY;
+            return false;  // no enough margin
+        }
+    }
+
     //--- check stops
     if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("OpenOrder: invalid stops");
