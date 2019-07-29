@@ -37,8 +37,10 @@ bool MiscJsonHandler::handle(const http::server::request& req, http::server::rep
         rep.content.append("{\"json_error\":\"Invalid json format\"}");
     }
 
-    rep.headers.push_back(header::json_content_type);
-    rep.headers.push_back(header(header::content_length, std::to_string(rep.content.length())));
+    rep.headers.push_back(header::response_json_content_type);
+    rep.headers.push_back(header::header_connection);
+    rep.headers.push_back(header::keep_alive);
+    rep.headers.push_back(header(header::response_content_length, std::to_string(rep.content.length())));
     return true;
 }
 

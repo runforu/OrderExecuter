@@ -33,8 +33,8 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         ptree response;
         response.put("json_error", "Invalid plugin license");
         rep.content.append(JsonWrapper::ToJsonStr(response));
-        rep.headers.push_back(header::json_content_type);
-        rep.headers.push_back(header(header::content_length, std::to_string(rep.content.length())));
+        rep.headers.push_back(header::response_json_content_type);
+        rep.headers.push_back(header(header::response_content_length, std::to_string(rep.content.length())));
         return true;
     }
 #endif
@@ -124,8 +124,10 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         rep.content.append(JsonWrapper::ToJsonStr(response));
     }
 
-    rep.headers.push_back(header::json_content_type);
-    rep.headers.push_back(header(header::content_length, std::to_string(rep.content.length())));
+    rep.headers.push_back(header::response_json_content_type);
+    rep.headers.push_back(header::header_connection);
+    rep.headers.push_back(header::keep_alive);
+    rep.headers.push_back(header(header::response_content_length, std::to_string(rep.content.length())));
     return true;
 }
 

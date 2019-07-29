@@ -55,7 +55,7 @@ bool DefaultHandler::handle(const http::server::request& req, http::server::repl
         rep.content.append(buf, is.gcount());
     }
     rep.headers.resize(2);
-    rep.headers[0].name = http::server::header::content_length;
+    rep.headers[0].name = http::server::header::response_content_length;
     rep.headers[0].value = boost::lexical_cast<std::string>(rep.content.size());
     rep.headers[1].name = "Content-Type";
     rep.headers[1].value = http::server::mime_types::extension_to_type(extension);
