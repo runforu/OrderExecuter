@@ -45,7 +45,9 @@ void server::run() {
     }
 
     // Wait for all threads in the pool to exit.
-    for (std::size_t i = 0; i < threads.size(); ++i) threads[i]->join();
+    for (std::size_t i = 0; i < threads.size(); ++i) {
+        threads[i]->join();
+    }
 }
 
 void server::start_accept() {

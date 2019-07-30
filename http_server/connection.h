@@ -70,6 +70,9 @@ private:
     reply reply_;
 
     boost::asio::deadline_timer timer_;
+
+    /// timeout stop flag
+    bool timeout_;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

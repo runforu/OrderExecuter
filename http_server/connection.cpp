@@ -18,7 +18,7 @@ namespace http {
 namespace server {
 
 connection::connection(boost::asio::io_context& io_context, request_dispatcher& dispatcher)
-    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher), timer_(io_context) {}
+    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher), timer_(io_context), timeout_(false) {}
 
 boost::asio::ip::tcp::socket& connection::socket() {
     return socket_;
@@ -49,10 +49,7 @@ void connection::do_start() {
 
 void connection::handle_close(const boost::system::error_code& error) {
     if (!error) {
-        // Initiate graceful connection closure.
-        boost::system::error_code ignored_ec;
-        socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-        socket_.close();
+        timeout_ = true;
     }
     // No new asynchronous operations are started. This means that all shared_ptr
     // references to the connection object will disappear and the object will be
@@ -98,8 +95,20 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
 }
 
 void connection::handle_write(const boost::system::error_code& e) {
+    try {
+        timer_.cancel();
+    } catch (...) {
+    }
     if (!e) {
-        do_start();
+        if (timeout_) {
+            // Initiate graceful connection closure.
+            boost::system::error_code ignored_ec;
+            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+            socket_.close();
+        } else {
+            // keep the connection alive.
+            do_start();
+        }
     }
 
     // No new asynchronous operations are started. This means that all shared_ptr
