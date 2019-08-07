@@ -17,8 +17,12 @@
 namespace http {
 namespace server {
 
+int connection::connection_number_ = 0;
+
 connection::connection(boost::asio::io_context& io_context, request_dispatcher& dispatcher)
-    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher), timer_(io_context), timeout_(false) {}
+    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher), timer_(io_context), timeout_(false) {
+    connection_number_++;
+}
 
 boost::asio::ip::tcp::socket& connection::socket() {
     return socket_;
@@ -28,6 +32,14 @@ void connection::start() {
     socket_.set_option(boost::asio::ip::tcp::no_delay(true));
     socket_.set_option(boost::asio::socket_base::do_not_route(true));
     do_start();
+}
+
+connection::~connection() {
+    connection_number_--;
+}
+
+int connection::total_connection() {
+    return connection_number_;
 }
 
 void connection::do_start() {
@@ -40,7 +52,7 @@ void connection::do_start() {
                                                                             boost::asio::placeholders::bytes_transferred)));
     try {
         // asynchronized handler will be cancelled.
-        timer_.expires_from_now(boost::posix_time::seconds(30));
+        timer_.expires_from_now(boost::posix_time::seconds(180));
     } catch (...) {
     }
     timer_.async_wait(boost::asio::bind_executor(
@@ -51,6 +63,7 @@ void connection::handle_close(const boost::system::error_code& error) {
     if (!error) {
         timeout_ = true;
     }
+
     // No new asynchronous operations are started. This means that all shared_ptr
     // references to the connection object will disappear and the object will be
     // destroyed automatically after this handler returns. The connection class's

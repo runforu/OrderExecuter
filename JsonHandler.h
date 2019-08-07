@@ -15,6 +15,7 @@ public:
 
 private:
     typedef bool (*FilterOut)(TradeRecord*);
+    boost::property_tree::ptree Ping();
     boost::property_tree::ptree OpenOrder(boost::property_tree::ptree pt);
     boost::property_tree::ptree AddOrder(boost::property_tree::ptree pt);
     boost::property_tree::ptree UpdateOrder(boost::property_tree::ptree pt);

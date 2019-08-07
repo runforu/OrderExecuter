@@ -37,6 +37,10 @@ public:
     /// Start the first asynchronous operation for the connection.
     void start();
 
+    ~connection();
+
+    static int total_connection();
+
 private:
     void do_start();
 
@@ -73,6 +77,9 @@ private:
 
     /// timeout stop flag
     bool timeout_;
+
+    /// number of connection
+    static int connection_number_;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;

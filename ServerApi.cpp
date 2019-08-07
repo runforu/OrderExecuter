@@ -1023,7 +1023,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     return true;
 }
 
-bool ServerApi::Deposit(const int login, const char* ip, const double value, const char* comment, double* balance,
+bool ServerApi::Deposit(const int login, const char* ip, const double value, const char* comment, double* order,
                         const ErrorCode** error_code) {
     FUNC_WARDER;
 
@@ -1037,7 +1037,7 @@ bool ServerApi::Deposit(const int login, const char* ip, const double value, con
         return false;
     }
 
-    if ((*balance = s_interface->ClientsChangeBalance(login, &user.grp, value, comment)) == 0) {
+    if ((*order = s_interface->ClientsChangeBalance(login, &user.grp, value, comment)) == 0) {
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         return false;
     }

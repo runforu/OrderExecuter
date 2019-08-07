@@ -30,7 +30,7 @@ public:
     static bool CloseOrder(const char* ip, const int order, double close_price, const char* comment,
                            const ErrorCode** error_code);
 
-    static bool Deposit(const int login, const char* ip, const double value, const char* comment, double* balance,
+    static bool Deposit(const int login, const char* ip, const double value, const char* comment, double* order,
                         const ErrorCode** error_code);
 
     static bool OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,

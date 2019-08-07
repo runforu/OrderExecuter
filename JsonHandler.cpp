@@ -9,6 +9,7 @@
 #include "Loger.h"
 #include "ServerApi.h"
 #include "common.h"
+#include "http_server/connection.h"
 #include "../include/MT4ServerAPI.h"
 
 using namespace boost::property_tree;
@@ -42,7 +43,8 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     if (!pt.empty()) {
         rep.status = reply::ok;
         if (pt.get<std::string>("request", "").compare("Ping") == 0) {
-            rep.content.append("{\"request\":\"Ping\",\"result\":\"OK\",\"error_code\":\"0\",\"error_des\":\"SUCCESS\"}\r\n");
+            ptree response = Ping();
+            rep.content.append(JsonWrapper::ToJsonStr(response));
         } else if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
             ptree response;
             response = OpenOrder(pt);
@@ -129,6 +131,16 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     rep.headers.push_back(header::keep_alive);
     rep.headers.push_back(header(header::response_content_length, std::to_string(rep.content.length())));
     return true;
+}
+
+boost::property_tree::ptree JsonHandler::Ping() {
+    ptree response;
+    response.put("request", "Ping");
+    response.put("result", "OK");
+    response.put("error_code", ErrorCode::EC_OK.m_code);
+    response.put("error_des", ErrorCode::EC_OK.m_des);
+    response.put("connections", connection::total_connection());
+    return response;
 }
 
 ptree JsonHandler::OpenOrder(ptree pt) {
@@ -518,7 +530,7 @@ void JsonHandler::GetPendingOrders(boost::property_tree::ptree pt, std::string& 
 }
 
 void JsonHandler::GetClosedOrders(boost::property_tree::ptree pt, std::string& response) {
-    _GetClosedOrders(pt, [](TradeRecord* trade) -> bool { return false && trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; },
+    _GetClosedOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; },
                      response);
 }
 
