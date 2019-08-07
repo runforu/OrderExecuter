@@ -1032,6 +1032,34 @@ bool ServerApi::Deposit(const int login, const char* ip, const double value, con
         return false;
     }
 
+    if (strlen(comment) > 0 && comment[0] >= '0' && comment[0] <= '9') {
+        int total = 0;
+        TradeRecord* trade_record = NULL;
+        bool handled = false;
+        bool result = ServerApi::GetClosedOrders(login, ServerApi::Api()->TradeTime() - 3600, ServerApi::Api()->TradeTime(),
+                                                 &total, &trade_record, error_code);
+
+        if (result && trade_record != NULL) {
+            for (int i = 0; i < total; ++i) {
+                TradeRecord* trade = trade_record + i;
+                if (trade->cmd == OP_BALANCE && strcmp(comment, trade->comment) == 0) {
+                    handled = true;
+                    break;
+                }
+            }
+        }
+
+        if (trade_record != NULL) {
+            HEAP_FREE(trade_record);
+            trade_record = NULL;
+        }
+
+        if (handled) {
+            *error_code = &ErrorCode::EC_ALREADY_DEPOSIT;
+            return false;
+        }
+    }
+
     UserInfo user = {0};
     if (!GetUserInfo(login, &user, error_code)) {
         return false;

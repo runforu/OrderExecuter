@@ -245,6 +245,7 @@ ptree JsonHandler::Deposit(ptree pt) {
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
     double value = pt.get<double>("value", 0.0);
     std::string comment = pt.get<std::string>("comment", "");
+
     const ErrorCode* error_code;
     double order = 0;
     bool result = ServerApi::Deposit(login, ip.c_str(), value, comment.c_str(), &order, &error_code);
@@ -530,8 +531,7 @@ void JsonHandler::GetPendingOrders(boost::property_tree::ptree pt, std::string& 
 }
 
 void JsonHandler::GetClosedOrders(boost::property_tree::ptree pt, std::string& response) {
-    _GetClosedOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; },
-                     response);
+    _GetClosedOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; }, response);
 }
 
 inline boost::property_tree::ptree JsonHandler::IsOpening(boost::property_tree::ptree pt) {

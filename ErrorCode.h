@@ -40,6 +40,8 @@ struct ErrorCode {
     static const ErrorCode EC_MAN_ERROR;
     static const ErrorCode EC_MAN_NO_CONNECT;
     static const ErrorCode EC_MAN_NO_AVAILABLE_INTERFACE;
+
+    static const ErrorCode EC_ALREADY_DEPOSIT;
     int m_code;
     const char* m_des;
 };
