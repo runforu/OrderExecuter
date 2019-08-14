@@ -178,7 +178,7 @@ boost::tribool request_parser::consume(request& req, char input) {
         case header_value:
             if (input == '\r') {
                 state_ = expecting_newline_2;
-                if (req.headers.back().name == header::content_length) {
+                if (req.headers.back().name == "content-length") {
                     try {
                         body_length_ = std::stoi(req.headers.back().value);
                     } catch (...) {

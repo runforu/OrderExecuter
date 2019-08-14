@@ -1032,7 +1032,7 @@ bool ServerApi::Deposit(const int login, const char* ip, const double value, con
         return false;
     }
 
-    if (strlen(comment) > 0 && comment[0] >= '0' && comment[0] <= '9') {
+    if (comment != nullptr && comment[0] >= '0' && comment[0] <= '9') {
         int total = 0;
         TradeRecord* trade_record = NULL;
         bool handled = false;

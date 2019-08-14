@@ -20,7 +20,7 @@ namespace server {
 int connection::connection_number_ = 0;
 
 connection::connection(boost::asio::io_context& io_context, request_dispatcher& dispatcher)
-    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher), timer_(io_context), timeout_(false) {
+    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher), timer_(io_context) {
     connection_number_++;
 }
 
@@ -31,6 +31,7 @@ boost::asio::ip::tcp::socket& connection::socket() {
 void connection::start() {
     socket_.set_option(boost::asio::ip::tcp::no_delay(true));
     socket_.set_option(boost::asio::socket_base::do_not_route(true));
+    socket_.set_option(boost::asio::socket_base::keep_alive(true));
     do_start();
 }
 
@@ -46,22 +47,19 @@ void connection::do_start() {
     request_parser_.reset();
     request_.reset();
     reply_.reset();
+    start_timer();
     boost::asio::async_read(socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
                             boost::asio::bind_executor(strand_, boost::bind(&connection::handle_read, shared_from_this(),
                                                                             boost::asio::placeholders::error,
                                                                             boost::asio::placeholders::bytes_transferred)));
-    try {
-        // asynchronized handler will be cancelled.
-        timer_.expires_from_now(boost::posix_time::seconds(180));
-    } catch (...) {
-    }
-    timer_.async_wait(boost::asio::bind_executor(
-        strand_, boost::bind(&connection::handle_close, shared_from_this(), boost::asio::placeholders::error)));
 }
 
 void connection::handle_close(const boost::system::error_code& error) {
     if (!error) {
-        timeout_ = true;
+        // Initiate graceful connection closure.
+        boost::system::error_code ignored_ec;
+        socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+        socket_.close();
     }
 
     // No new asynchronous operations are started. This means that all shared_ptr
@@ -71,10 +69,8 @@ void connection::handle_close(const boost::system::error_code& error) {
 }
 
 void connection::handle_read(const boost::system::error_code& e, std::size_t bytes_transferred) {
-    try {
-        timer_.cancel();
-    } catch (...) {
-    }
+    cancel_timer();
+
     if (!e) {
         boost::tribool result;
         decltype(buffer_.data()) iter;
@@ -108,26 +104,32 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
 }
 
 void connection::handle_write(const boost::system::error_code& e) {
-    try {
-        timer_.cancel();
-    } catch (...) {
-    }
     if (!e) {
-        if (timeout_) {
-            // Initiate graceful connection closure.
-            boost::system::error_code ignored_ec;
-            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-            socket_.close();
-        } else {
-            // keep the connection alive.
-            do_start();
-        }
+        // keep the connection alive.
+        do_start();
     }
 
     // No new asynchronous operations are started. This means that all shared_ptr
     // references to the connection object will disappear and the object will be
     // destroyed automatically after this handler returns. The connection class's
     // destructor closes the socket.
+}
+
+void connection::start_timer() {
+    try {
+        // asynchronized handler will be cancelled.
+        timer_.expires_from_now(boost::posix_time::seconds(200));
+    } catch (...) {
+    }
+    timer_.async_wait(boost::asio::bind_executor(
+        strand_, boost::bind(&connection::handle_close, shared_from_this(), boost::asio::placeholders::error)));
+}
+
+void connection::cancel_timer() {
+    try {
+        timer_.cancel();
+    } catch (...) {
+    }
 }
 
 }  // namespace server
