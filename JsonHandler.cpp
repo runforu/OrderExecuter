@@ -152,7 +152,7 @@ boost::property_tree::ptree JsonHandler::Ping() {
     return response;
 }
 
-ptree JsonHandler::OpenOrder(ptree pt) {
+ptree JsonHandler::OpenOrder(const ptree& pt) {
     const ErrorCode* error_code;
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
@@ -180,7 +180,7 @@ ptree JsonHandler::OpenOrder(ptree pt) {
     return response;
 }
 
-ptree JsonHandler::AddOrder(ptree pt) {
+ptree JsonHandler::AddOrder(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
@@ -209,7 +209,7 @@ ptree JsonHandler::AddOrder(ptree pt) {
     return response;
 }
 
-ptree JsonHandler::UpdateOrder(ptree pt) {
+ptree JsonHandler::UpdateOrder(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
     int order = pt.get<int>("order", 0);
@@ -230,7 +230,7 @@ ptree JsonHandler::UpdateOrder(ptree pt) {
     return response;
 }
 
-ptree JsonHandler::CloseOrder(ptree pt) {
+ptree JsonHandler::CloseOrder(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
     int order = pt.get<int>("order", 0);
@@ -248,7 +248,7 @@ ptree JsonHandler::CloseOrder(ptree pt) {
     return response;
 }
 
-ptree JsonHandler::Deposit(ptree pt) {
+ptree JsonHandler::Deposit(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
@@ -271,7 +271,7 @@ ptree JsonHandler::Deposit(ptree pt) {
     return response;
 }
 
-ptree JsonHandler::GetUserRecord(ptree pt) {
+ptree JsonHandler::GetUserRecord(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int user = pt.get<int>("user", -1);
@@ -328,7 +328,7 @@ ptree JsonHandler::GetUserRecord(ptree pt) {
     return response;
 }
 
-ptree JsonHandler::UpdateUserRecord(ptree pt) {
+ptree JsonHandler::UpdateUserRecord(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int user = pt.get<int>("user", -1);
@@ -353,7 +353,7 @@ ptree JsonHandler::UpdateUserRecord(ptree pt) {
     return response;
 }
 
-ptree JsonHandler::AddUser(ptree pt) {
+ptree JsonHandler::AddUser(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string name = pt.get<std::string>("name", "");
@@ -378,7 +378,7 @@ ptree JsonHandler::AddUser(ptree pt) {
     return response;
 }
 
-boost::property_tree::ptree JsonHandler::ChangePassword(boost::property_tree::ptree pt) {
+ptree JsonHandler::ChangePassword(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
@@ -395,7 +395,7 @@ boost::property_tree::ptree JsonHandler::ChangePassword(boost::property_tree::pt
     return response;
 }
 
-boost::property_tree::ptree JsonHandler::CheckPassword(boost::property_tree::ptree pt) {
+ptree JsonHandler::CheckPassword(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
@@ -412,7 +412,7 @@ boost::property_tree::ptree JsonHandler::CheckPassword(boost::property_tree::ptr
     return response;
 }
 
-boost::property_tree::ptree JsonHandler::GetMargin(boost::property_tree::ptree pt) {
+ptree JsonHandler::GetMargin(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     const ErrorCode* error_code;
@@ -447,7 +447,7 @@ boost::property_tree::ptree JsonHandler::GetMargin(boost::property_tree::ptree p
     return response;
 }
 
-boost::property_tree::ptree JsonHandler::GetMarginInfo(boost::property_tree::ptree pt) {
+ptree JsonHandler::GetMarginInfo(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     const ErrorCode* error_code;
@@ -482,7 +482,7 @@ boost::property_tree::ptree JsonHandler::GetMarginInfo(boost::property_tree::ptr
     return response;
 }
 
-boost::property_tree::ptree JsonHandler::GetOrder(boost::property_tree::ptree pt) {
+ptree JsonHandler::GetOrder(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int order = pt.get<int>("order", -1);
@@ -543,7 +543,7 @@ void JsonHandler::GetClosedOrders(boost::property_tree::ptree pt, std::string& r
     _GetClosedOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; }, response);
 }
 
-inline boost::property_tree::ptree JsonHandler::IsOpening(boost::property_tree::ptree pt) {
+inline boost::property_tree::ptree JsonHandler::IsOpening(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     const ErrorCode* error_code;
     std::string symbol = pt.get<std::string>("symbol", "");
@@ -561,7 +561,7 @@ inline boost::property_tree::ptree JsonHandler::IsOpening(boost::property_tree::
     return response;
 }
 
-inline boost::property_tree::ptree JsonHandler::TradeTime(boost::property_tree::ptree pt) {
+inline boost::property_tree::ptree JsonHandler::TradeTime(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     const ErrorCode* error_code;
     time_t time = 0;
@@ -578,7 +578,7 @@ inline boost::property_tree::ptree JsonHandler::TradeTime(boost::property_tree::
     return response;
 }
 
-inline boost::property_tree::ptree JsonHandler::GetSymbolList(boost::property_tree::ptree pt) {
+inline boost::property_tree::ptree JsonHandler::GetSymbolList(const ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     const ErrorCode* error_code;
     const ConSymbol* con_symbols = NULL;
@@ -657,7 +657,7 @@ inline boost::property_tree::ptree JsonHandler::GetSymbolList(boost::property_tr
     return response;
 }
 
-void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter_out, std::string& response) {
+void JsonHandler::_GetOpenOrders(const ptree& pt, FilterOut filter_out, std::string& response) {
     FUNC_WARDER;
 
     std::string request = pt.get<std::string>("request", "");
@@ -712,7 +712,7 @@ void JsonHandler::_GetOpenOrders(boost::property_tree::ptree pt, FilterOut filte
     }
 }
 
-void JsonHandler::_GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter_out, std::string& response) {
+void JsonHandler::_GetClosedOrders(const ptree& pt, FilterOut filter_out, std::string& response) {
     FUNC_WARDER;
 
     std::string request = pt.get<std::string>("request", "");

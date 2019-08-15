@@ -16,29 +16,29 @@ public:
 private:
     typedef bool (*FilterOut)(TradeRecord*);
     boost::property_tree::ptree Ping();
-    boost::property_tree::ptree OpenOrder(boost::property_tree::ptree pt);
-    boost::property_tree::ptree AddOrder(boost::property_tree::ptree pt);
-    boost::property_tree::ptree UpdateOrder(boost::property_tree::ptree pt);
-    boost::property_tree::ptree CloseOrder(boost::property_tree::ptree pt);
-    boost::property_tree::ptree Deposit(boost::property_tree::ptree pt);
-    boost::property_tree::ptree GetUserRecord(boost::property_tree::ptree pt);
-    boost::property_tree::ptree UpdateUserRecord(boost::property_tree::ptree pt);
-    boost::property_tree::ptree ChangePassword(boost::property_tree::ptree pt);
-    boost::property_tree::ptree CheckPassword(boost::property_tree::ptree pt);
-    boost::property_tree::ptree GetMargin(boost::property_tree::ptree pt);
-    boost::property_tree::ptree GetMarginInfo(boost::property_tree::ptree pt);
-    boost::property_tree::ptree GetOrder(boost::property_tree::ptree pt);
-    boost::property_tree::ptree AddUser(boost::property_tree::ptree pt);
+    boost::property_tree::ptree OpenOrder(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree AddOrder(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree UpdateOrder(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree CloseOrder(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree Deposit(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree GetUserRecord(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree UpdateUserRecord(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree ChangePassword(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree CheckPassword(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree GetMargin(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree GetMarginInfo(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree GetOrder(const boost::property_tree::ptree& pt);
+    boost::property_tree::ptree AddUser(const boost::property_tree::ptree& pt);
     inline void GetOpenOrders(boost::property_tree::ptree pt, std::string& response);
     inline void GetPendingOrders(boost::property_tree::ptree pt, std::string& response);
     inline void GetClosedOrders(boost::property_tree::ptree pt, std::string& response);
-    inline boost::property_tree::ptree IsOpening(boost::property_tree::ptree pt);
-    inline boost::property_tree::ptree TradeTime(boost::property_tree::ptree pt);
-    inline boost::property_tree::ptree GetSymbolList(boost::property_tree::ptree pt);
+    inline boost::property_tree::ptree IsOpening(const boost::property_tree::ptree& pt);
+    inline boost::property_tree::ptree TradeTime(const boost::property_tree::ptree& pt);
+    inline boost::property_tree::ptree GetSymbolList(const boost::property_tree::ptree& pt);
 
 private:
-    void _GetOpenOrders(boost::property_tree::ptree pt, FilterOut filter, std::string& response);
-    void _GetClosedOrders(boost::property_tree::ptree pt, FilterOut filter, std::string& response);
+    void _GetOpenOrders(const boost::property_tree::ptree& pt, FilterOut filter, std::string& response);
+    void _GetClosedOrders(const boost::property_tree::ptree& pt, FilterOut filter, std::string& response);
     void AppendTradeRecordJsonStr(TradeRecord* trade_record, std::string& response);
 };
 
