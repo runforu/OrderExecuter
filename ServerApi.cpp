@@ -1023,7 +1023,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     return true;
 }
 
-bool ServerApi::Deposit(const int login, const char* ip, const double value, const char* comment, double* order,
+bool ServerApi::Deposit(const int login, const char* ip, const double value, const char* comment, int* order,
                         const ErrorCode** error_code) {
     FUNC_WARDER;
 

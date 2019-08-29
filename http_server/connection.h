@@ -79,6 +79,10 @@ private:
 
     boost::asio::deadline_timer timer_;
 
+    SYSTEMTIME timestamp_;
+
+    int mt4_time_;
+
     /// number of connection
     static int connection_number_;
 };

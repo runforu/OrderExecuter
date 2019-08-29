@@ -5,6 +5,7 @@
 #include "http_server/request_handler.h"
 
 struct TradeRecord;
+struct ErrorCode;
 
 class JsonHandler : public http::server::request_handler {
 public:
@@ -40,6 +41,8 @@ private:
     void _GetOpenOrders(const boost::property_tree::ptree& pt, FilterOut filter, std::string& response);
     void _GetClosedOrders(const boost::property_tree::ptree& pt, FilterOut filter, std::string& response);
     void AppendTradeRecordJsonStr(TradeRecord* trade_record, std::string& response);
+    void SetResponseJson(boost::property_tree::ptree& response, const std::string& request, bool result,
+                         const ErrorCode* error_code);
 };
 
 #endif  // !_JSON_HANDLER_H_

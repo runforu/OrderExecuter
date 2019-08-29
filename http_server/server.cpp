@@ -38,22 +38,22 @@ server::server(const std::string& address, const std::string& port, std::size_t 
 
 void server::run() {
     // Create a pool of threads to run all of the io_contexts.
-    std::vector<boost::shared_ptr<boost::thread> > threads;
+    boost::thread_group thread_group;
     for (std::size_t i = 0; i < thread_pool_size_; ++i) {
-        boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_context::run, &io_context_)));
-        threads.push_back(thread);
+        thread_group.add_thread(new boost::thread(boost::bind(&boost::asio::io_context::run, &io_context_)));
     }
 
     // Wait for all threads in the pool to exit.
-    for (std::size_t i = 0; i < threads.size(); ++i) {
-        threads[i]->join();
-    }
+    thread_group.join_all();
 }
 
 void server::start_accept() {
-    new_connection_.reset(new connection(io_context_, dispatcher_));
-    acceptor_.async_accept(new_connection_->socket(),
-                           boost::bind(&server::handle_accept, this, boost::asio::placeholders::error));
+    try {
+        new_connection_.reset(new connection(io_context_, dispatcher_));
+        acceptor_.async_accept(new_connection_->socket(),
+                               boost::bind(&server::handle_accept, this, boost::asio::placeholders::error));
+    } catch (...) {
+    }
 }
 
 void server::handle_accept(const boost::system::error_code& e) {

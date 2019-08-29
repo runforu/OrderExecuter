@@ -7,7 +7,7 @@
 #include "ServerApi.h"
 #include "../include/MT4ServerAPI.h"
 
-PluginInfo ExtPluginInfo = {"Order Executer", 1, "DH Copyrigh.", {0}};
+PluginInfo ExtPluginInfo = {"Order Executer", 2, "DH Copyrigh.", {0}};
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID /*lpReserved*/) {
     switch (reason) {

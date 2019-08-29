@@ -53,7 +53,7 @@ private:
     Synchronizer m_synchronizer;
     boost::thread m_thread;
 
-    static const int MAX_MANAGER_LOGIN = 128;
+    static const int MAX_MANAGER_LOGIN = 32;
 };
 
 #endif  // !_MANAGERAPI_H_

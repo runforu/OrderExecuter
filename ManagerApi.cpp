@@ -18,7 +18,6 @@ void ManagerApi::Initialize(CManagerInterface* man) {
         return;
     }
 
-    int rt = man->IsConnected();
     if (man->IsConnected()) {
         man->Disconnect();
     }
@@ -48,18 +47,9 @@ void ManagerApi::RequestChart(int login, const char* symbol, int period, int mod
     }
 
     CManagerInterface* man = GetInterface();
-    int count = 2;
     while (man == NULL) {
-        if (count--) {
-            ErrorCodeToString(&ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE, json_str);
-            return;
-        }
-        boost::this_thread::sleep(boost::posix_time::milliseconds(8));
-        if (!IsValid()) {
-            ErrorCodeToString(&ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE, json_str);
-            return;
-        }
-        man = GetInterface();
+        ErrorCodeToString(&ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE, json_str);
+        return;
     }
 
     ChartInfo ci = {0};
@@ -78,7 +68,7 @@ void ManagerApi::RequestChart(int login, const char* symbol, int period, int mod
         if (login != -1) {
             spread_diff = GetSpreadDiff(login, symbol);
         }
-        LOG("ManagerApi::RequestChart complete %d.", total);
+        // LOG("ManagerApi::RequestChart complete %d.", total);
         // avarage length of a RateInfo json is less than 100, the max length of other info is less than 256
         try {
             json_str.reserve(total * 100 + 256);

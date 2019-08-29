@@ -52,7 +52,7 @@ bool DefaultHandler::handle(const http::server::request& req, http::server::repl
     rep.status = http::server::reply::ok;
     char buf[512];
     while (is.read(buf, sizeof(buf)).gcount() > 0) {
-        rep.content.append(buf, is.gcount());
+        rep.content.append(buf, static_cast<std::string::size_type>(is.gcount()));
     }
     rep.headers.resize(2);
     rep.headers[0].name = "Content-Length";

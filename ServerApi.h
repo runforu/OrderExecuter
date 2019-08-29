@@ -30,7 +30,7 @@ public:
     static bool CloseOrder(const char* ip, const int order, double close_price, const char* comment,
                            const ErrorCode** error_code);
 
-    static bool Deposit(const int login, const char* ip, const double value, const char* comment, double* order,
+    static bool Deposit(const int login, const char* ip, const double value, const char* comment, int* order,
                         const ErrorCode** error_code);
 
     static bool OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
@@ -50,7 +50,7 @@ public:
                           const ErrorCode** error_code);
 
     static bool GetMarginInfo(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
-        const ErrorCode** error_code);
+                              const ErrorCode** error_code);
 
     static bool GetOrder(int order, TradeRecord* trade_record, const ErrorCode** error_code);
 
