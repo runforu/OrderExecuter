@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="OrderExecuter.def" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="http_server">
