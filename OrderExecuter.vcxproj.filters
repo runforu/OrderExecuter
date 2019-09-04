@@ -44,6 +44,7 @@
     <ClCompile Include="http_server\request.cpp">
       <Filter>http_server</Filter>
     </ClCompile>
+    <ClCompile Include="PluginVersion.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Processor.h" />

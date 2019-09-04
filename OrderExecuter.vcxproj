@@ -289,6 +289,7 @@
     <ClCompile Include="LicenseService.cpp" />
     <ClCompile Include="ManagerApi.cpp" />
     <ClCompile Include="MiscJsonHandler.cpp" />
+    <ClCompile Include="PluginVersion.cpp" />
     <ClCompile Include="Processor.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="Config.cpp" />

@@ -7,7 +7,10 @@
 #include "ServerApi.h"
 #include "../include/MT4ServerAPI.h"
 
-PluginInfo ExtPluginInfo = {"Order Executer", 2, "DH Copyrigh.", {0}};
+extern const char *PLUGIN_VERSION_STRING;
+#define PLUGIN_NAME "Order Executer"
+#define PLUGIN_VERSION 2
+#define PLUGIN_COPYRIGHT "DH Copyrigh."
 
 BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID /*lpReserved*/) {
     switch (reason) {
@@ -43,7 +46,10 @@ BOOL APIENTRY DllMain(HANDLE hModule, DWORD reason, LPVOID /*lpReserved*/) {
 
 void APIENTRY MtSrvAbout(PluginInfo* info) {
     if (info != NULL) {
-        memcpy(info, &ExtPluginInfo, sizeof(PluginInfo));
+        sprintf(info->name, "%s %s", PLUGIN_NAME, PLUGIN_VERSION_STRING);
+        info->version = PLUGIN_VERSION;
+        sprintf(info->copyright, "%s", PLUGIN_COPYRIGHT);
+        memset(info->reserved, 0, sizeof(info->reserved));
     }
 }
 
