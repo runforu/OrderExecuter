@@ -47,7 +47,7 @@ void ManagerApi::RequestChart(int login, const char* symbol, int period, int mod
     }
 
     CManagerInterface* man = GetInterface();
-    while (man == NULL) {
+    if (man == NULL) {
         ErrorCodeToString(&ErrorCode::EC_MAN_NO_AVAILABLE_INTERFACE, json_str);
         return;
     }
