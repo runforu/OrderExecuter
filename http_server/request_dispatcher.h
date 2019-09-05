@@ -32,12 +32,16 @@ public:
     /// Handle a request and produce a reply.
     void dispatch_request(const request& req, reply& rep);
 
-    void set_request_handler_provider(request_handler_provider* provider);
+    inline void set_request_handler_provider(request_handler_provider* handlers) {
+        provider_ = handlers;
+    }
 
-    void set_request_interception(request_interception* interception);
+    inline void set_request_interception(request_interception* interception) {
+        interception_ = interception;
+    }
 
 private:
-    request_handler_provider* provider;
+    request_handler_provider* provider_;
     request_interception* interception_;
 };
 

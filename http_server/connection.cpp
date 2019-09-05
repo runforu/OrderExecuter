@@ -36,10 +36,9 @@ boost::asio::ip::tcp::socket& connection::socket() {
 
 void connection::start() {
     try {
-        boost::system::error_code ignore;
-        socket_.set_option(boost::asio::ip::tcp::no_delay(true), ignore);
-        socket_.set_option(boost::asio::socket_base::do_not_route(true), ignore);
-        socket_.set_option(boost::asio::socket_base::keep_alive(true), ignore);
+        socket_.set_option(boost::asio::ip::tcp::no_delay(true));
+        socket_.set_option(boost::asio::socket_base::do_not_route(true));
+        socket_.set_option(boost::asio::socket_base::keep_alive(true));
     } catch (...) {
         LOG_LINE;
     }
@@ -73,9 +72,8 @@ void connection::handle_close(const boost::system::error_code& error) {
     if (!error) {
         // Initiate graceful connection closure.
         try {
-            boost::system::error_code ignored_ec;
-            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
-            socket_.close(ignored_ec);
+            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
+            socket_.close();
         } catch (...) {
             LOG_LINE;
         }

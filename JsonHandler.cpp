@@ -20,7 +20,7 @@ int JsonHandler::get_priority() const {
 }
 
 bool JsonHandler::can_handle(const request& req) {
-    return std::find_if(req.headers.begin(), req.headers.end(), [&](const http::server::header& h) {
+    return std::find_if(req.headers.begin(), req.headers.end(), [](const http::server::header& h) {
                return h.name == "content-type" && h.value == "application/json";
            }) != req.headers.end();
 }

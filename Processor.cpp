@@ -34,7 +34,6 @@ void Processor::Initialize() {
 }
 
 void Processor::Shutdown() {
-
 #ifdef _LICENSE_VERIFICATION_
     LicenseService::Instance().Stop();
 #endif  // !_LICENSE_VERIFICATION_
@@ -50,7 +49,7 @@ void Processor::StartServer(const char* port, const char* num_threads) {
     try {
         // Initialise the server.
         RequestHandlerProviderImp provider;
-        //RequestLoger req_loger;
+        // RequestLoger req_loger;
         std::size_t number = boost::lexical_cast<std::size_t>(num_threads);
         m_http_server = new http::server::server("0.0.0.0", port, number, &provider, nullptr);
 
