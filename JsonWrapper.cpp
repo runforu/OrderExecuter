@@ -8,8 +8,20 @@ boost::property_tree::ptree JsonWrapper::ParseJson(std::string json_str) {
         read_json(ss, tree);
     } catch (boost::property_tree::ptree_error& e) {
         LOG("read_json -- exception: %s", e.what());
+        tree.clear();
     }
     return tree;
+}
+
+void JsonWrapper::ParseJson(std::string json_str, boost::property_tree::ptree & tree) {
+    std::stringstream ss(json_str);
+    try {
+        read_json(ss, tree);
+    }
+    catch (boost::property_tree::ptree_error& e) {
+        LOG("read_json -- exception: %s", e.what());
+        tree.clear();
+    }
 }
 
 std::string JsonWrapper::ToJsonStr(boost::property_tree::ptree& pt, bool pretty) {

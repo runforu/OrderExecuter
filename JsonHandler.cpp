@@ -26,7 +26,8 @@ bool JsonHandler::can_handle(const request& req) {
 }
 
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
-    ptree pt = JsonWrapper::ParseJson(req.body);
+    ptree json;
+    JsonWrapper::ParseJson(req.body, json);
 
 #ifdef _LICENSE_VERIFICATION_
     if (!LicenseService::Instance().IsLicenseValid()) {
@@ -43,81 +44,66 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     }
 #endif
 
-    if (!pt.empty()) {
+    if (!json.empty()) {
         rep.status = reply::ok;
-        if (pt.get<std::string>("request", "").compare("Ping") == 0) {
-            ptree response = Ping();
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("OpenOrder") == 0) {
+        if (json.get<std::string>("request", "").compare("Ping") == 0) {
+            Ping(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("OpenOrder") == 0) {
+            OpenOrder(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("AddOrder") == 0) {
+            AddOrder(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("UpdateOrder") == 0) {
+            UpdateOrder(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("CloseOrder") == 0) {
+            CloseOrder(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("Deposit") == 0) {
+            Deposit(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("GetUserRecord") == 0) {
+            GetUserRecord(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
+            UpdateUserRecord(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("AddUser") == 0) {
             ptree response;
-            response = OpenOrder(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("AddOrder") == 0) {
-            ptree response;
-            response = AddOrder(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("UpdateOrder") == 0) {
-            ptree response;
-            response = UpdateOrder(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("CloseOrder") == 0) {
-            ptree response;
-            response = CloseOrder(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("Deposit") == 0) {
-            ptree response;
-            response = Deposit(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("GetUserRecord") == 0) {
-            ptree response;
-            response = GetUserRecord(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
-            ptree response;
-            response = UpdateUserRecord(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("AddUser") == 0) {
-            ptree response;
-            response = AddUser(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("ChangePassword") == 0) {
-            ptree response;
-            response = ChangePassword(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("CheckPassword") == 0) {
-            ptree response;
-            response = CheckPassword(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("GetMargin") == 0) {
-            ptree response;
-            response = GetMargin(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("GetMarginInfo") == 0) {
-            ptree response;
-            response = GetMargin(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("GetOrder") == 0) {
-            ptree response;
-            response = GetOrder(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
-            GetOpenOrders(pt, rep.content);
-        } else if (pt.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
-            GetPendingOrders(pt, rep.content);
-        } else if (pt.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
-            GetClosedOrders(pt, rep.content);
-        } else if (pt.get<std::string>("request", "").compare("IsOpening") == 0) {
-            ptree response;
-            response = IsOpening(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("TradeTime") == 0) {
-            ptree response;
-            response = TradeTime(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
-        } else if (pt.get<std::string>("request", "").compare("GetSymbolList") == 0) {
-            ptree response;
-            response = GetSymbolList(pt);
-            rep.content.append(JsonWrapper::ToJsonStr(response));
+            AddUser(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("ChangePassword") == 0) {
+            ChangePassword(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("CheckPassword") == 0) {
+            CheckPassword(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("GetMargin") == 0) {
+            GetMargin(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("GetMarginInfo") == 0) {
+            GetMargin(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("GetOrder") == 0) {
+            GetOrder(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
+            GetOpenOrders(json, rep.content);
+        } else if (json.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
+            GetPendingOrders(json, rep.content);
+        } else if (json.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
+            GetClosedOrders(json, rep.content);
+        } else if (json.get<std::string>("request", "").compare("IsOpening") == 0) {
+            IsOpening(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("TradeTime") == 0) {
+            TradeTime(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (json.get<std::string>("request", "").compare("GetSymbolList") == 0) {
+            GetSymbolList(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
         } else {
             return false;
         }
@@ -142,14 +128,12 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
     return true;
 }
 
-boost::property_tree::ptree JsonHandler::Ping() {
-    ptree response;
-    SetResponseJson(response, "Ping", true, &ErrorCode::EC_OK);
-    response.put("connections", connection::total_connection());
-    return response;
+void JsonHandler::Ping(boost::property_tree::ptree& pt) {
+    SetResponseJson(pt, "Ping", true, &ErrorCode::EC_OK);
+    pt.put("connections", connection::total_connection());
 }
 
-boost::property_tree::ptree JsonHandler::OpenOrder(const boost::property_tree::ptree& pt) {
+void JsonHandler::OpenOrder(boost::property_tree::ptree& pt) {
     const ErrorCode* error_code;
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
@@ -159,12 +143,13 @@ boost::property_tree::ptree JsonHandler::OpenOrder(const boost::property_tree::p
     std::string coupon_comment = pt.get<std::string>("coupon_comment", "");
 
     int order = 0;
-    ptree response;
+
     if (coupon > 0.0) {
         bool result = ServerApi::Deposit(login, ip.c_str(), coupon, coupon_comment.c_str(), &order, &error_code);
         if (!result) {
-            SetResponseJson(response, request, result, error_code);
-            return response;
+            pt.clear();
+            SetResponseJson(pt, request, result, error_code);
+            return;
         }
     }
 
@@ -180,14 +165,14 @@ boost::property_tree::ptree JsonHandler::OpenOrder(const boost::property_tree::p
     bool result = ServerApi::OpenOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, expiration,
                                        comment.c_str(), &error_code, &order);
 
-    SetResponseJson(response, request, result, error_code);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
     if (result) {
-        response.put("order", order);
+        pt.put("order", order);
     }
-    return response;
 }
 
-ptree JsonHandler::AddOrder(const ptree& pt) {
+void JsonHandler::AddOrder(boost::property_tree::ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
@@ -205,15 +190,14 @@ ptree JsonHandler::AddOrder(const ptree& pt) {
     bool result = ServerApi::AddOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, expiration,
                                       comment.c_str(), &error_code, &order);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
     if (result) {
-        response.put("order", order);
+        pt.put("order", order);
     }
-    return response;
 }
 
-ptree JsonHandler::UpdateOrder(const ptree& pt) {
+void JsonHandler::UpdateOrder(boost::property_tree::ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
     int order = pt.get<int>("order", 0);
@@ -225,13 +209,11 @@ ptree JsonHandler::UpdateOrder(const ptree& pt) {
     const ErrorCode* error_code;
 
     bool result = ServerApi::UpdateOrder(ip.c_str(), order, open_price, sl, tp, expiration, comment.c_str(), &error_code);
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
 }
 
-ptree JsonHandler::CloseOrder(const ptree& pt) {
+void JsonHandler::CloseOrder(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
     int order = pt.get<int>("order", 0);
@@ -240,13 +222,11 @@ ptree JsonHandler::CloseOrder(const ptree& pt) {
     const ErrorCode* error_code;
 
     bool result = ServerApi::CloseOrder(ip.c_str(), order, close_price, comment.c_str(), &error_code);
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
 }
 
-ptree JsonHandler::Deposit(const ptree& pt) {
+void JsonHandler::Deposit(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
@@ -257,16 +237,14 @@ ptree JsonHandler::Deposit(const ptree& pt) {
     int order = 0;
     bool result = ServerApi::Deposit(login, ip.c_str(), value, comment.c_str(), &order, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
     if (result) {
-        response.put("order", order);
+        pt.put("order", order);
     }
-
-    return response;
 }
 
-ptree JsonHandler::GetUserRecord(const ptree& pt) {
+void JsonHandler::GetUserRecord(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int user = pt.get<int>("user", -1);
@@ -276,51 +254,49 @@ ptree JsonHandler::GetUserRecord(const ptree& pt) {
     UserRecord user_record;
     bool result = ServerApi::GetUserRecord(user, &user_record, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
     if (result) {
-        response.put("login", user_record.login);
-        response.put("group", user_record.group);
-        response.put("enable", user_record.enable);
-        response.put("enable_change_password", user_record.enable_change_password);
-        response.put("enable_read_only", user_record.enable_read_only);
-        response.put("enable_otp", user_record.enable_otp);
-        response.put("name", user_record.name);
-        response.put("country", user_record.country);
-        response.put("city", user_record.city);
-        response.put("state", user_record.state);
-        response.put("zipcode", user_record.zipcode);
-        response.put("address", user_record.address);
-        response.put("lead_source", user_record.lead_source);
-        response.put("phone", user_record.phone);
-        response.put("email", user_record.email);
-        response.put("comment", user_record.comment);
-        response.put("id", user_record.id);
-        response.put("status", user_record.status);
-        response.put("regdate", user_record.regdate);
-        response.put("lastdate", user_record.lastdate);
-        response.put("leverage", user_record.leverage);
-        response.put("agent_account", user_record.agent_account);
-        response.put("timestamp", user_record.timestamp);
-        response.put("last_ip", user_record.last_ip);
-        response.put("balance", user_record.balance);
-        response.put("prevmonthbalance", user_record.prevmonthbalance);
-        response.put("prevbalance", user_record.prevbalance);
-        response.put("credit", user_record.credit);
-        response.put("interestrate", user_record.interestrate);
-        response.put("taxes", user_record.taxes);
-        response.put("prevmonthequity", user_record.prevmonthequity);
-        response.put("prevequity", user_record.prevequity);
-        response.put("otp_secret", user_record.otp_secret);
-        response.put("send_reports", user_record.send_reports);
-        response.put("mqid", user_record.mqid);
-        response.put("user_color", user_record.user_color);
+        pt.put("login", user_record.login);
+        pt.put("group", user_record.group);
+        pt.put("enable", user_record.enable);
+        pt.put("enable_change_password", user_record.enable_change_password);
+        pt.put("enable_read_only", user_record.enable_read_only);
+        pt.put("enable_otp", user_record.enable_otp);
+        pt.put("name", user_record.name);
+        pt.put("country", user_record.country);
+        pt.put("city", user_record.city);
+        pt.put("state", user_record.state);
+        pt.put("zipcode", user_record.zipcode);
+        pt.put("address", user_record.address);
+        pt.put("lead_source", user_record.lead_source);
+        pt.put("phone", user_record.phone);
+        pt.put("email", user_record.email);
+        pt.put("comment", user_record.comment);
+        pt.put("id", user_record.id);
+        pt.put("status", user_record.status);
+        pt.put("regdate", user_record.regdate);
+        pt.put("lastdate", user_record.lastdate);
+        pt.put("leverage", user_record.leverage);
+        pt.put("agent_account", user_record.agent_account);
+        pt.put("timestamp", user_record.timestamp);
+        pt.put("last_ip", user_record.last_ip);
+        pt.put("balance", user_record.balance);
+        pt.put("prevmonthbalance", user_record.prevmonthbalance);
+        pt.put("prevbalance", user_record.prevbalance);
+        pt.put("credit", user_record.credit);
+        pt.put("interestrate", user_record.interestrate);
+        pt.put("taxes", user_record.taxes);
+        pt.put("prevmonthequity", user_record.prevmonthequity);
+        pt.put("prevequity", user_record.prevequity);
+        pt.put("otp_secret", user_record.otp_secret);
+        pt.put("send_reports", user_record.send_reports);
+        pt.put("mqid", user_record.mqid);
+        pt.put("user_color", user_record.user_color);
     }
-
-    return response;
 }
 
-ptree JsonHandler::UpdateUserRecord(const ptree& pt) {
+void JsonHandler::UpdateUserRecord(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int user = pt.get<int>("user", -1);
@@ -336,13 +312,11 @@ ptree JsonHandler::UpdateUserRecord(const ptree& pt) {
     bool result = ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage,
                                               &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
 }
 
-ptree JsonHandler::AddUser(const ptree& pt) {
+void JsonHandler::AddUser(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string name = pt.get<std::string>("name", "");
@@ -357,14 +331,12 @@ ptree JsonHandler::AddUser(const ptree& pt) {
     bool result = ServerApi::AddUser(login, name.c_str(), password.c_str(), group.c_str(), phone.c_str(), email.c_str(),
                                      lead_source.c_str(), leverage, &error_code, &login);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-    response.put("login", login);
-
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
+    pt.put("login", login);
 }
 
-ptree JsonHandler::ChangePassword(const ptree& pt) {
+void JsonHandler::ChangePassword(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
@@ -372,13 +344,11 @@ ptree JsonHandler::ChangePassword(const ptree& pt) {
 
     bool result = ServerApi::ChangePassword(login, password.c_str(), &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
 }
 
-ptree JsonHandler::CheckPassword(const ptree& pt) {
+void JsonHandler::CheckPassword(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
@@ -386,13 +356,11 @@ ptree JsonHandler::CheckPassword(const ptree& pt) {
 
     bool result = ServerApi::CheckPassword(login, password.c_str(), &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
 }
 
-ptree JsonHandler::GetMargin(const ptree& pt) {
+void JsonHandler::GetMargin(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     const ErrorCode* error_code;
@@ -403,28 +371,26 @@ ptree JsonHandler::GetMargin(const ptree& pt) {
 
     bool result = ServerApi::GetMargin(login, &user_info, &margin, &freemargin, &equity, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
     if (result) {
-        response.put("margin", margin);
-        response.put("freemargin", freemargin);
-        response.put("equity", equity);
-        response.put("group", user_info.group);
-        response.put("margin_call", user_info.grp.margin_call);
-        response.put("margin_mode", user_info.grp.margin_mode);
-        response.put("margin_stopout", user_info.grp.margin_stopout);
-        response.put("margin_type", user_info.grp.margin_type);
-        response.put("margin_stopout", user_info.grp.margin_stopout);
-        response.put("ip", user_info.ip);
-        response.put("leverage", user_info.leverage);
-        response.put("balance", user_info.balance);
-        response.put("credit", user_info.credit);
+        pt.put("margin", margin);
+        pt.put("freemargin", freemargin);
+        pt.put("equity", equity);
+        pt.put("group", user_info.group);
+        pt.put("margin_call", user_info.grp.margin_call);
+        pt.put("margin_mode", user_info.grp.margin_mode);
+        pt.put("margin_stopout", user_info.grp.margin_stopout);
+        pt.put("margin_type", user_info.grp.margin_type);
+        pt.put("margin_stopout", user_info.grp.margin_stopout);
+        pt.put("ip", user_info.ip);
+        pt.put("leverage", user_info.leverage);
+        pt.put("balance", user_info.balance);
+        pt.put("credit", user_info.credit);
     }
-
-    return response;
 }
 
-ptree JsonHandler::GetMarginInfo(const ptree& pt) {
+void JsonHandler::GetMarginInfo(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     const ErrorCode* error_code;
@@ -435,28 +401,26 @@ ptree JsonHandler::GetMarginInfo(const ptree& pt) {
 
     bool result = ServerApi::GetMarginInfo(login, &user_info, &margin, &freemargin, &equity, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
     if (result) {
-        response.put("margin", margin);
-        response.put("freemargin", freemargin);
-        response.put("equity", equity);
-        response.put("group", user_info.group);
-        response.put("margin_call", user_info.grp.margin_call);
-        response.put("margin_mode", user_info.grp.margin_mode);
-        response.put("margin_stopout", user_info.grp.margin_stopout);
-        response.put("margin_type", user_info.grp.margin_type);
-        response.put("margin_stopout", user_info.grp.margin_stopout);
-        response.put("ip", user_info.ip);
-        response.put("leverage", user_info.leverage);
-        response.put("balance", user_info.balance);
-        response.put("credit", user_info.credit);
+        pt.put("margin", margin);
+        pt.put("freemargin", freemargin);
+        pt.put("equity", equity);
+        pt.put("group", user_info.group);
+        pt.put("margin_call", user_info.grp.margin_call);
+        pt.put("margin_mode", user_info.grp.margin_mode);
+        pt.put("margin_stopout", user_info.grp.margin_stopout);
+        pt.put("margin_type", user_info.grp.margin_type);
+        pt.put("margin_stopout", user_info.grp.margin_stopout);
+        pt.put("ip", user_info.ip);
+        pt.put("leverage", user_info.leverage);
+        pt.put("balance", user_info.balance);
+        pt.put("credit", user_info.credit);
     }
-
-    return response;
 }
 
-ptree JsonHandler::GetOrder(const ptree& pt) {
+void JsonHandler::GetOrder(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int order = pt.get<int>("order", -1);
@@ -465,56 +429,54 @@ ptree JsonHandler::GetOrder(const ptree& pt) {
 
     bool result = ServerApi::GetOrder(order, &trade_record, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
     if (result) {
-        response.put("order", trade_record.order);
-        response.put("login", trade_record.login);
-        response.put("symbol", trade_record.symbol);
-        response.put("digits", trade_record.digits);
-        response.put("cmd", trade_record.cmd);
-        response.put("volume", trade_record.volume);
-        response.put("open_time", trade_record.open_time);
-        response.put("state", ToTradeRecordStateStr(trade_record.state));
-        response.put("open_price", trade_record.open_price);
-        response.put("sl", trade_record.sl);
-        response.put("tp", trade_record.tp);
-        response.put("close_time", trade_record.close_time);
-        response.put("gw_volume", trade_record.gw_volume);
-        response.put("expiration", trade_record.expiration);
-        response.put("commission", trade_record.commission);
-        response.put("commission_agent", trade_record.commission_agent);
-        response.put("storage", trade_record.storage);
-        response.put("close_price", trade_record.close_price);
-        response.put("profit", NormalizeDouble(trade_record.profit, 2));
-        response.put("taxes", trade_record.taxes);
-        response.put("magic", trade_record.magic);
-        response.put("comment", trade_record.comment);
-        response.put("gw_order", trade_record.gw_order);
-        response.put("activation", trade_record.activation);
-        response.put("gw_open_price", trade_record.gw_open_price);
-        response.put("gw_close_price", trade_record.gw_close_price);
-        response.put("margin_rate", trade_record.margin_rate);
-        response.put("timestamp", trade_record.timestamp);
+        pt.put("order", trade_record.order);
+        pt.put("login", trade_record.login);
+        pt.put("symbol", trade_record.symbol);
+        pt.put("digits", trade_record.digits);
+        pt.put("cmd", trade_record.cmd);
+        pt.put("volume", trade_record.volume);
+        pt.put("open_time", trade_record.open_time);
+        pt.put("state", ToTradeRecordStateStr(trade_record.state));
+        pt.put("open_price", trade_record.open_price);
+        pt.put("sl", trade_record.sl);
+        pt.put("tp", trade_record.tp);
+        pt.put("close_time", trade_record.close_time);
+        pt.put("gw_volume", trade_record.gw_volume);
+        pt.put("expiration", trade_record.expiration);
+        pt.put("commission", trade_record.commission);
+        pt.put("commission_agent", trade_record.commission_agent);
+        pt.put("storage", trade_record.storage);
+        pt.put("close_price", trade_record.close_price);
+        pt.put("profit", NormalizeDouble(trade_record.profit, 2));
+        pt.put("taxes", trade_record.taxes);
+        pt.put("magic", trade_record.magic);
+        pt.put("comment", trade_record.comment);
+        pt.put("gw_order", trade_record.gw_order);
+        pt.put("activation", trade_record.activation);
+        pt.put("gw_open_price", trade_record.gw_open_price);
+        pt.put("gw_close_price", trade_record.gw_close_price);
+        pt.put("margin_rate", trade_record.margin_rate);
+        pt.put("timestamp", trade_record.timestamp);
     }
-
-    return response;
 }
 
-void JsonHandler::GetOpenOrders(boost::property_tree::ptree pt, std::string& response) {
+void JsonHandler::GetOpenOrders(const boost::property_tree::ptree& pt, std::string& response) {
     return _GetOpenOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL; }, response);
 }
 
-void JsonHandler::GetPendingOrders(boost::property_tree::ptree pt, std::string& response) {
+void JsonHandler::GetPendingOrders(const boost::property_tree::ptree& pt, std::string& response) {
     return _GetOpenOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY_LIMIT || trade->cmd > OP_SELL_STOP; },
                           response);
 }
 
-void JsonHandler::GetClosedOrders(boost::property_tree::ptree pt, std::string& response) {
+void JsonHandler::GetClosedOrders(const boost::property_tree::ptree& pt, std::string& response) {
     _GetClosedOrders(pt, [](TradeRecord* trade) -> bool { return trade->cmd < OP_BUY || trade->cmd > OP_SELL_STOP; }, response);
 }
 
-inline boost::property_tree::ptree JsonHandler::IsOpening(const ptree& pt) {
+void JsonHandler::IsOpening(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     const ErrorCode* error_code;
     std::string symbol = pt.get<std::string>("symbol", "");
@@ -523,27 +485,24 @@ inline boost::property_tree::ptree JsonHandler::IsOpening(const ptree& pt) {
 
     bool result = ServerApi::IsOpening(symbol.c_str(), time, &is_open, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-    response.put("is_open", is_open);
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
+    pt.put("is_open", is_open);
 }
 
-inline boost::property_tree::ptree JsonHandler::TradeTime(const ptree& pt) {
+void JsonHandler::TradeTime(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     const ErrorCode* error_code;
     time_t time = 0;
 
     bool result = ServerApi::CurrentTradeTime(&time, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-    response.put("trade_time", time);
-
-    return response;
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
+    pt.put("trade_time", time);
 }
 
-inline boost::property_tree::ptree JsonHandler::GetSymbolList(const ptree& pt) {
+void JsonHandler::GetSymbolList(ptree& pt) {
     std::string request = pt.get<std::string>("request", "");
     const ErrorCode* error_code;
     const ConSymbol* con_symbols = NULL;
@@ -551,9 +510,9 @@ inline boost::property_tree::ptree JsonHandler::GetSymbolList(const ptree& pt) {
 
     bool result = ServerApi::GetSymbolList(&total, &con_symbols, &error_code);
 
-    ptree response;
-    SetResponseJson(response, request, result, error_code);
-    response.put("count", total);
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
+    pt.put("count", total);
     if (result && con_symbols != NULL) {
         ptree symbols;
         for (int i = 0; i < total; i++) {
@@ -612,11 +571,10 @@ inline boost::property_tree::ptree JsonHandler::GetSymbolList(const ptree& pt) {
 
             symbols.push_back(std::make_pair("", symbol));
         }
-        response.add_child("orders", symbols);
+        pt.add_child("orders", symbols);
     }
 
     // no need free con_symbols
-    return response;
 }
 
 void JsonHandler::_GetOpenOrders(const ptree& pt, FilterOut filter_out, std::string& response) {

@@ -72,7 +72,7 @@ void ManagerApi::RequestChart(int login, const char* symbol, int period, int mod
         // avarage length of a RateInfo json is less than 100, the max length of other info is less than 256
         try {
             json_str.reserve(total * 100 + 256);
-            json_str.append("{");
+            json_str.append("{\"request\":\"RequestChart\",");
             json_str.append("\"result\":\"").append(ErrorCode::EC_OK.m_code == 0 ? "OK" : "ERROR").append("\",");
             json_str.append("\"error_code\":").append(std::to_string(ErrorCode::EC_OK.m_code)).append(",");
             json_str.append("\"error_des\":\"").append(ErrorCode::EC_OK.m_des).append("\",");

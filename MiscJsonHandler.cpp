@@ -22,7 +22,8 @@ bool MiscJsonHandler::can_handle(const request& req) {
 }
 
 bool MiscJsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
-    ptree pt = JsonWrapper::ParseJson(req.body);
+    ptree pt;
+    JsonWrapper::ParseJson(req.body, pt);
 
     if (!pt.empty()) {
         rep.status = reply::ok;
