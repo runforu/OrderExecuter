@@ -17,6 +17,7 @@
 
 namespace http {
 namespace server {
+namespace placeholders = boost::asio::placeholders;
 
 int connection::connection_number_ = 0;
 
@@ -26,7 +27,7 @@ int DiffTime(SYSTEMTIME time1, SYSTEMTIME time2) {
 }
 
 connection::connection(boost::asio::io_context& io_context, request_dispatcher& dispatcher)
-    : strand_(io_context), socket_(io_context), dispatcher_(dispatcher), timer_(io_context) {
+    : strand_(boost::asio::make_strand(io_context)), socket_(strand_), dispatcher_(dispatcher), timer_(strand_) {
     connection_number_++;
 }
 
@@ -59,10 +60,9 @@ void connection::do_start() {
         request_.reset();
         reply_.reset();
         start_timer();
-        boost::asio::async_read(socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
-                                boost::asio::bind_executor(strand_, boost::bind(&connection::handle_read, shared_from_this(),
-                                                                                boost::asio::placeholders::error,
-                                                                                boost::asio::placeholders::bytes_transferred)));
+        boost::asio::async_read(
+            socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
+            boost::bind(&connection::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
     } catch (...) {
         LOG_LINE;
     }
@@ -103,22 +103,16 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
                 GetLocalTime(&mt4_end);
                 mt4_time_ = DiffTime(mt4_end, timestamp_);
 
-                boost::asio::async_write(
-                    socket_, reply_.to_buffers(),
-                    boost::asio::bind_executor(
-                        strand_, boost::bind(&connection::handle_write, shared_from_this(), boost::asio::placeholders::error)));
+                boost::asio::async_write(socket_, reply_.to_buffers(),
+                                         boost::bind(&connection::handle_write, shared_from_this(), placeholders::error));
             } else if (!result) {
                 reply_ = reply::stock_reply(reply::bad_request);
-                boost::asio::async_write(
-                    socket_, reply_.to_buffers(),
-                    boost::asio::bind_executor(
-                        strand_, boost::bind(&connection::handle_write, shared_from_this(), boost::asio::placeholders::error)));
+                boost::asio::async_write(socket_, reply_.to_buffers(),
+                                         boost::bind(&connection::handle_write, shared_from_this(), placeholders::error));
             } else {
-                boost::asio::async_read(
-                    socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
-                    boost::asio::bind_executor(
-                        strand_, boost::bind(&connection::handle_read, shared_from_this(), boost::asio::placeholders::error,
-                                             boost::asio::placeholders::bytes_transferred)));
+                boost::asio::async_read(socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
+                                        boost::bind(&connection::handle_read, shared_from_this(), placeholders::error,
+                                                    placeholders::bytes_transferred));
             }
         } catch (...) {
             LOG_LINE;
@@ -163,8 +157,7 @@ void connection::start_timer() {
     try {
         // asynchronized handler will be cancelled.
         timer_.expires_from_now(boost::posix_time::seconds(200));
-        timer_.async_wait(boost::asio::bind_executor(
-            strand_, boost::bind(&connection::handle_close, shared_from_this(), boost::asio::placeholders::error)));
+        timer_.async_wait(boost::bind(&connection::handle_close, shared_from_this(), placeholders::error));
     } catch (...) {
         LOG_LINE;
     }
