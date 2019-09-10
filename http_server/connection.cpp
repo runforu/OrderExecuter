@@ -72,8 +72,9 @@ void connection::handle_close(const boost::system::error_code& error) {
     if (!error) {
         // Initiate graceful connection closure.
         try {
-            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both);
-            socket_.close();
+            boost::system::error_code ignored_ec;
+            socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
+            socket_.close(ignored_ec);
         } catch (...) {
             LOG_LINE;
         }

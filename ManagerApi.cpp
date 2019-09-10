@@ -139,15 +139,12 @@ void ManagerApi::StartHeartBeat() {
     }
 
     for (;;) {
-        if (!m_running) {
-            break;
-        }
         // try to exit quickly
         for (int i = 0; i < 200; i++) {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
             if (!m_running) {
                 return;
             }
+            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
         }
         // vector
         int availabe_connnection = 0;

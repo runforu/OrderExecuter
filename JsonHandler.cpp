@@ -41,67 +41,67 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         rep.headers[1].name = "Content-Length";
         rep.headers[1].value = std::to_string(rep.content.length());
         return true;
-    }
+    }`
 #endif
 
     if (!json.empty()) {
         rep.status = reply::ok;
-        if (json.get<std::string>("request", "").compare("Ping") == 0) {
+        std::string request = json.get<std::string>("request", "");
+        if (request.compare("Ping") == 0) {
             Ping(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("OpenOrder") == 0) {
+        } else if (request.compare("OpenOrder") == 0) {
             OpenOrder(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("AddOrder") == 0) {
+        } else if (request.compare("AddOrder") == 0) {
             AddOrder(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("UpdateOrder") == 0) {
+        } else if (request.compare("UpdateOrder") == 0) {
             UpdateOrder(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("CloseOrder") == 0) {
+        } else if (request.compare("CloseOrder") == 0) {
             CloseOrder(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("Deposit") == 0) {
+        } else if (request.compare("Deposit") == 0) {
             Deposit(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("GetUserRecord") == 0) {
+        } else if (request.compare("GetUserRecord") == 0) {
             GetUserRecord(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("UpdateUserRecord") == 0) {
+        } else if (request.compare("UpdateUserRecord") == 0) {
             UpdateUserRecord(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("AddUser") == 0) {
-            ptree response;
+        } else if (request.compare("AddUser") == 0) {
             AddUser(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("ChangePassword") == 0) {
+        } else if (request.compare("ChangePassword") == 0) {
             ChangePassword(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("CheckPassword") == 0) {
+        } else if (request.compare("CheckPassword") == 0) {
             CheckPassword(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("GetMargin") == 0) {
+        } else if (request.compare("GetMargin") == 0) {
             GetMargin(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("GetMarginInfo") == 0) {
+        } else if (request.compare("GetMarginInfo") == 0) {
             GetMargin(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("GetOrder") == 0) {
+        } else if (request.compare("GetOrder") == 0) {
             GetOrder(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("GetOpenOrders") == 0) {
+        } else if (request.compare("GetOpenOrders") == 0) {
             GetOpenOrders(json, rep.content);
-        } else if (json.get<std::string>("request", "").compare("GetPendingOrders") == 0) {
+        } else if (request.compare("GetPendingOrders") == 0) {
             GetPendingOrders(json, rep.content);
-        } else if (json.get<std::string>("request", "").compare("GetClosedOrders") == 0) {
+        } else if (request.compare("GetClosedOrders") == 0) {
             GetClosedOrders(json, rep.content);
-        } else if (json.get<std::string>("request", "").compare("IsOpening") == 0) {
+        } else if (request.compare("IsOpening") == 0) {
             IsOpening(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("TradeTime") == 0) {
+        } else if (request.compare("TradeTime") == 0) {
             TradeTime(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
-        } else if (json.get<std::string>("request", "").compare("GetSymbolList") == 0) {
+        } else if (request.compare("GetSymbolList") == 0) {
             GetSymbolList(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
         } else {

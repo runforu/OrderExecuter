@@ -62,13 +62,13 @@
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Free|Win32'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(ProjectDir)$(Configuration)\</OutDir>
@@ -141,8 +141,11 @@
       <OutputFile>.\Release/$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>..\..\include\debuginfo.exe $(TargetPath)</Command>
+      <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Free|Win32'">
     <Midl>
@@ -213,8 +216,12 @@
       <OutputFile>.\Release/$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>..\..\include\debuginfo.exe $(TargetPath)</Command>
+      <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
     </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Midl>
@@ -268,6 +275,12 @@
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <OutputFile>.\Debug/$(TargetName).bsc</OutputFile>
     </Bscmake>
+    <PreBuildEvent>
+      <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Environment.cpp" />
