@@ -144,7 +144,8 @@
       <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Free|Win32'">
@@ -276,7 +277,8 @@
       <OutputFile>.\Debug/$(TargetName).bsc</OutputFile>
     </Bscmake>
     <PreBuildEvent>
-      <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>del $(ProjectDir)$(Configuration)\PluginVersion.obj</Command>

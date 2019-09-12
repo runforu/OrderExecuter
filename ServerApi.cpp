@@ -10,6 +10,7 @@
 CServerInterface* ServerApi::s_interface = NULL;
 ConSymbol ServerApi::s_symbols[MAX_SYMBOL_COUNT] = {0};
 int ServerApi::s_symbol_count = 0;
+Synchronizer ServerApi::s_deposit_sync;
 
 void ServerApi::Initialize(CServerInterface* server_interface) {
     s_interface = server_interface;
@@ -1032,6 +1033,8 @@ bool ServerApi::Deposit(const int login, const char* ip, const double value, con
         return false;
     }
 
+    s_deposit_sync.Lock();
+
     if (comment != nullptr && comment[0] >= '0' && comment[0] <= '9') {
         int total = 0;
         TradeRecord* trade_record = NULL;
@@ -1056,22 +1059,21 @@ bool ServerApi::Deposit(const int login, const char* ip, const double value, con
 
         if (handled) {
             *error_code = &ErrorCode::EC_ALREADY_DEPOSIT;
+            s_deposit_sync.Unlock();
             return false;
         }
     }
 
     UserInfo user = {0};
     if (!GetUserInfo(login, &user, error_code)) {
+        s_deposit_sync.Unlock();
         return false;
     }
 
-    if ((*order = s_interface->ClientsChangeBalance(login, &user.grp, value, comment)) == 0) {
-        *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
-        return false;
-    }
-
-    *error_code = &ErrorCode::EC_OK;
-    return true;
+    *order = s_interface->ClientsChangeBalance(login, &user.grp, value, comment);
+    s_deposit_sync.Unlock();
+    *error_code = (*order == 0) ? &ErrorCode::EC_UNKNOWN_ERROR : &ErrorCode::EC_OK;
+    return (*order != 0);
 }
 
 bool ServerApi::GetUserInfo(const int login, UserInfo* user_info, const ErrorCode** error_code) {

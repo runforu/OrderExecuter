@@ -3,6 +3,7 @@
 
 #include <exception>
 #include <string>
+#include "Synchronizer.h"
 
 #define MAX_SYMBOL_COUNT 256
 
@@ -90,6 +91,7 @@ private:
     static CServerInterface* s_interface;
     static ConSymbol s_symbols[MAX_SYMBOL_COUNT];
     static int s_symbol_count;
+    static Synchronizer s_deposit_sync;
 };
 
 #endif  // !_SERVERAPIADAPTER_H_
