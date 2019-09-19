@@ -13,16 +13,14 @@
 #include "../include/MT4ServerAPI.h"
 
 using namespace boost::property_tree;
-using namespace http::server;
 
 int JsonHandler::get_priority() const {
     return 100;
 }
 
-bool JsonHandler::can_handle(const request& req) {
-    return std::find_if(req.headers.begin(), req.headers.end(), [](const http::server::header& h) {
-               return h.name == "content-type" && h.value == "application/json";
-           }) != req.headers.end();
+bool JsonHandler::can_handle(const http::server::request& req) {
+    return std::any_of(req.headers.begin(), req.headers.end(),
+                       [](const http::server::header& h) { return h.name == "content-type" && h.value == "application/json"; });
 }
 
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
@@ -31,7 +29,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
 
 #ifdef _LICENSE_VERIFICATION_
     if (!LicenseService::Instance().IsLicenseValid()) {
-        rep.status = reply::bad_request;
+        rep.status = http::server::reply::bad_request;
         ptree response;
         response.put("json_error", "Invalid plugin license");
         rep.content.append(JsonWrapper::ToJsonStr(response));
@@ -41,11 +39,11 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         rep.headers[1].name = "Content-Length";
         rep.headers[1].value = std::to_string(rep.content.length());
         return true;
-    }`
+    }
 #endif
 
     if (!json.empty()) {
-        rep.status = reply::ok;
+        rep.status = http::server::reply::ok;
         std::string request = json.get<std::string>("request", "");
         if (request.compare("Ping") == 0) {
             Ping(json);
@@ -109,7 +107,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         }
     } else {
         // Handle json parse error
-        rep.status = reply::bad_request;
+        rep.status = http::server::reply::bad_request;
         ptree response;
         response.put("json_error", "Invalid json format");
         rep.content.append(JsonWrapper::ToJsonStr(response));
@@ -130,7 +128,7 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
 
 void JsonHandler::Ping(boost::property_tree::ptree& pt) {
     SetResponseJson(pt, "Ping", true, &ErrorCode::EC_OK);
-    pt.put("connections", connection::total_connection());
+    pt.put("connections", http::server::connection::total_connection());
 }
 
 void JsonHandler::OpenOrder(boost::property_tree::ptree& pt) {

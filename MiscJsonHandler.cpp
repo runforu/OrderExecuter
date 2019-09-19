@@ -9,16 +9,14 @@
 #include "common.h"
 
 using namespace boost::property_tree;
-using namespace http::server;
 
 int MiscJsonHandler::get_priority() const {
     return 99;
 }
 
-bool MiscJsonHandler::can_handle(const request& req) {
-    return std::find_if(req.headers.begin(), req.headers.end(), [&](const http::server::header& h) {
-               return h.name == "content-type" && h.value == "application/json";
-           }) != req.headers.end();
+bool MiscJsonHandler::can_handle(const http::server::request& req) {
+    return std::any_of(req.headers.begin(), req.headers.end(),
+                       [](const http::server::header& h) { return h.name == "content-type" && h.value == "application/json"; });
 }
 
 bool MiscJsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
@@ -26,7 +24,7 @@ bool MiscJsonHandler::handle(const http::server::request& req, http::server::rep
     JsonWrapper::ParseJson(req.body, pt);
 
     if (!pt.empty()) {
-        rep.status = reply::ok;
+        rep.status = http::server::reply::ok;
         if (pt.get<std::string>("request", "").compare("RequestChart") == 0) {
             RequestChart(pt, rep.content);
         } else {
@@ -34,7 +32,7 @@ bool MiscJsonHandler::handle(const http::server::request& req, http::server::rep
         }
     } else {
         // Handle json parse error
-        rep.status = reply::bad_request;
+        rep.status = http::server::reply::bad_request;
         rep.content.append("{\"json_error\":\"Invalid json format\"}");
     }
 
