@@ -14,12 +14,12 @@ int MiscJsonHandler::get_priority() const {
     return 99;
 }
 
-bool MiscJsonHandler::can_handle(const http::server::request& req) {
+bool MiscJsonHandler::can_handle(const http::server::request& req) const {
     return std::any_of(req.headers.begin(), req.headers.end(),
                        [](const http::server::header& h) { return h.name == "content-type" && h.value == "application/json"; });
 }
 
-bool MiscJsonHandler::handle(const http::server::request& req, http::server::reply& rep) {
+bool MiscJsonHandler::handle(const http::server::request& req, http::server::reply& rep) const {
     ptree pt;
     JsonWrapper::ParseJson(req.body, pt);
 
@@ -49,7 +49,7 @@ bool MiscJsonHandler::handle(const http::server::request& req, http::server::rep
     return true;
 }
 
-void MiscJsonHandler::RequestChart(ptree pt, std::string& content) {
+void MiscJsonHandler::RequestChart(ptree pt, std::string& content) const {
     std::string request = pt.get<std::string>("request", "");
     std::string symbol = pt.get<std::string>("symbol", "");
     int login = pt.get<int>("login", -1);

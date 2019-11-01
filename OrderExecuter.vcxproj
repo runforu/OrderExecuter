@@ -187,7 +187,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
-      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerOutput>AssemblyAndSourceCode</AssemblerOutput>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -211,6 +211,7 @@
       <AdditionalDependencies>crypt32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
+      <MapExports>true</MapExports>
     </Link>
     <Bscmake>
       <SuppressStartupBanner>true</SuppressStartupBanner>

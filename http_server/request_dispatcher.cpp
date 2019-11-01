@@ -24,9 +24,10 @@
 namespace http {
 namespace server {
 
-request_dispatcher::request_dispatcher() : provider_(nullptr), interception_(nullptr) {}
+request_dispatcher::request_dispatcher(request_handler_provider* provider, request_interception* interception)
+    : provider_(provider), interception_(interception) {}
 
-void request_dispatcher::dispatch_request(const request& req, reply& rep) {
+void request_dispatcher::dispatch_request(const request& req, reply& rep) const {
     if (interception_ != nullptr && interception_->handle(req)) {
         return;
     }

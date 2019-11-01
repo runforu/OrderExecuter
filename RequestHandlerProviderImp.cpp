@@ -9,7 +9,7 @@ RequestHandlerProviderImp::RequestHandlerProviderImp() {
     m_request_handlers.push_back(new MiscJsonHandler());
     std::sort(m_request_handlers.begin(), m_request_handlers.end(),
               [](http::server::request_handler* left, http::server::request_handler* right) {
-                  return right->get_priority() < left->get_priority();
+                  return left->get_priority() > right->get_priority();
               });
 
     m_default_handler = new DefaultHandler();

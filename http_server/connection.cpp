@@ -26,7 +26,7 @@ int DiffTime(SYSTEMTIME time1, SYSTEMTIME time2) {
            ((time1.wMinute != time2.wMinute) ? 60 * 1000 : 0);
 }
 
-connection::connection(boost::asio::io_context& io_context, request_dispatcher& dispatcher)
+connection::connection(boost::asio::io_context& io_context, const request_dispatcher& dispatcher)
     : strand_(boost::asio::make_strand(io_context)), socket_(strand_), dispatcher_(dispatcher), timer_(strand_) {
     connection_number_++;
 }

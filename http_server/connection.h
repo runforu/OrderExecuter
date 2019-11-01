@@ -29,7 +29,7 @@ namespace server {
 class connection : public boost::enable_shared_from_this<connection>, private boost::noncopyable {
 public:
     /// Construct a connection with the given io_context.
-    explicit connection(boost::asio::io_context& io_context, request_dispatcher& dispatcher);
+    connection(boost::asio::io_context& io_context, const request_dispatcher& dispatcher);
 
     /// Get the socket associated with the connection.
     boost::asio::ip::tcp::socket& socket();
@@ -63,7 +63,7 @@ private:
     boost::asio::ip::tcp::socket socket_;
 
     /// The dispatcher used to process the incoming request.
-    request_dispatcher& dispatcher_;
+    const request_dispatcher& dispatcher_;
 
     /// Buffer for incoming data.
     boost::array<char, 2048> buffer_;

@@ -13,7 +13,7 @@ int DefaultHandler::get_priority() const {
     return 0;
 }
 
-bool DefaultHandler::handle(const http::server::request& req, http::server::reply& rep) {
+bool DefaultHandler::handle(const http::server::request& req, http::server::reply& rep) const {
     // Decode url to path.
     std::string request_path;
     if (!url_decode(req.uri, request_path)) {
@@ -88,6 +88,6 @@ bool DefaultHandler::url_decode(const std::string& in, std::string& out) {
     return true;
 }
 
-bool DefaultHandler::can_handle(const http::server::request& req) {
+bool DefaultHandler::can_handle(const http::server::request& req) const {
     return true;
 }

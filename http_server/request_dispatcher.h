@@ -27,18 +27,10 @@ struct request;
 class request_dispatcher : private boost::noncopyable {
 public:
     /// Construct with a directory containing files to be served.
-    explicit request_dispatcher();
+    request_dispatcher(request_handler_provider* provider, request_interception* interception);
 
     /// Handle a request and produce a reply.
-    void dispatch_request(const request& req, reply& rep);
-
-    inline void set_request_handler_provider(request_handler_provider* handlers) {
-        provider_ = handlers;
-    }
-
-    inline void set_request_interception(request_interception* interception) {
-        interception_ = interception;
-    }
+    void dispatch_request(const request& req, reply& rep) const;
 
 private:
     request_handler_provider* provider_;
