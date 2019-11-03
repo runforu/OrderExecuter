@@ -8,10 +8,9 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/thread.hpp>
+#include <functional>
 #include <iostream>
+#include <thread>
 #include <vector>
 #include "server.h"
 
@@ -34,20 +33,25 @@ server::server(const std::string& address, const std::string& port, std::size_t 
 
 void server::run() {
     // Create a pool of threads to run all of the io_contexts.
-    boost::thread_group thread_group;
+    std::vector<std::thread*> threads;
     for (std::size_t i = 0; i < thread_pool_size_; ++i) {
-        thread_group.add_thread(new boost::thread(boost::bind(&boost::asio::io_context::run, &io_context_)));
+        threads.push_back(new std::thread(std::bind(
+            static_cast<boost::asio::io_context::count_type (boost::asio::io_context::*)()>(&boost::asio::io_context::run),
+            &io_context_)));
     }
 
     // Wait for all threads in the pool to exit.
-    thread_group.join_all();
+    for (auto it = threads.begin(); it != threads.end(); ++it) {
+        (*it)->join();
+    }
 }
 
 void server::start_accept() {
     try {
         new_connection_.reset(new connection(io_context_, dispatcher_));
+        // acceptor_.async_accept(new_connection_->socket(), std::bind(&server::handle_accept, this, std::placeholders::_1));
         acceptor_.async_accept(new_connection_->socket(),
-                               boost::bind(&server::handle_accept, this, boost::asio::placeholders::error));
+                               [this](const boost::system::error_code& error) -> void { this->handle_accept(error); });
     } catch (...) {
     }
 }

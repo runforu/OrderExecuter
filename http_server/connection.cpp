@@ -8,8 +8,7 @@
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
+#include <memory>
 #include <vector>
 #include "connection.h"
 #include "request_dispatcher.h"
@@ -62,7 +61,7 @@ void connection::do_start() {
         start_timer();
         boost::asio::async_read(
             socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
-            boost::bind(&connection::handle_read, shared_from_this(), placeholders::error, placeholders::bytes_transferred));
+            std::bind(&connection::handle_read, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
     } catch (...) {
         LOG_LINE;
     }
@@ -105,15 +104,15 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
                 mt4_time_ = DiffTime(mt4_end, timestamp_);
 
                 boost::asio::async_write(socket_, reply_.to_buffers(),
-                                         boost::bind(&connection::handle_write, shared_from_this(), placeholders::error));
+                                         std::bind(&connection::handle_write, shared_from_this(), std::placeholders::_1));
             } else if (!result) {
                 reply_ = reply::stock_reply(reply::bad_request);
                 boost::asio::async_write(socket_, reply_.to_buffers(),
-                                         boost::bind(&connection::handle_write, shared_from_this(), placeholders::error));
+                                         std::bind(&connection::handle_write, shared_from_this(), std::placeholders::_1));
             } else {
-                boost::asio::async_read(socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
-                                        boost::bind(&connection::handle_read, shared_from_this(), placeholders::error,
-                                                    placeholders::bytes_transferred));
+                boost::asio::async_read(
+                    socket_, boost::asio::buffer(buffer_), boost::asio::transfer_at_least(1),
+                    std::bind(&connection::handle_read, shared_from_this(), std::placeholders::_1, std::placeholders::_2));
             }
         } catch (...) {
             LOG_LINE;
@@ -158,7 +157,7 @@ void connection::start_timer() {
     try {
         // asynchronized handler will be cancelled.
         timer_.expires_from_now(boost::posix_time::seconds(200));
-        timer_.async_wait(boost::bind(&connection::handle_close, shared_from_this(), placeholders::error));
+        timer_.async_wait(std::bind(&connection::handle_close, shared_from_this(), std::placeholders::_1));
     } catch (...) {
         LOG_LINE;
     }

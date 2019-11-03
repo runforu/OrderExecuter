@@ -144,7 +144,7 @@ void ManagerApi::StartHeartBeat() {
             if (!m_running) {
                 return;
             }
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         // vector
         int availabe_connnection = 0;
@@ -182,7 +182,7 @@ inline ManagerApi::ManagerApi() : m_running(1), m_factory() {
         }
     }
 
-    m_thread = boost::thread(boost::bind(&ManagerApi::StartHeartBeat, this));
+    m_thread = std::thread(std::bind(&ManagerApi::StartHeartBeat, this));
 }
 
 ManagerApi::~ManagerApi() {

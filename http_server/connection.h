@@ -14,9 +14,8 @@
 #include <boost/array.hpp>
 #include <boost/asio.hpp>
 #include <boost/asio/deadline_timer.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+#include <memory>
 #include "reply.h"
 #include "request.h"
 #include "request_dispatcher.h"
@@ -26,7 +25,7 @@ namespace http {
 namespace server {
 
 /// Represents a single connection from a client.
-class connection : public boost::enable_shared_from_this<connection>, private boost::noncopyable {
+class connection : public std::enable_shared_from_this<connection> {
 public:
     /// Construct a connection with the given io_context.
     connection(boost::asio::io_context& io_context, const request_dispatcher& dispatcher);
@@ -40,6 +39,11 @@ public:
     ~connection();
 
     static int total_connection();
+
+private:
+    connection(const connection&) = delete;
+
+    connection& operator=(const connection&) = delete;
 
 private:
     void do_start();
@@ -87,7 +91,7 @@ private:
     static int connection_number_;
 };
 
-typedef boost::shared_ptr<connection> connection_ptr;
+typedef std::shared_ptr<connection> connection_ptr;
 
 }  // namespace server
 }  // namespace http

@@ -1,7 +1,7 @@
 #ifndef _PROCESSOR_H_
 #define _PROCESSOR_H_
 
-#include <boost/thread.hpp>
+#include <thread>
 
 namespace http {
 namespace server {
@@ -32,7 +32,7 @@ private:
     char m_max_thread[8];
 
     http::server::server* m_http_server;
-    boost::thread m_thread;
+    std::thread m_thread;
     // Synchronizer m_synchronizer;
 };
 
