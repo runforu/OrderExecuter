@@ -140,21 +140,23 @@ void ManagerApi::StartHeartBeat() {
 
     for (;;) {
         // try to exit quickly
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 5; i++) {
             if (!m_running) {
                 return;
             }
-            boost::this_thread::sleep(boost::posix_time::milliseconds(100));
+            boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
         }
         // vector
         int availabe_connnection = 0;
         for (std::vector<CManagerInterface*>::iterator it = m_managers.begin(); it != m_managers.end(); ++it) {
             if ((*it) != NULL && (*it)->IsConnected()) {
-                int rt = (*it)->Ping();
-                availabe_connnection++;
+                if ((*it)->Ping() != RET_OK) {
+                    (*it)->Disconnect();
+                } else {
+                    availabe_connnection++;
+                }
             }
         }
-        LOG("ManagerApi available connection (%d)", availabe_connnection);
     }
 }
 
