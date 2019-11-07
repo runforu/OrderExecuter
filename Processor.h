@@ -20,10 +20,13 @@ public:
     void Shutdown();
 
 private:
-    Processor() : m_http_server(NULL) {}
-    ~Processor(){};
-    Processor(Processor const&) {}
-    void operator=(Processor const&) {}
+    Processor() {}
+
+    ~Processor() = default;
+
+    Processor(Processor const&) = delete;
+
+    void operator=(Processor const&) = delete;
 
     void StartServer(const char* port, const char* num_threads);
 
@@ -31,7 +34,7 @@ private:
     char m_server_port[8];
     char m_max_thread[8];
 
-    http::server::server* m_http_server;
+    http::server::server* m_http_server = nullptr;
     boost::thread m_thread;
     // Synchronizer m_synchronizer;
 };

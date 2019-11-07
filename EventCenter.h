@@ -16,10 +16,10 @@ public:
     void Bind(int event, boost::function<void()> c);
 
 private:
-    EventCenter() {}
-    ~EventCenter() {}
-    EventCenter(EventCenter const&) {}
-    void operator=(EventCenter const&) {}
+    EventCenter() = default;
+    ~EventCenter() = default;
+    EventCenter(EventCenter const&) = delete;
+    void operator=(EventCenter const&) = delete;
 
 private:
     std::vector<std::pair<int, boost::function<void()>>> m_vector;

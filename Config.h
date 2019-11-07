@@ -47,8 +47,8 @@ public:
 private:
     Config();
     ~Config();
-    Config(Config const&) {}
-    void operator=(Config const&) {}
+    Config(Config const&) = delete;
+    void operator=(Config const&) = delete;
     PluginCfg* Search(const char* name);
     static int SortByName(const void* left, const void* right);
     static int SearchByName(const void* left, const void* right);

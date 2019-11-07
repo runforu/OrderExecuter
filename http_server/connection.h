@@ -59,8 +59,11 @@ private:
     /// Strand to ensure the connection's handlers are not called concurrently.
     boost::asio::strand<boost::asio::io_context::executor_type> strand_;
 
-    /// Socket for the connection.
+    /// Socket for the connection, depands on strand_.
     boost::asio::ip::tcp::socket socket_;
+
+    /// Depands on strand_.
+    boost::asio::deadline_timer timer_;
 
     /// The dispatcher used to process the incoming request.
     const request_dispatcher& dispatcher_;
@@ -76,8 +79,6 @@ private:
 
     /// The reply to be sent back to the client.
     reply reply_;
-
-    boost::asio::deadline_timer timer_;
 
     SYSTEMTIME timestamp_;
 
