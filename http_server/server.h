@@ -40,6 +40,8 @@ public:
     void run();
 
 private:
+    void context_run();
+
     /// Initiate an asynchronous accept operation.
     void start_accept();
 

@@ -12,8 +12,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/thread.hpp>
 #include <iostream>
-#include <vector>
 #include "server.h"
+#include "../Loger.h"
 
 namespace http {
 namespace server {
@@ -36,28 +36,38 @@ void server::run() {
     // Create a pool of threads to run all of the io_contexts.
     boost::thread_group thread_group;
     for (std::size_t i = 0; i < thread_pool_size_; ++i) {
-        thread_group.add_thread(new boost::thread(boost::bind(&boost::asio::io_context::run, &io_context_)));
+        thread_group.create_thread(boost::bind(&server::context_run, this));
     }
 
     // Wait for all threads in the pool to exit.
     thread_group.join_all();
 }
 
-void server::start_accept() {
-    try {
-        new_connection_.reset(new connection(io_context_, dispatcher_));
-        acceptor_.async_accept(new_connection_->socket(),
-                               boost::bind(&server::handle_accept, this, boost::asio::placeholders::error));
-    } catch (...) {
+void server::context_run() {
+    for (;;) {
+        try {
+            io_context_.run();
+            // normal exit.
+            break;
+        } catch (...) {
+            LOG_LINE;
+        }
     }
 }
 
-void server::handle_accept(const boost::system::error_code& e) {
-    if (!e) {
-        new_connection_->start();
-    }
+void server::start_accept() {
+    new_connection_.reset(new connection(io_context_, dispatcher_));
+    acceptor_.async_accept(new_connection_->socket(),
+                           boost::bind(&server::handle_accept, this, boost::asio::placeholders::error));
+}
 
+void server::handle_accept(const boost::system::error_code& e) {
+    connection_ptr tmp = boost::move(new_connection_);
     start_accept();
+
+    if (!e) {
+        tmp->start();
+    }
 }
 
 void server::stop() {
