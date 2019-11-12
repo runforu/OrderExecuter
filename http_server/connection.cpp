@@ -19,7 +19,7 @@ namespace http {
 namespace server {
 namespace placeholders = boost::asio::placeholders;
 
-int connection::connection_number_ = 0;
+std::atomic<int> connection::connection_number_ = 0;
 
 int DiffTime(SYSTEMTIME time1, SYSTEMTIME time2) {
     return (time1.wSecond - time2.wSecond) * 1000 + time1.wMilliseconds - time2.wMilliseconds +
@@ -28,7 +28,7 @@ int DiffTime(SYSTEMTIME time1, SYSTEMTIME time2) {
 
 connection::connection(boost::asio::io_context& io_context, const request_dispatcher& dispatcher)
     : strand_(boost::asio::make_strand(io_context)), socket_(strand_), dispatcher_(dispatcher), timer_(strand_) {
-    connection_number_++;
+    ++connection_number_;
 }
 
 boost::asio::ip::tcp::socket& connection::socket() {
@@ -43,7 +43,7 @@ void connection::start() {
 }
 
 connection::~connection() {
-    connection_number_--;
+    --connection_number_;
 }
 
 int connection::total_connection() {

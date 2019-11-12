@@ -85,7 +85,7 @@ private:
     int mt4_time_;
 
     /// number of connection
-    static int connection_number_;
+    static std::atomic<int> connection_number_;
 };
 
 typedef boost::shared_ptr<connection> connection_ptr;
