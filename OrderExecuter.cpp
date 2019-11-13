@@ -1,6 +1,5 @@
 #include "Config.h"
 #include "Environment.h"
-#include "EventCenter.h"
 #include "LicenseService.h"
 #include "Loger.h"
 #include "Processor.h"

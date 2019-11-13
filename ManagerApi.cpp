@@ -7,6 +7,7 @@
 #include "Loger.h"
 #include "ManagerApi.h"
 #include "common.h"
+#include "../include/MT4ManagerAPI.h"
 
 ManagerApi& ManagerApi::Instance() {
     static ManagerApi _instance;
@@ -37,8 +38,8 @@ void ManagerApi::Initialize(CManagerInterface* man) {
     LOG("New manager interface initialized.");
 }
 
-void ManagerApi::RequestChart(int login, const char* symbol, int period, int mode, __time32_t start, __time32_t end,
-                              __time32_t* timestamp, std::string& json_str) {
+void ManagerApi::RequestChart(int login, const char* symbol, int period, std::string& mode_str, __time32_t start,
+                              __time32_t end, __time32_t* timestamp, std::string& json_str) {
     FUNC_WARDER;
 
     if (!IsValid()) {
@@ -55,10 +56,16 @@ void ManagerApi::RequestChart(int login, const char* symbol, int period, int mod
     ChartInfo ci = {0};
     strncpy_s(ci.symbol, symbol, sizeof(ci.symbol));
     ci.period = period;
-    ci.mode = mode;
     ci.start = start;
     ci.end = end;
     ci.timesign = *timestamp;
+
+    ci.mode = CHART_RANGE_IN;
+    if (mode_str.compare("CHART_RANGE_OUT") == 0) {
+        ci.mode = CHART_RANGE_OUT;
+    } else if (mode_str.compare("CHART_RANGE_LAST") == 0) {
+        ci.mode = CHART_RANGE_LAST;
+    }
 
     void* rate_info = NULL;
     int total = 0;
@@ -106,6 +113,10 @@ void ManagerApi::RequestChart(int login, const char* symbol, int period, int mod
     PutInterface(man);
 }
 
+inline bool ManagerApi::IsValid() {
+    return m_factory->IsValid() && m_running;
+}
+
 CManagerInterface* ManagerApi::GetInterface() {
     if (!IsValid()) {
         return NULL;
@@ -140,15 +151,16 @@ void ManagerApi::StartHeartBeat() {
 
     for (;;) {
         // try to exit quickly
-        for (int i = 0; i < 5; i++) {
-            if (!m_running) {
-                return;
-            }
-            boost::this_thread::sleep(boost::posix_time::milliseconds(1000));
+        if (!m_running) {
+            return;
         }
-        // vector
+
+        for (int i = 0; m_running && i < 100; i++) {
+            boost::this_thread::sleep_for(boost::chrono::milliseconds(100));
+        }
+
         int availabe_connnection = 0;
-        for (std::vector<CManagerInterface*>::iterator it = m_managers.begin(); it != m_managers.end(); ++it) {
+        for (std::vector<CManagerInterface*>::iterator it = m_managers.begin(); m_running && it != m_managers.end(); ++it) {
             if ((*it) != NULL && (*it)->IsConnected()) {
                 if ((*it)->Ping() != RET_OK) {
                     (*it)->Disconnect();
@@ -160,17 +172,17 @@ void ManagerApi::StartHeartBeat() {
     }
 }
 
-inline ManagerApi::ManagerApi() : m_running(1), m_factory() {
+inline ManagerApi::ManagerApi() : m_running(1) {
     char buf[256] = {0};
     COPY_STR(buf, Environment::s_module_path);
     strcat(buf, "mtmanapi.moa");
-    m_factory.Init(buf);
+    m_factory = new CManagerFactory(buf);
 
-    if (!m_factory.IsValid()) {
+    if (!m_factory->IsValid()) {
         LOG("ManagerApi::ManagerApi lib is not loaded.");
         return;
     }
-    m_factory.WinsockStartup();
+    m_factory->WinsockStartup();
 
     m_managers.reserve(MAX_MANAGER_LOGIN);
     m_available_managers.reserve(MAX_MANAGER_LOGIN);
@@ -178,7 +190,7 @@ inline ManagerApi::ManagerApi() : m_running(1), m_factory() {
     // init m_managers.
     while (m_managers.size() < MAX_MANAGER_LOGIN) {
         CManagerInterface* in = NULL;
-        if ((in = m_factory.Create(ManAPIVersion)) != NULL) {
+        if ((in = m_factory->Create(ManAPIVersion)) != NULL) {
             m_managers.push_back(in);
             m_available_managers.push_back(in);
         }
@@ -200,8 +212,8 @@ ManagerApi::~ManagerApi() {
             (*it) = NULL;
         }
     }
-    m_factory.WinsockCleanup();
-    LOG("ManagerApi::~ManagerApi()");
+    m_factory->WinsockCleanup();
+    delete m_factory;
 }
 
 void ManagerApi::ErrorCodeToString(const ErrorCode* ec, std::string& str) {

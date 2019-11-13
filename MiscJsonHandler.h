@@ -2,6 +2,7 @@
 #define _MISC_JSON_HANDLER_H_
 
 #include <boost/property_tree/ptree.hpp>
+#include "ManagerApi.h"
 #include "http_server/request_handler.h"
 
 struct TradeRecord;

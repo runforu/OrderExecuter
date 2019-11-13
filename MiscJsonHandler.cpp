@@ -59,12 +59,5 @@ void MiscJsonHandler::RequestChart(ptree pt, std::string& content) const {
     __time32_t end = pt.get<__time32_t>("end", 0);
     __time32_t timestamp = pt.get<__time32_t>("timestamp", 0);
 
-    int mode = CHART_RANGE_IN;
-    if (mode_str.compare("CHART_RANGE_OUT") == 0) {
-        mode = CHART_RANGE_OUT;
-    } else if (mode_str.compare("CHART_RANGE_LAST") == 0) {
-        mode = CHART_RANGE_LAST;
-    }
-
-    ManagerApi::Instance().RequestChart(login, symbol.c_str(), period, mode, start, end, &timestamp, content);
+    ManagerApi::Instance().RequestChart(login, symbol.c_str(), period, mode_str, start, end, &timestamp, content);
 }
