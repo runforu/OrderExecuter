@@ -18,12 +18,12 @@
 #include <vector>
 #include "connection.h"
 #include "request_dispatcher.h"
-#include "request_handler.h"
-#include "request_handler_provider.h"
-#include "request_interception.h"
 
 namespace http {
 namespace server {
+
+class request_handler_provider;
+class request_interception;
 
 /// The top-level class of the HTTP server.
 class server : private boost::noncopyable {
@@ -34,7 +34,7 @@ public:
     /// Construct the server to listen on the specified TCP address and port, and
     /// serve up files from the given directory.
     explicit server(const std::string& address, const std::string& port, std::size_t thread_pool_size,
-                    request_handler_provider* handlers, request_interception* interception= nullptr);
+                    request_handler_provider* handlers, request_interception* interception = nullptr);
 
     /// Run the server's io_context loop.
     void run();

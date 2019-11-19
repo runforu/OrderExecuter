@@ -80,10 +80,6 @@ private:
     /// The reply to be sent back to the client.
     reply reply_;
 
-    SYSTEMTIME timestamp_;
-
-    int mt4_time_;
-
     /// number of connection
     static std::atomic<int> connection_number_;
 };

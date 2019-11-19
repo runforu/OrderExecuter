@@ -13,18 +13,12 @@
 #include <vector>
 #include "connection.h"
 #include "request_dispatcher.h"
-#include "../Loger.h"
 
 namespace http {
 namespace server {
 namespace placeholders = boost::asio::placeholders;
 
 std::atomic<int> connection::connection_number_ = 0;
-
-int DiffTime(SYSTEMTIME time1, SYSTEMTIME time2) {
-    return (time1.wSecond - time2.wSecond) * 1000 + time1.wMilliseconds - time2.wMilliseconds +
-           ((time1.wMinute != time2.wMinute) ? 60 * 1000 : 0);
-}
 
 connection::connection(boost::asio::io_context& io_context, const request_dispatcher& dispatcher)
     : strand_(boost::asio::make_strand(io_context)), socket_(strand_), dispatcher_(dispatcher), timer_(strand_) {
@@ -78,7 +72,6 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
     cancel_timer();
 
     if (!e) {
-        GetLocalTime(&timestamp_);
         boost::tribool result;
         decltype(buffer_.data()) iter;
 
@@ -86,10 +79,6 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
 
         if (result) {
             dispatcher_.dispatch_request(request_, reply_);
-
-            SYSTEMTIME mt4_end;
-            GetLocalTime(&mt4_end);
-            mt4_time_ = DiffTime(mt4_end, timestamp_);
 
             boost::asio::async_write(socket_, reply_.to_buffers(),
                                      boost::bind(&connection::handle_write, shared_from_this(), placeholders::error));
@@ -112,18 +101,6 @@ void connection::handle_read(const boost::system::error_code& e, std::size_t byt
 
 void connection::handle_write(const boost::system::error_code& e) {
     if (!e) {
-        if (request_.body.length() > 10) {
-            std::size_t begin = request_.body.find("request");
-            begin = request_.body.find(":", begin);
-            begin = request_.body.find("\"", begin) + 1;
-            std::size_t end = request_.body.find("\"", begin);
-            if (end > begin && begin > 0) {
-                SYSTEMTIME write_end;
-                GetLocalTime(&write_end);
-                LOG("Request [%s] takes %d, mt4 takes %d", request_.body.substr(begin, end - begin).c_str(),
-                    DiffTime(write_end, timestamp_), mt4_time_);
-            }
-        }
         // keep the connection alive.
         do_start();
     }
