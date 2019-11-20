@@ -405,7 +405,8 @@ bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, Tr
         return false;
     }
 
-    if (user < 0 || error_code == NULL) {
+    if (user < 0) {
+        *error_code = &ErrorCode::EC_BAD_PARAMETER;
         return false;
     }
     if (from == -1) {
@@ -414,14 +415,6 @@ bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, Tr
     if (to == -1) {
         to = s_interface->TradeTime();
     }
-
-    //--- Do not check the time span.
-    /*
-    if (to - from > 7 * 24 * 60 * 60) {
-        *error_code = &ErrorCode::EC_BAD_TIME_SPAN;
-        return false;
-    }
-    */
 
     int users[1] = {user};
     *orders = s_interface->OrdersGetClosed(from, to, users, 1, total);
@@ -632,6 +625,8 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
             *error_code = &ErrorCode::EC_TRADE_DISABLE;
         } else if (rt == RET_TRADE_OFFQUOTES) {
             *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
+        } else {
+            *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         }
         return false;  // trade disabled, market closed, or no prices for long time
     }
@@ -856,6 +851,8 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
             *error_code = &ErrorCode::EC_TRADE_DISABLE;
         } else if (rt == RET_TRADE_OFFQUOTES) {
             *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
+        } else {
+            *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         }
         return false;  // trade disabled, market closed, or no prices for long time
     }

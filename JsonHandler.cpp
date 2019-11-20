@@ -132,7 +132,7 @@ void JsonHandler::Ping(boost::property_tree::ptree& pt) const {
 }
 
 void JsonHandler::OpenOrder(boost::property_tree::ptree& pt) const {
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
@@ -183,7 +183,7 @@ void JsonHandler::AddOrder(boost::property_tree::ptree& pt) const {
     time_t expiration = pt.get<time_t>("expiration", -1);
     std::string comment = pt.get<std::string>("comment", "");
     int order;
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     bool result = ServerApi::AddOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, expiration,
                                       comment.c_str(), &error_code, &order);
@@ -204,7 +204,7 @@ void JsonHandler::UpdateOrder(boost::property_tree::ptree& pt) const {
     double tp = pt.get<double>("tp", 0.0);
     time_t expiration = pt.get<time_t>("expiration", -1);
     std::string comment = pt.get<std::string>("comment", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     bool result = ServerApi::UpdateOrder(ip.c_str(), order, open_price, sl, tp, expiration, comment.c_str(), &error_code);
     pt.clear();
@@ -217,7 +217,7 @@ void JsonHandler::CloseOrder(ptree& pt) const {
     int order = pt.get<int>("order", 0);
     double close_price = pt.get<double>("close_price", 0.0);
     std::string comment = pt.get<std::string>("comment", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     bool result = ServerApi::CloseOrder(ip.c_str(), order, close_price, comment.c_str(), &error_code);
     pt.clear();
@@ -231,7 +231,7 @@ void JsonHandler::Deposit(ptree& pt) const {
     double value = pt.get<double>("value", 0.0);
     std::string comment = pt.get<std::string>("comment", "");
 
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     int order = 0;
     bool result = ServerApi::Deposit(login, ip.c_str(), value, comment.c_str(), &order, &error_code);
 
@@ -247,7 +247,7 @@ void JsonHandler::GetUserRecord(ptree& pt) const {
     int login = pt.get<int>("login", -1);
     int user = pt.get<int>("user", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     UserRecord user_record;
     bool result = ServerApi::GetUserRecord(user, &user_record, &error_code);
@@ -305,7 +305,7 @@ void JsonHandler::UpdateUserRecord(ptree& pt) const {
     std::string email = pt.get<std::string>("email", "");
     int enable = pt.get<int>("enable", -1);
     int leverage = pt.get<int>("leverage", -1);
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     bool result = ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage,
                                               &error_code);
@@ -324,7 +324,7 @@ void JsonHandler::AddUser(ptree& pt) const {
     std::string email = pt.get<std::string>("email", "");
     int leverage = pt.get<int>("leverage", -1);
     std::string lead_source = pt.get<std::string>("lead_source", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     bool result = ServerApi::AddUser(login, name.c_str(), password.c_str(), group.c_str(), phone.c_str(), email.c_str(),
                                      lead_source.c_str(), leverage, &error_code, &login);
@@ -338,7 +338,7 @@ void JsonHandler::ChangePassword(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     bool result = ServerApi::ChangePassword(login, password.c_str(), &error_code);
 
@@ -350,7 +350,7 @@ void JsonHandler::CheckPassword(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string password = pt.get<std::string>("password", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
 
     bool result = ServerApi::CheckPassword(login, password.c_str(), &error_code);
 
@@ -361,7 +361,7 @@ void JsonHandler::CheckPassword(ptree& pt) const {
 void JsonHandler::GetMargin(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     UserInfo user_info = {0};
     double margin;
     double freemargin;
@@ -391,7 +391,7 @@ void JsonHandler::GetMargin(ptree& pt) const {
 void JsonHandler::GetMarginInfo(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     UserInfo user_info = {0};
     double margin;
     double freemargin;
@@ -422,7 +422,7 @@ void JsonHandler::GetOrder(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     int order = pt.get<int>("order", -1);
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     TradeRecord trade_record = {0};
 
     bool result = ServerApi::GetOrder(order, &trade_record, &error_code);
@@ -478,7 +478,7 @@ void JsonHandler::GetClosedOrders(const boost::property_tree::ptree& pt, std::st
 
 void JsonHandler::IsOpening(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     std::string symbol = pt.get<std::string>("symbol", "");
     int time = pt.get<int>("time", 0);
     bool is_open = false;
@@ -492,7 +492,7 @@ void JsonHandler::IsOpening(ptree& pt) const {
 
 void JsonHandler::TradeTime(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     time_t time = 0;
 
     bool result = ServerApi::CurrentTradeTime(&time, &error_code);
@@ -504,7 +504,7 @@ void JsonHandler::TradeTime(ptree& pt) const {
 
 void JsonHandler::GetSymbolList(ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     const ConSymbol* con_symbols = NULL;
     int total = 0;
 
@@ -582,7 +582,7 @@ void JsonHandler::_GetOpenOrders(const ptree& pt, FilterOut filter_out, std::str
 
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     TradeRecord* trade_record = NULL;
     int total = 0;
     int count = 0;
@@ -639,7 +639,7 @@ void JsonHandler::_GetClosedOrders(const ptree& pt, FilterOut filter_out, std::s
     int login = pt.get<int>("login", -1);
     int from = pt.get<int>("from", -1);
     int to = pt.get<int>("to", -1);
-    const ErrorCode* error_code;
+    const ErrorCode* error_code = nullptr;
     TradeRecord* trade_record = NULL;
     int total = 0;
     int count = 0;
