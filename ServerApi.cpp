@@ -20,6 +20,65 @@ CServerInterface* ServerApi::Api() {
     return s_interface;
 }
 
+
+bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
+    double close_price, double profit, const char* comment, const ErrorCode** error_code, int* order) {
+    FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        *error_code = &ErrorCode::EC_INVALID_SERVER_INTERFACE;
+        return false;
+    }
+
+    UserInfo user_info = { 0 };
+    ConSymbol symbol_cfg = { 0 };
+    TradeRecord trade_record = { 0 };
+
+    //--- checks
+    if (login <= 0 || cmd < OP_BUY || cmd > OP_SELL || symbol == NULL || volume <= 0) {
+        *error_code = &ErrorCode::EC_BAD_PARAMETER;
+        return false;
+    }
+
+    //--- get user info
+    if (!GetUserInfo(login, &user_info, error_code)) {
+        LOG("BinaryOption: GetUserInfo failed");
+        return false;  // error
+    }
+
+    //--- get symbol config
+    if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
+        LOG("BinaryOption: SymbolsGet failed [%s]", symbol);
+        *error_code = &ErrorCode::EC_SYMBOL_NOT_FOUND;
+        return false;  // error
+    }
+
+    //--- prepare new trade state of order
+    trade_record.login = login;
+    trade_record.cmd = cmd;
+    trade_record.open_price = open_price;
+    trade_record.volume = volume;
+    trade_record.close_price = close_price;
+    trade_record.open_time = s_interface->TradeTime();
+    trade_record.close_time = s_interface->TradeTime();
+    trade_record.digits = symbol_cfg.digits;
+
+    COPY_STR(trade_record.symbol, symbol);
+    COPY_STR(trade_record.comment, comment);
+
+    //--- add order into database directly
+    // LOG_INFO(&trade_record);
+    if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
+        LOG("BinaryOption: OrdersAdd failed");
+        *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
+        return false;  // error
+    }
+    //--- TODO: Need to modify the balance?
+
+    *error_code = &ErrorCode::EC_OK;
+    return true;
+}
+
 bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
                           double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
                           int* order) {

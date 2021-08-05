@@ -48,6 +48,9 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         if (request.compare("Ping") == 0) {
             Ping(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (request.compare("BinaryOption") == 0) {
+            BinaryOption(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
         } else if (request.compare("OpenOrder") == 0) {
             OpenOrder(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
@@ -131,8 +134,32 @@ void JsonHandler::Ping(boost::property_tree::ptree& pt) const {
     pt.put("connections", http::server::connection::total_connection());
 }
 
+
+void JsonHandler::BinaryOption(boost::property_tree::ptree& pt) const {
+    std::string request = pt.get<std::string>("request", "");
+    int login = pt.get<int>("login", -1);
+    std::string ip = pt.get<std::string>("ip", "0.0.0.0");
+    std::string symbol = pt.get<std::string>("symbol", "");
+    int cmd = ToCmd(pt.get<std::string>("cmd", "OP_BUY"));
+    int volume = pt.get<int>("volume", 1);
+    double open_price = pt.get<double>("open_price", 0.0);
+    double close_price = pt.get<double>("close_price", 0.0);
+    double profit = pt.get<double>("profit", 0.0);
+    std::string comment = pt.get<std::string>("comment", "");
+    int order;
+    const ErrorCode* error_code;
+
+    bool result = ServerApi::BinaryOption(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, close_price, profit, comment.c_str(), &error_code, &order);
+
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
+    if (result) {
+        pt.put("order", order);
+    }
+}
+
 void JsonHandler::OpenOrder(boost::property_tree::ptree& pt) const {
-    const ErrorCode* error_code = nullptr;
+    const ErrorCode* error_code;
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
     std::string ip = pt.get<std::string>("ip", "0.0.0.0");

@@ -108,6 +108,41 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
 }</code>
 </pre>
     </div>
+    
+    <br />
+    <br />
+    <br />
+    <h3> Request to create
+    <i>Binary Option</i> order <em>history</em></h3>
+    <b>Request</b>
+    <div style="margin-left:60px;width:50%; background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "BinaryOption",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "symbol": "USDJPY",
+    "cmd": "OP_BUY",
+    "volume": 77,
+    "open_price": 112.75,
+    "close_price": 112.75,
+    "profit": 80,
+    "comment": "BinaryOption Order"
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "BinaryOption",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS",
+    "order": "123"
+}</code>
+</pre>
+    </div>
 
     <br />
     <br />
@@ -141,7 +176,8 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "request": "OpenOrder",
     "result": "OK",
     "error_code": "0",
-    "error_des": "SUCCESS"
+    "error_des": "SUCCESS",
+    "order": "123"
 }</code>
 </pre>
     </div>
@@ -177,7 +213,8 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "request": "AddOrder",
     "result": "OK",
     "error_code": "0",
-    "error_des": "SUCCESS"
+    "error_des": "SUCCESS",
+    "order": "123"
 }</code>
 </pre>
     </div>

@@ -21,6 +21,9 @@ public:
     static void Initialize(CServerInterface* server_interface);
     static CServerInterface* Api();
 
+    static bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
+                                        double close_price, double profit, const char* comment, const ErrorCode** error_code, int* order);
+
     static bool AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
                          double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
                          int* order);
