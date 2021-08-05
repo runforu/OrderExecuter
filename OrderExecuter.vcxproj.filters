@@ -99,6 +99,8 @@
       <Filter>http_server</Filter>
     </ClInclude>
     <ClInclude Include="RequestLoger.h" />
+    <ClInclude Include="MT4ServerAPI.h" />
+    <ClInclude Include="MT4ManagerAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OrderExecuter.def" />

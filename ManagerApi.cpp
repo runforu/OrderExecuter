@@ -7,7 +7,7 @@
 #include "Loger.h"
 #include "ManagerApi.h"
 #include "common.h"
-#include "../include/MT4ManagerAPI.h"
+#include "MT4ManagerAPI.h"
 
 ManagerApi& ManagerApi::Instance() {
     static ManagerApi _instance;
