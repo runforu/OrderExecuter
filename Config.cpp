@@ -2,7 +2,7 @@
 #include "Config.h"
 #include "FileUtil.h"
 #include "Loger.h"
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 //+------------------------------------------------------------------+
 //|                                                                  |

@@ -2,7 +2,7 @@
 #include <time.h>
 #include "Loger.h"
 #include "ServerApi.h"
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 #if defined(_RELEASE_LOG_) || defined(_DEBUG)
 

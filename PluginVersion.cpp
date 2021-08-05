@@ -1,4 +1,4 @@
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 #define BUILD_DATE_YEAR_CH0 (__DATE__[ 7])
 #define BUILD_DATE_YEAR_CH1 (__DATE__[ 8])

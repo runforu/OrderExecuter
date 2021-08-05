@@ -10,7 +10,7 @@
 #include "ServerApi.h"
 #include "common.h"
 #include "http_server/connection.h"
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 using namespace boost::property_tree;
 

@@ -1,6 +1,6 @@
 #include "ServerApi.h"
 #include "common.h"
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 static const double ExtDecimalArray[9] = {1.0, 10.0, 100.0, 1000.0, 10000.0, 100000.0, 1000000.0, 10000000.0, 100000000.0};
 

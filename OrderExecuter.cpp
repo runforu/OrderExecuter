@@ -4,7 +4,7 @@
 #include "Loger.h"
 #include "Processor.h"
 #include "ServerApi.h"
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 extern const char *PLUGIN_VERSION_STRING;
 #define PLUGIN_NAME "Order Executer"

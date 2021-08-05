@@ -5,7 +5,7 @@
 #include "Loger.h"
 #include "ServerApi.h"
 #include "common.h"
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 CServerInterface* ServerApi::s_interface = NULL;
 ConSymbol ServerApi::s_symbols[MAX_SYMBOL_COUNT] = {0};

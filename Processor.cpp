@@ -12,7 +12,7 @@
 #include "RequestLoger.h"
 #include "ServerApi.h"
 #include "http_server/server.h"
-#include "../include/MT4ServerAPI.h"
+#include "MT4ServerAPI.h"
 
 Processor& Processor::Instance() {
     static Processor _instance;
