@@ -105,6 +105,15 @@
   <ItemGroup>
     <None Include="OrderExecuter.def" />
     <None Include="packages.config" />
+    <None Include="http_server\index.html">
+      <Filter>http_server</Filter>
+    </None>
+    <None Include="http_server\prism.css">
+      <Filter>http_server</Filter>
+    </None>
+    <None Include="http_server\prism.js">
+      <Filter>http_server</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="http_server">

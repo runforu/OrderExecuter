@@ -7,10 +7,10 @@
 #include "JsonWrapper.h"
 #include "LicenseService.h"
 #include "Loger.h"
+#include "MT4ServerAPI.h"
 #include "ServerApi.h"
 #include "common.h"
 #include "http_server/connection.h"
-#include "MT4ServerAPI.h"
 
 using namespace boost::property_tree;
 
@@ -19,8 +19,7 @@ int JsonHandler::get_priority() const {
 }
 
 bool JsonHandler::can_handle(const http::server::request& req) const {
-    return std::any_of(req.headers.begin(), req.headers.end(),
-                       [](const http::server::header& h) { return h.name == "content-type" && h.value == "application/json"; });
+    return std::any_of(req.headers.begin(), req.headers.end(), [](const http::server::header& h) { return h.name == "content-type" && h.value == "application/json"; });
 }
 
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) const {
@@ -134,7 +133,6 @@ void JsonHandler::Ping(boost::property_tree::ptree& pt) const {
     pt.put("connections", http::server::connection::total_connection());
 }
 
-
 void JsonHandler::BinaryOption(boost::property_tree::ptree& pt) const {
     std::string request = pt.get<std::string>("request", "");
     int login = pt.get<int>("login", -1);
@@ -145,7 +143,7 @@ void JsonHandler::BinaryOption(boost::property_tree::ptree& pt) const {
     double open_price = pt.get<double>("open_price", 0.0);
     double close_price = pt.get<double>("close_price", 0.0);
     double profit = pt.get<double>("profit", 0.0);
-    std::string comment = pt.get<std::string>("comment", "");
+    std::string comment = pt.get<std::string>("comment", "BinaryOption Order");
     int order;
     const ErrorCode* error_code;
 
@@ -187,8 +185,7 @@ void JsonHandler::OpenOrder(boost::property_tree::ptree& pt) const {
     time_t expiration = pt.get<time_t>("expiration", -1);
     std::string comment = pt.get<std::string>("comment", "");
 
-    bool result = ServerApi::OpenOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, expiration,
-                                       comment.c_str(), &error_code, &order);
+    bool result = ServerApi::OpenOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, expiration, comment.c_str(), &error_code, &order);
 
     pt.clear();
     SetResponseJson(pt, request, result, error_code);
@@ -212,8 +209,7 @@ void JsonHandler::AddOrder(boost::property_tree::ptree& pt) const {
     int order;
     const ErrorCode* error_code = nullptr;
 
-    bool result = ServerApi::AddOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, expiration,
-                                      comment.c_str(), &error_code, &order);
+    bool result = ServerApi::AddOrder(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, sl, tp, expiration, comment.c_str(), &error_code, &order);
 
     pt.clear();
     SetResponseJson(pt, request, result, error_code);
@@ -334,8 +330,7 @@ void JsonHandler::UpdateUserRecord(ptree& pt) const {
     int leverage = pt.get<int>("leverage", -1);
     const ErrorCode* error_code = nullptr;
 
-    bool result = ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage,
-                                              &error_code);
+    bool result = ServerApi::UpdateUserRecord(user, group.c_str(), name.c_str(), phone.c_str(), email.c_str(), enable, leverage, &error_code);
 
     pt.clear();
     SetResponseJson(pt, request, result, error_code);
@@ -353,8 +348,7 @@ void JsonHandler::AddUser(ptree& pt) const {
     std::string lead_source = pt.get<std::string>("lead_source", "");
     const ErrorCode* error_code = nullptr;
 
-    bool result = ServerApi::AddUser(login, name.c_str(), password.c_str(), group.c_str(), phone.c_str(), email.c_str(),
-                                     lead_source.c_str(), leverage, &error_code, &login);
+    bool result = ServerApi::AddUser(login, name.c_str(), password.c_str(), group.c_str(), phone.c_str(), email.c_str(), lead_source.c_str(), leverage, &error_code, &login);
 
     pt.clear();
     SetResponseJson(pt, request, result, error_code);
@@ -750,8 +744,7 @@ void JsonHandler::AppendTradeRecordJsonStr(TradeRecord* trade, std::string& resp
     response.append("}");
 }
 
-void JsonHandler::SetResponseJson(boost::property_tree::ptree& response, const std::string& request, bool result,
-                                  const ErrorCode* error_code) const {
+void JsonHandler::SetResponseJson(boost::property_tree::ptree& response, const std::string& request, bool result, const ErrorCode* error_code) const {
     response.put("request", request);
     response.put("result", result ? "OK" : "ERROR");
     response.put("error_code", error_code->m_code);
