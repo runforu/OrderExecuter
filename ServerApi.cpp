@@ -3,9 +3,9 @@
 #include "Config.h"
 #include "ErrorCode.h"
 #include "Loger.h"
+#include "MT4ServerAPI.h"
 #include "ServerApi.h"
 #include "common.h"
-#include "MT4ServerAPI.h"
 
 CServerInterface* ServerApi::s_interface = NULL;
 ConSymbol ServerApi::s_symbols[MAX_SYMBOL_COUNT] = {0};
@@ -20,9 +20,8 @@ CServerInterface* ServerApi::Api() {
     return s_interface;
 }
 
-
-bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-    double close_price, double profit, const char* comment, const ErrorCode** error_code, int* order) {
+bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double close_price, double profit,
+                             const char* comment, const ErrorCode** error_code, int* order) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -30,9 +29,9 @@ bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol
         return false;
     }
 
-    UserInfo user_info = { 0 };
-    ConSymbol symbol_cfg = { 0 };
-    TradeRecord trade_record = { 0 };
+    UserInfo user_info = {0};
+    ConSymbol symbol_cfg = {0};
+    TradeRecord trade_record = {0};
 
     //--- checks
     if (login <= 0 || cmd < OP_BUY || cmd > OP_SELL || symbol == NULL || volume <= 0) {
@@ -60,28 +59,31 @@ bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol
     trade_record.volume = volume;
     trade_record.close_price = close_price;
     trade_record.open_time = s_interface->TradeTime();
-    trade_record.close_time = s_interface->TradeTime();
+    trade_record.close_time = trade_record.open_time;
     trade_record.digits = symbol_cfg.digits;
 
     COPY_STR(trade_record.symbol, symbol);
     COPY_STR(trade_record.comment, comment);
 
     //--- add order into database directly
-    // LOG_INFO(&trade_record);
     if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
         LOG("BinaryOption: OrdersAdd failed");
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
-        return false;  // error
+        return false;
     }
-    //--- TODO: Need to modify the balance?
+
+    if (s_interface->ClientsChangeBalance(login, &user_info.grp, user_info.balance + profit, "Binary option profit") == 0) {
+        LOG("BinaryOption: Change balance failed [%f]", profit);
+        *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
+        return false;
+    }
 
     *error_code = &ErrorCode::EC_OK;
     return true;
 }
 
-bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                          double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
-                          int* order) {
+bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double sl, double tp, time_t expiration,
+                          const char* comment, const ErrorCode** error_code, int* order) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -263,8 +265,7 @@ bool ServerApi::GetUserRecord(int user, UserRecord* user_record, const ErrorCode
     return true;
 }
 
-bool ServerApi::UpdateUserRecord(int user, const char* group, const char* name, const char* phone, const char* email,
-                                 int enable, int leverage, const ErrorCode** error_code) {
+bool ServerApi::UpdateUserRecord(int user, const char* group, const char* name, const char* phone, const char* email, int enable, int leverage, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -360,8 +361,7 @@ bool ServerApi::CheckPassword(int user, const char* password, const ErrorCode** 
     return true;
 }
 
-bool ServerApi::GetMargin(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
-                          const ErrorCode** error_code) {
+bool ServerApi::GetMargin(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -383,8 +383,7 @@ bool ServerApi::GetMargin(int user, UserInfo* user_info, double* margin, double*
     return true;
 }
 
-bool ServerApi::GetMarginInfo(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity,
-                              const ErrorCode** error_code) {
+bool ServerApi::GetMarginInfo(int user, UserInfo* user_info, double* margin, double* freemargin, double* equity, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -455,8 +454,7 @@ bool ServerApi::GetOpenOrders(int user, int* total, TradeRecord** orders, const 
     return true;
 }
 
-bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, TradeRecord** orders,
-                                const ErrorCode** error_code) {
+bool ServerApi::GetClosedOrders(int user, time_t from, time_t to, int* total, TradeRecord** orders, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -526,8 +524,8 @@ bool ServerApi::GetSymbolList(int* total, const ConSymbol** const symbols, const
     return true;
 }
 
-bool ServerApi::AddUser(int login, const char* name, const char* password, const char* group, const char* phone,
-                        const char* email, const char* lead_source, int leverage, const ErrorCode** error_code, int* user) {
+bool ServerApi::AddUser(int login, const char* name, const char* password, const char* group, const char* phone, const char* email, const char* lead_source, int leverage,
+                        const ErrorCode** error_code, int* user) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -564,8 +562,7 @@ bool ServerApi::AddUser(int login, const char* name, const char* password, const
         return false;
     }
 
-    if (group != NULL && strnlen_s(group, sizeof(user_record.group)) != 0 &&
-        s_interface->GroupsGet(group, &group_cfg) == TRUE) {
+    if (group != NULL && strnlen_s(group, sizeof(user_record.group)) != 0 && s_interface->GroupsGet(group, &group_cfg) == TRUE) {
         COPY_STR(user_record.group, group);
     } else {
         *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
@@ -613,9 +610,8 @@ bool ServerApi::UpdateSymbolList() {
     return true;
 }
 
-bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price,
-                         double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code,
-                         int* order) {
+bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double sl, double tp, time_t expiration,
+                         const char* comment, const ErrorCode** error_code, int* order) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -738,8 +734,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     //--- check margin
     if (cmd == OP_BUY || cmd == OP_SELL) {
         margin = s_interface->TradesMarginCheck(&user_info, &trade_trans_info, &profit, &free_margin, &prev_margin);
-        LOG("AddOrder: TradesMarginCheck  margin = %d, profit = %d, free_margin = %d, prev_margin = %d", margin, profit,
-            free_margin, prev_margin);
+        LOG("AddOrder: TradesMarginCheck  margin = %d, profit = %d, free_margin = %d, prev_margin = %d", margin, profit, free_margin, prev_margin);
         if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg.margin_hedged_strong != FALSE || prev_margin <= margin)) {
             LOG("AddOrder: not enough margin");
             *error_code = &ErrorCode::EC_TRADE_NO_MONEY;
@@ -792,8 +787,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     return true;
 }
 
-bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, time_t expiration,
-                            const char* comment, const ErrorCode** error_code) {
+bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, double sl, double tp, time_t expiration, const char* comment, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -939,8 +933,7 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
     return true;
 }
 
-bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, const char* comment,
-                           const ErrorCode** error_code) {
+bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, const char* comment, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -1020,9 +1013,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     double prices[2] = {0};
     GetCurrentPrice(trade_record.symbol, user_info.group, prices, error_code);
     if (close_price <= PRICE_PRECISION) {
-        close_price = (trade_record.cmd == OP_BUY || trade_record.cmd == OP_BUY_LIMIT || trade_record.cmd == OP_BUY_STOP)
-                          ? prices[0]
-                          : prices[1];
+        close_price = (trade_record.cmd == OP_BUY || trade_record.cmd == OP_BUY_LIMIT || trade_record.cmd == OP_BUY_STOP) ? prices[0] : prices[1];
     }
     trade_trans_info.price = close_price;
     trade_trans_info.volume = trade_record.volume;
@@ -1080,8 +1071,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     return true;
 }
 
-bool ServerApi::Deposit(const int login, const char* ip, const double value, const char* comment, int* order,
-                        const ErrorCode** error_code) {
+bool ServerApi::Deposit(const int login, const char* ip, const double value, const char* comment, int* order, const ErrorCode** error_code) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -1095,8 +1085,7 @@ bool ServerApi::Deposit(const int login, const char* ip, const double value, con
         int total = 0;
         TradeRecord* trade_record = NULL;
         bool handled = false;
-        bool result = ServerApi::GetClosedOrders(login, ServerApi::Api()->TradeTime() - 3600, ServerApi::Api()->TradeTime(),
-                                                 &total, &trade_record, error_code);
+        bool result = ServerApi::GetClosedOrders(login, ServerApi::Api()->TradeTime() - 3600, ServerApi::Api()->TradeTime(), &total, &trade_record, error_code);
 
         if (result && trade_record != NULL) {
             for (int i = 0; i < total; ++i) {
@@ -1206,8 +1195,7 @@ bool ServerApi::IsQuoteAlive(const char* symbol, const ErrorCode** error_code) {
     }
 
     if (s_interface->TradeTime() - last_time > offquote_time) {
-        LOG("IsQuoteAlive: last quote is too old. trade_time: %d, quote_time: %d, offquote_time: %d", s_interface->TradeTime(),
-            last_time, offquote_time);
+        LOG("IsQuoteAlive: last quote is too old. trade_time: %d, quote_time: %d, offquote_time: %d", s_interface->TradeTime(), last_time, offquote_time);
         *error_code = &ErrorCode::EC_TRADE_OFFQUOTES;
         return false;
     }
