@@ -5,7 +5,6 @@
 #include "ErrorCode.h"
 #include "JsonHandler.h"
 #include "JsonWrapper.h"
-#include "LicenseService.h"
 #include "Loger.h"
 #include "MT4ServerAPI.h"
 #include "ServerApi.h"
@@ -25,21 +24,6 @@ bool JsonHandler::can_handle(const http::server::request& req) const {
 bool JsonHandler::handle(const http::server::request& req, http::server::reply& rep) const {
     ptree json;
     JsonWrapper::ParseJson(req.body, json);
-
-#ifdef _LICENSE_VERIFICATION_
-    if (!LicenseService::Instance().IsLicenseValid()) {
-        rep.status = http::server::reply::bad_request;
-        ptree response;
-        response.put("json_error", "Invalid plugin license");
-        rep.content.append(JsonWrapper::ToJsonStr(response));
-        rep.headers.resize(2);
-        rep.headers[0].name = "Content-Type";
-        rep.headers[0].value = "application/json";
-        rep.headers[1].name = "Content-Length";
-        rep.headers[1].value = std::to_string(rep.content.length());
-        return true;
-    }
-#endif
 
     if (!json.empty()) {
         rep.status = http::server::reply::ok;

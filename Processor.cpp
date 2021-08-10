@@ -5,7 +5,6 @@
 #include <process.h>
 #include <stdlib.h>
 #include "Config.h"
-#include "LicenseService.h"
 #include "Loger.h"
 #include "Processor.h"
 #include "RequestHandlerProviderImp.h"
@@ -27,17 +26,9 @@ void Processor::Initialize() {
     Config::Instance().GetString("Max.Http.Threads!reboot", m_max_thread, sizeof(m_max_thread) - 1, "16");
     LOG("Processor::Initialize %s, %s", m_server_port, m_max_thread);
     m_thread = boost::thread(boost::bind(&Processor::StartServer, this, m_server_port, m_max_thread));
-
-#ifdef _LICENSE_VERIFICATION_
-    LicenseService::Instance().ResetLicense();
-#endif  // !_LICENSE_VERIFICATION_
 }
 
 void Processor::Shutdown() {
-#ifdef _LICENSE_VERIFICATION_
-    LicenseService::Instance().Stop();
-#endif  // !_LICENSE_VERIFICATION_
-
     if (m_http_server != NULL) {
         m_http_server->stop();
     }

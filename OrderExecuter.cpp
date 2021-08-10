@@ -1,6 +1,5 @@
 #include "Config.h"
 #include "Environment.h"
-#include "LicenseService.h"
 #include "Loger.h"
 #include "Processor.h"
 #include "ServerApi.h"
@@ -77,11 +76,6 @@ void APIENTRY MtSrvCleanup() {
 int APIENTRY MtSrvPluginCfgSet(const PluginCfg* values, const int total) {
     LOG("MtSrvPluginCfgSet total = %d.", total);
     int res = Config::Instance().Set(values, total);
-
-#ifdef _LICENSE_VERIFICATION_
-    LicenseService::Instance().ResetLicense();
-#endif  // !_LICENSE_VERIFICATION_
-
     return (res);
 }
 

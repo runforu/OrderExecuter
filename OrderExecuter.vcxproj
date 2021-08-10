@@ -135,7 +135,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_LICENSE_VERIFICATION_;_CRT_SECURE_NO_WARNINGS;_RELEASE_LOG_;WIN32;NDEBUG;_WINDOWS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WIN32_WINNT=0x0501;_CRT_SECURE_NO_WARNINGS;_RELEASE_LOG_;WIN32;NDEBUG;_WINDOWS;_USE_32BIT_TIME_T</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -344,8 +344,6 @@
     <ClCompile Include="http_server\server.cpp" />
     <ClCompile Include="JsonHandler.cpp" />
     <ClCompile Include="JsonWrapper.cpp" />
-    <ClCompile Include="LicenseClient.cpp" />
-    <ClCompile Include="LicenseService.cpp" />
     <ClCompile Include="ManagerApi.cpp" />
     <ClCompile Include="MiscJsonHandler.cpp" />
     <ClCompile Include="PluginVersion.cpp" />
@@ -376,8 +374,6 @@
     <ClInclude Include="http_server\server.h" />
     <ClInclude Include="JsonHandler.h" />
     <ClInclude Include="JsonWrapper.h" />
-    <ClInclude Include="LicenseClient.h" />
-    <ClInclude Include="LicenseService.h" />
     <ClInclude Include="ManagerApi.h" />
     <ClInclude Include="MiscJsonHandler.h" />
     <ClInclude Include="MT4ManagerAPI.h" />
