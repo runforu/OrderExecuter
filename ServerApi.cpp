@@ -21,7 +21,7 @@ CServerInterface* ServerApi::Api() {
 }
 
 bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double close_price, double profit,
-                             const char* comment, const ErrorCode** error_code, int* order) {
+                             double balance_change, const char* comment, const ErrorCode** error_code, int* order) {
     FUNC_WARDER;
 
     if (s_interface == NULL) {
@@ -72,10 +72,12 @@ bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol
         return false;
     }
 
-    if (s_interface->ClientsChangeBalance(login, &user_info.grp, user_info.balance + profit, "Binary option profit") == 0) {
-        LOG("BinaryOption: Change balance failed [%f]", profit);
-        *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
-        return false;
+    if (balance_change != 0.0) {
+        if (s_interface->ClientsChangeBalance(login, &user_info.grp, max(user_info.balance + balance_change, 0.0), "Binary option profit") == 0) {
+            LOG("BinaryOption: Change balance failed [%f]", balance_change);
+            *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
+            return false;
+        }
     }
 
     *error_code = &ErrorCode::EC_OK;

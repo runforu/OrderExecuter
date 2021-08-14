@@ -127,11 +127,12 @@ void JsonHandler::BinaryOption(boost::property_tree::ptree& pt) const {
     double open_price = pt.get<double>("open_price", 0.0);
     double close_price = pt.get<double>("close_price", 0.0);
     double profit = pt.get<double>("profit", 0.0);
+    double balance_change = pt.get<double>("balance_change", 0.0);
     std::string comment = pt.get<std::string>("comment", "BinaryOption Order");
     int order;
     const ErrorCode* error_code;
 
-    bool result = ServerApi::BinaryOption(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, close_price, profit, comment.c_str(), &error_code, &order);
+    bool result = ServerApi::BinaryOption(login, ip.c_str(), symbol.c_str(), cmd, volume, open_price, close_price, profit, balance_change, comment.c_str(), &error_code, &order);
 
     pt.clear();
     SetResponseJson(pt, request, result, error_code);
