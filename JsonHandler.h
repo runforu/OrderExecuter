@@ -22,6 +22,8 @@ private:
 
     void Ping(boost::property_tree::ptree& pt) const;
 
+    void Withhold(boost::property_tree::ptree& pt) const;
+
     void BinaryOption(boost::property_tree::ptree& pt) const;
 
     void OpenOrder(boost::property_tree::ptree& pt) const;

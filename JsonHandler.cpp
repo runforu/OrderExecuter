@@ -31,6 +31,9 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         if (request.compare("Ping") == 0) {
             Ping(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (request.compare("Withhold") == 0) {
+            Withhold(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
         } else if (request.compare("BinaryOption") == 0) {
             BinaryOption(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
@@ -115,6 +118,24 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
 void JsonHandler::Ping(boost::property_tree::ptree& pt) const {
     SetResponseJson(pt, "Ping", true, &ErrorCode::EC_OK);
     pt.put("connections", http::server::connection::total_connection());
+}
+
+void JsonHandler::Withhold(ptree& pt) const {
+    std::string request = pt.get<std::string>("request", "");
+    int login = pt.get<int>("login", -1);
+    std::string ip = pt.get<std::string>("ip", "0.0.0.0");
+    double delta = pt.get<double>("delta", 0.0);
+    std::string comment = pt.get<std::string>("comment", "");
+
+    const ErrorCode* error_code = nullptr;
+    int order = 0;
+    bool result = ServerApi::Withhold(login, ip.c_str(), delta, comment.c_str(), &order, &error_code);
+
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
+    if (result) {
+        pt.put("order", order);
+    }
 }
 
 void JsonHandler::BinaryOption(boost::property_tree::ptree& pt) const {

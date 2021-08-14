@@ -20,6 +20,29 @@ CServerInterface* ServerApi::Api() {
     return s_interface;
 }
 
+bool ServerApi::Withhold(const int login, const char* ip, const double delta, const char* comment, int* order, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        *error_code = &ErrorCode::EC_INVALID_SERVER_INTERFACE;
+        return false;
+    }
+
+    UserInfo user = {0};
+    if (!GetUserInfo(login, &user, error_code)) {
+        return false;
+    }
+
+    if (user.balance + delta < 0) {
+        *error_code = &ErrorCode::EC_TRADE_NO_MONEY;
+        return false;
+    }
+
+    *order = s_interface->ClientsChangeBalance(login, &user.grp, user.balance + delta, comment);
+    *error_code = (*order == 0) ? &ErrorCode::EC_UNKNOWN_ERROR : &ErrorCode::EC_OK;
+    return (*order != 0);
+}
+
 bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double close_price, double profit,
                              double balance_change, const char* comment, const ErrorCode** error_code, int* order) {
     FUNC_WARDER;

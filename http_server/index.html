@@ -108,6 +108,35 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
 }</code>
 </pre>
     </div>
+
+    <br />
+    <hr />
+    <br />
+    <h3>Request to 
+    <i>Withhold</i> (increase/decrease balance with <i>delta</i>)</h3>
+    <b>Request</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"Withhold",
+    "login": 5,
+    "ip": "0.0.0.0",
+    "delta": -100,
+    "comment": "Withhold"
+}</code>
+</pre>
+    </div>
+    <b>Response</b>
+    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request":"Withhold",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS"
+}</code>
+</pre>
+    </div>
     
     <br />
     <br />
