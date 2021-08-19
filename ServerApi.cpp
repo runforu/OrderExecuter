@@ -38,7 +38,7 @@ bool ServerApi::Withhold(const int login, const char* ip, const double delta, co
         return false;
     }
 
-    *order = s_interface->ClientsChangeBalance(login, &user.grp, user.balance + delta, comment);
+    *order = s_interface->ClientsChangeBalance(login, &user.grp, delta, comment);
     *error_code = (*order == 0) ? &ErrorCode::EC_UNKNOWN_ERROR : &ErrorCode::EC_OK;
     return (*order != 0);
 }
@@ -79,24 +79,26 @@ bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol
     trade_record.login = login;
     trade_record.cmd = cmd;
     trade_record.open_price = open_price;
+    trade_record.state = TS_CLOSED_NORMAL;
     trade_record.volume = volume;
     trade_record.close_price = close_price;
     trade_record.open_time = s_interface->TradeTime();
     trade_record.close_time = trade_record.open_time;
     trade_record.digits = symbol_cfg.digits;
+    trade_record.profit = profit;
 
     COPY_STR(trade_record.symbol, symbol);
     COPY_STR(trade_record.comment, comment);
 
     //--- add order into database directly
-    if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
+    if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, nullptr)) == 0) {
         LOG("BinaryOption: OrdersAdd failed");
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         return false;
     }
 
     if (balance_change != 0.0) {
-        if (s_interface->ClientsChangeBalance(login, &user_info.grp, max(user_info.balance + balance_change, 0.0), "Binary option profit") == 0) {
+        if (s_interface->ClientsChangeBalance(login, &user_info.grp, balance_change, "Binary option profit") == 0) {
             LOG("BinaryOption: Change balance failed [%f]", balance_change);
             *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
             return false;
