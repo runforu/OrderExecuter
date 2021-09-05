@@ -8,7 +8,6 @@
 #include "common.h"
 
 CServerInterface* ServerApi::s_interface = NULL;
-ConSymbol ServerApi::s_symbols[MAX_SYMBOL_COUNT] = {0};
 int ServerApi::s_symbol_count = 0;
 Synchronizer ServerApi::s_deposit_sync;
 
@@ -138,7 +137,6 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
 
     UserInfo user_info = {0};
     ConSymbol symbol_cfg = {0};
-    ConGroup group_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
 
     //--- checks
@@ -155,11 +153,7 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     }
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("OpenOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
     if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
@@ -559,8 +553,11 @@ bool ServerApi::CurrentTradeTime(time_t* time, const ErrorCode** error_code) {
 bool ServerApi::GetSymbolList(int* total, const ConSymbol** const symbols, const ErrorCode** error_code) {
     FUNC_WARDER;
 
+    static ConSymbol s_symbols[MAX_SYMBOL_COUNT]{};
     if (s_symbol_count == 0) {
-        UpdateSymbolList();
+        while (s_interface->SymbolsNext(s_symbol_count, &s_symbols[s_symbol_count]) != FALSE) {
+            s_symbol_count++;
+        }
     }
 
     *total = s_symbol_count;
@@ -645,16 +642,6 @@ void ServerApi::SymbolChanged() {
     s_symbol_count = 0;
 }
 
-bool ServerApi::UpdateSymbolList() {
-    FUNC_WARDER;
-
-    s_symbol_count = 0;
-    while (s_interface->SymbolsNext(s_symbol_count, &s_symbols[s_symbol_count]) != FALSE) {
-        s_symbol_count++;
-    }
-    return true;
-}
-
 bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double sl, double tp, time_t expiration,
                          const char* comment, const ErrorCode** error_code, int* order) {
     FUNC_WARDER;
@@ -666,7 +653,6 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
 
     UserInfo user_info = {0};
     ConSymbol symbol_cfg = {0};
-    ConGroup group_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
     TradeRecord trade_record = {0};
     double profit = 0, margin = 0, free_margin = 0, prev_margin = 0;
@@ -684,11 +670,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     }
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("AddOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    const ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
     if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
@@ -842,7 +824,6 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
 
     UserInfo user_info = {0};
     ConSymbol symbol_cfg = {0};
-    ConGroup group_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
     TradeRecord trade_record = {0};
 
@@ -873,11 +854,7 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
     }
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("UpdateOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    const ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
     if (s_interface->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
@@ -987,7 +964,6 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     }
 
     UserInfo user_info = {0};
-    ConGroup group_cfg = {0};
     ConSymbol symbol_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
     TradeRecord trade_record = {0};
@@ -1014,11 +990,7 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     // LOG_INFO(&trade_record);
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("CloseOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    const ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
     if (s_interface->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
