@@ -5,7 +5,8 @@
 #include <string>
 #include "Synchronizer.h"
 
-#define MAX_SYMBOL_COUNT 256
+constexpr auto MAX_SYMBOL_COUNT{256};
+constexpr auto MAX_GROUP_COUNT{256};
 
 #define PRICE_PRECISION 1E-8
 
@@ -14,6 +15,7 @@ struct UserRecord;
 struct TradeRecord;
 struct CServerInterface;
 struct ConSymbol;
+struct ConGroup;
 struct ErrorCode;
 
 class ServerApi {
@@ -70,7 +72,9 @@ public:
     static bool AddUser(int login, const char* name, const char* password, const char* group, const char* phone, const char* email, const char* lead_source, int leverage,
                         const ErrorCode** error_code, int* user);
 
-    static void SymbolChanged();
+    static void SymbolAdded(const ConSymbol* con_symbol);
+
+    static void SymbolDeleted(const ConSymbol* con_symbol);
 
 private:
     static bool GetUserInfo(const int login, UserInfo* user_info, const ErrorCode** error_code);
@@ -79,8 +83,6 @@ private:
 
     static bool IsQuoteAlive(const char* symbol, const ErrorCode** error_code);
 
-    static bool UpdateSymbolList();
-
     ServerApi(){};
     ~ServerApi(){};
     ServerApi(const ServerApi&) = delete;
@@ -88,9 +90,8 @@ private:
 
 private:
     static CServerInterface* s_interface;
-    static ConSymbol s_symbols[MAX_SYMBOL_COUNT];
-    static int s_symbol_count;
     static Synchronizer s_deposit_sync;
+    static int s_symbol_count;
 };
 
 #endif  // !_SERVERAPIADAPTER_H_

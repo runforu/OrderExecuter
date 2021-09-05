@@ -7,13 +7,144 @@
 #include "ServerApi.h"
 #include "common.h"
 
-CServerInterface* ServerApi::s_interface = NULL;
-ConSymbol ServerApi::s_symbols[MAX_SYMBOL_COUNT] = {0};
-int ServerApi::s_symbol_count = 0;
+CServerInterface* ServerApi::s_interface{nullptr};
 Synchronizer ServerApi::s_deposit_sync;
+int ServerApi::s_symbol_count = 0;
+
+namespace {
+
+struct SymbolCache {
+public:
+    struct SymbolItem {
+        ConSymbol m_symbol{};
+        bool m_valid{false};
+    };
+    SymbolItem m_symbols[MAX_SYMBOL_COUNT]{};
+    int m_count{0};
+
+public:
+    const ConSymbol* Find(const char* symbol) {
+        const ConSymbol* symbol_cfg{nullptr};
+        for (int i = 0; i < m_count; ++i) {
+            if (!m_symbols[i].m_valid) {
+                continue;
+            }
+            if (strncmp(symbol, m_symbols[i].m_symbol.symbol, std::size(m_symbols[i].m_symbol.symbol) == 0)) {
+                symbol_cfg = &m_symbols[i].m_symbol;
+                break;
+            }
+        }
+        return symbol_cfg;
+    }
+
+    void Reset() {
+        m_count = 0;
+        for (auto& item : m_symbols) {
+            item.m_valid = false;
+        }
+    }
+
+    bool Add(const ConSymbol* symbol_cfg) {
+        if (m_count >= MAX_SYMBOL_COUNT) {
+            return false;
+        }
+        m_symbols[m_count].m_symbol = *symbol_cfg;
+        m_symbols[m_count].m_valid = true;
+        ++m_count;
+        return true;
+    }
+
+    void Delete(const ConSymbol* con_symbol) {
+        for (int i = 0; i < m_count; ++i) {
+            if (strncmp(con_symbol->symbol, m_symbols[i].m_symbol.symbol, std::size(con_symbol->symbol) == 0)) {
+                m_symbols[i].m_valid = false;
+                break;
+            }
+        }
+    }
+};
+
+struct GroupCache {
+public:
+    struct GroupItem {
+        ConGroup m_group{};
+        bool m_valid{false};
+    };
+    GroupItem m_groups[MAX_GROUP_COUNT]{};
+    int m_count{0};
+
+public:
+    const ConGroup* Find(const char* group) {
+        const ConGroup* group_cfg{nullptr};
+        for (int i = 0; i < m_count; ++i) {
+            if (!m_groups[i].m_valid) {
+                continue;
+            }
+            if (strncmp(group, m_groups[i].m_group.group, std::size(m_groups[i].m_group.group) == 0)) {
+                group_cfg = &m_groups[i].m_group;
+                break;
+            }
+        }
+        return group_cfg;
+    }
+
+    void Reset() {
+        m_count = 0;
+        for (auto& item : m_groups) {
+            item.m_valid = false;
+        }
+    }
+
+    bool Add(const ConGroup* group_cfg) {
+        if (m_count >= MAX_GROUP_COUNT) {
+            return false;
+        }
+        m_groups[m_count].m_group = *group_cfg;
+        m_groups[m_count].m_valid = true;
+        ++m_count;
+        return true;
+    }
+
+    void Delete(const ConGroup* con_group) {
+        for (int i = 0; i < m_count; ++i) {
+            if (strncmp(con_group->group, m_groups[i].m_group.group, std::size(con_group->group) == 0)) {
+                m_groups[i].m_valid = false;
+                break;
+            }
+        }
+    }
+};
+
+SymbolCache g_symbol_cache;
+GroupCache g_group_cache;
+
+bool UpdateSymbolCache(CServerInterface* server_interface) {
+    FUNC_WARDER;
+
+    g_symbol_cache.Reset();
+    while (server_interface->SymbolsNext(g_symbol_cache.m_count, &g_symbol_cache.m_symbols[g_symbol_cache.m_count].m_symbol) != FALSE) {
+        g_symbol_cache.m_symbols[g_symbol_cache.m_count].m_valid = true;
+        g_symbol_cache.m_count++;
+    }
+    return true;
+}
+
+bool UpdateGroupCache(CServerInterface* server_interface) {
+    FUNC_WARDER;
+
+    g_group_cache.Reset();
+    while (server_interface->GroupsNext(g_group_cache.m_count, &g_group_cache.m_groups[g_group_cache.m_count].m_group) != FALSE) {
+        g_group_cache.m_groups[g_group_cache.m_count].m_valid = true;
+        g_group_cache.m_count++;
+    }
+    return true;
+}
+}  // namespace
 
 void ServerApi::Initialize(CServerInterface* server_interface) {
     s_interface = server_interface;
+    UpdateSymbolCache(server_interface);
+    //UpdateGroupCache(server_interface);
 }
 
 CServerInterface* ServerApi::Api() {
@@ -71,7 +202,6 @@ bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol
     }
 
     UserInfo user_info = {0};
-    ConSymbol symbol_cfg = {0};
     TradeRecord trade_record = {0};
 
     //--- checks
@@ -87,7 +217,8 @@ bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol
     }
 
     //--- get symbol config
-    if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
+    const ConSymbol* symbol_cfg = g_symbol_cache.Find(symbol);
+    if (symbol_cfg == nullptr) {
         LOG("BinaryOption: SymbolsGet failed [%s]", symbol);
         *error_code = &ErrorCode::EC_SYMBOL_NOT_FOUND;
         return false;  // error
@@ -102,7 +233,7 @@ bool ServerApi::BinaryOption(const int login, const char* ip, const char* symbol
     trade_record.close_price = close_price;
     trade_record.open_time = s_interface->TradeTime();
     trade_record.close_time = trade_record.open_time;
-    trade_record.digits = symbol_cfg.digits;
+    trade_record.digits = symbol_cfg->digits;
     trade_record.profit = profit;
 
     COPY_STR(trade_record.symbol, symbol);
@@ -137,8 +268,6 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     }
 
     UserInfo user_info = {0};
-    ConSymbol symbol_cfg = {0};
-    ConGroup group_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
 
     //--- checks
@@ -155,41 +284,38 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     }
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("OpenOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
-    if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
+    const ConSymbol* symbol_cfg = g_symbol_cache.Find(symbol);
+    if (symbol_cfg == nullptr) {
         LOG("OpenOrder: SymbolsGet failed [%s]", symbol);
         *error_code = &ErrorCode::EC_SYMBOL_NOT_FOUND;
         return false;  // error
     }
 
-    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("AddOrder: market closed", user_info.group);
         *error_code = &ErrorCode::EC_TRADE_MARKET_CLOSED;
         return false;  // error
     }
 
     //--- check long only
-    if (symbol_cfg.long_only != FALSE && (cmd == OP_SELL || cmd == OP_SELL_LIMIT || cmd == OP_SELL_STOP)) {
+    if (symbol_cfg->long_only != FALSE && (cmd == OP_SELL || cmd == OP_SELL_LIMIT || cmd == OP_SELL_STOP)) {
         LOG("OpenOrder: long only allowed");
         *error_code = &ErrorCode::EC_TRADE_LONG_ONLY;
         return false;  // long only
     }
 
     //--- check close only
-    if (symbol_cfg.trade == TRADE_CLOSE) {
+    if (symbol_cfg->trade == TRADE_CLOSE) {
         LOG("OpenOrder: close only allowed");
         *error_code = &ErrorCode::EC_CLOSE_ONLY;
         return false;  // close only
     }
 
     //--- check secutiry
-    if (int rt = s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (int rt = s_interface->TradesCheckSecurity(symbol_cfg, &group_cfg) != RET_OK) {
         LOG("OpenOrder: trade disabled or market closed %d", rt);
         if (rt == RET_ERROR) {
             *error_code = &ErrorCode::EC_BAD_PARAMETER;
@@ -238,14 +364,14 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     }
 
     //--- check tick size
-    if (s_interface->TradesCheckTickSize(open_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(open_price, symbol_cfg) == FALSE) {
         LOG("OpenOrder: invalid price");
         *error_code = &ErrorCode::EC_TRADE_BAD_PRICES;
         return false;  // invalid price
     }
 
     //--- check volume
-    if (s_interface->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
+    if (s_interface->TradesCheckVolume(&trade_trans_info, symbol_cfg, &group_cfg, TRUE) != RET_OK) {
         LOG("OpenOrder: invalid volume");
         *error_code = &ErrorCode::EC_TRADE_BAD_VOLUME;
         return false;  // invalid volume
@@ -255,7 +381,7 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     if (cmd == OP_BUY || cmd == OP_SELL) {
         double profit = 0, margin = 0, free_margin = 0, prev_margin = 0;
         margin = s_interface->TradesMarginCheck(&user_info, &trade_trans_info, &profit, &free_margin, &prev_margin);
-        if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg.margin_hedged_strong != FALSE || prev_margin <= margin)) {
+        if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg->margin_hedged_strong != FALSE || prev_margin <= margin)) {
             LOG("OpenOrder: not enough margin");
             *error_code = &ErrorCode::EC_TRADE_NO_MONEY;
             return false;  // no enough margin
@@ -263,7 +389,7 @@ bool ServerApi::OpenOrder(const int login, const char* ip, const char* symbol, c
     }
 
     //--- check stops
-    if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
+    if (s_interface->TradesCheckStops(&trade_trans_info, symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("OpenOrder: invalid stops");
         *error_code = &ErrorCode::EC_TRADE_BAD_STOPS;
         return false;  // invalid stops
@@ -559,12 +685,18 @@ bool ServerApi::CurrentTradeTime(time_t* time, const ErrorCode** error_code) {
 bool ServerApi::GetSymbolList(int* total, const ConSymbol** const symbols, const ErrorCode** error_code) {
     FUNC_WARDER;
 
+    static ConSymbol symbol_cache[MAX_SYMBOL_COUNT];
     if (s_symbol_count == 0) {
-        UpdateSymbolList();
+        while (s_interface->SymbolsNext(s_symbol_count, &symbol_cache[s_symbol_count]) != FALSE) {
+            s_symbol_count++;
+            if (s_symbol_count >= MAX_SYMBOL_COUNT) {
+                break;
+            }
+        }
     }
 
     *total = s_symbol_count;
-    *symbols = s_symbols;
+    *symbols = symbol_cache;
     *error_code = &ErrorCode::EC_OK;
     return true;
 }
@@ -641,18 +773,14 @@ bool ServerApi::AddUser(int login, const char* name, const char* password, const
     return true;
 }
 
-void ServerApi::SymbolChanged() {
+void ServerApi::SymbolAdded(const ConSymbol* con_symbol) {
     s_symbol_count = 0;
+    g_symbol_cache.Add(con_symbol);
 }
 
-bool ServerApi::UpdateSymbolList() {
-    FUNC_WARDER;
-
+void ServerApi::SymbolDeleted(const ConSymbol* con_symbol) {
     s_symbol_count = 0;
-    while (s_interface->SymbolsNext(s_symbol_count, &s_symbols[s_symbol_count]) != FALSE) {
-        s_symbol_count++;
-    }
-    return true;
+    g_symbol_cache.Delete(con_symbol);
 }
 
 bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double sl, double tp, time_t expiration,
@@ -665,8 +793,6 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     }
 
     UserInfo user_info = {0};
-    ConSymbol symbol_cfg = {0};
-    ConGroup group_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
     TradeRecord trade_record = {0};
     double profit = 0, margin = 0, free_margin = 0, prev_margin = 0;
@@ -684,40 +810,37 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     }
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("AddOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
-    if (s_interface->SymbolsGet(symbol, &symbol_cfg) == FALSE) {
+    const ConSymbol* symbol_cfg = g_symbol_cache.Find(symbol);
+    if (symbol_cfg == nullptr) {
         LOG("AddOrder: SymbolsGet failed [%s]", symbol);
         *error_code = &ErrorCode::EC_SYMBOL_NOT_FOUND;
         return false;  // error
     }
 
-    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("AddOrder: market closed", user_info.group);
         *error_code = &ErrorCode::EC_TRADE_MARKET_CLOSED;
         return false;  // error
     }
 
     //--- check long only
-    if (symbol_cfg.long_only != FALSE && (cmd == OP_SELL || cmd == OP_SELL_LIMIT || cmd == OP_SELL_STOP)) {
+    if (symbol_cfg->long_only != FALSE && (cmd == OP_SELL || cmd == OP_SELL_LIMIT || cmd == OP_SELL_STOP)) {
         LOG("AddOrder: long only allowed");
         *error_code = &ErrorCode::EC_TRADE_LONG_ONLY;
         return false;  // long only
     }
     //--- check close only
-    if (symbol_cfg.trade == TRADE_CLOSE) {
+    if (symbol_cfg->trade == TRADE_CLOSE) {
         LOG("AddOrder: close only allowed");
         *error_code = &ErrorCode::EC_CLOSE_ONLY;
         return false;  // close only
     }
 
     //--- check secutiry
-    if (int rt = s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (int rt = s_interface->TradesCheckSecurity(symbol_cfg, &group_cfg) != RET_OK) {
         LOG("AddOrder: trade disabled or market closed");
         if (rt == RET_ERROR) {
             *error_code = &ErrorCode::EC_BAD_PARAMETER;
@@ -763,14 +886,14 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     }
 
     //--- check tick size
-    if (s_interface->TradesCheckTickSize(trade_record.open_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(trade_record.open_price, symbol_cfg) == FALSE) {
         LOG("AddOrder: invalid price");
         *error_code = &ErrorCode::EC_TRADE_BAD_PRICES;
         return false;  // invalid price
     }
 
     //--- check volume
-    if (s_interface->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
+    if (s_interface->TradesCheckVolume(&trade_trans_info, symbol_cfg, &group_cfg, TRUE) != RET_OK) {
         LOG("AddOrder: invalid volume");
         *error_code = &ErrorCode::EC_TRADE_BAD_VOLUME;
         return false;  // invalid volume
@@ -780,7 +903,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     if (cmd == OP_BUY || cmd == OP_SELL) {
         margin = s_interface->TradesMarginCheck(&user_info, &trade_trans_info, &profit, &free_margin, &prev_margin);
         LOG("AddOrder: TradesMarginCheck  margin = %d, profit = %d, free_margin = %d, prev_margin = %d", margin, profit, free_margin, prev_margin);
-        if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg.margin_hedged_strong != FALSE || prev_margin <= margin)) {
+        if ((free_margin + group_cfg.credit) < 0 && (symbol_cfg->margin_hedged_strong != FALSE || prev_margin <= margin)) {
             LOG("AddOrder: not enough margin");
             *error_code = &ErrorCode::EC_TRADE_NO_MONEY;
             return false;  // no enough margin
@@ -794,7 +917,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     trade_record.volume = volume;
     trade_record.close_price = ((cmd == OP_BUY || cmd == OP_BUY_LIMIT || cmd == OP_BUY_STOP) ? prices[0] : prices[1]);
     trade_record.open_time = s_interface->TradeTime();
-    trade_record.digits = symbol_cfg.digits;
+    trade_record.digits = symbol_cfg->digits;
 
     COPY_STR(trade_record.symbol, symbol);
     COPY_STR(trade_record.comment, comment);
@@ -807,7 +930,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
     }
 
     //--- check stops
-    if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
+    if (s_interface->TradesCheckStops(&trade_trans_info, symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("AddOrder: invalid stops");
         *error_code = &ErrorCode::EC_TRADE_BAD_STOPS;
         return false;  // invalid stops
@@ -821,7 +944,7 @@ bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, co
 
     //--- add order into database directly
     // LOG_INFO(&trade_record);
-    if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, &symbol_cfg)) == 0) {
+    if ((*order = s_interface->OrdersAdd(&trade_record, &user_info, symbol_cfg)) == 0) {
         LOG("AddOrder: OrdersAdd failed");
         *error_code = &ErrorCode::EC_UNKNOWN_ERROR;
         return false;  // error
@@ -841,8 +964,6 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
     }
 
     UserInfo user_info = {0};
-    ConSymbol symbol_cfg = {0};
-    ConGroup group_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
     TradeRecord trade_record = {0};
 
@@ -873,34 +994,31 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
     }
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("UpdateOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
-    if (s_interface->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
+    const ConSymbol* symbol_cfg = g_symbol_cache.Find(trade_record.symbol);
+    if (symbol_cfg == nullptr) {
         LOG("UpdateOrder: SymbolsGet failed [%s]", trade_record.symbol);
         *error_code = &ErrorCode::EC_SYMBOL_NOT_FOUND;
         return false;  // error
     }
 
-    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("UpdateOrder: market closed", user_info.group);
         *error_code = &ErrorCode::EC_TRADE_MARKET_CLOSED;
         return false;  // error
     }
 
     //--- check tick size
-    if (s_interface->TradesCheckTickSize(open_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(open_price, symbol_cfg) == FALSE) {
         LOG("UpdateOrder: invalid price");
         *error_code = &ErrorCode::EC_TRADE_BAD_PRICES;
         return false;  // invalid price
     }
 
     //--- check close only
-    if (symbol_cfg.trade == TRADE_CLOSE) {
+    if (symbol_cfg->trade == TRADE_CLOSE) {
         LOG("UpdateOrder: close only");
         *error_code = &ErrorCode::EC_CLOSE_ONLY;
         return false;
@@ -941,7 +1059,7 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
     }
 
     //--- check secutiry
-    if (int rt = s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (int rt = s_interface->TradesCheckSecurity(symbol_cfg, &group_cfg) != RET_OK) {
         LOG("UpdateOrder: trade disabled or market closed");
         if (rt == RET_ERROR) {
             *error_code = &ErrorCode::EC_BAD_PARAMETER;
@@ -957,7 +1075,7 @@ bool ServerApi::UpdateOrder(const char* ip, const int order, double open_price, 
 
     //--- check stops
     // LOG_INFO(&trade_trans_info);
-    if (s_interface->TradesCheckStops(&trade_trans_info, &symbol_cfg, &group_cfg, NULL) != RET_OK) {
+    if (s_interface->TradesCheckStops(&trade_trans_info, symbol_cfg, &group_cfg, NULL) != RET_OK) {
         LOG("UpdateOrder: invalid stops");
         *error_code = &ErrorCode::EC_TRADE_BAD_STOPS;
         return false;  // invalid stops
@@ -987,8 +1105,6 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     }
 
     UserInfo user_info = {0};
-    ConGroup group_cfg = {0};
-    ConSymbol symbol_cfg = {0};
     TradeTransInfo trade_trans_info = {0};
     TradeRecord trade_record = {0};
 
@@ -1014,20 +1130,17 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     // LOG_INFO(&trade_record);
 
     //--- get group config
-    if (s_interface->GroupsGet(user_info.group, &group_cfg) == FALSE) {
-        LOG("CloseOrder: GroupsGet failed [%s]", user_info.group);
-        *error_code = &ErrorCode::EC_GROUP_NOT_FOUND;
-        return false;  // error
-    }
+    ConGroup& group_cfg = user_info.grp;
 
     //--- get symbol config
-    if (s_interface->SymbolsGet(trade_record.symbol, &symbol_cfg) == FALSE) {
+    const ConSymbol* symbol_cfg = g_symbol_cache.Find(trade_record.symbol);
+    if (symbol_cfg == nullptr) {
         LOG("CloseOrder: SymbolsGet failed [%s]", trade_record.symbol);
         *error_code = &ErrorCode::EC_SYMBOL_NOT_FOUND;
         return false;  // error
     }
 
-    if (s_interface->TradesCheckSessions(&symbol_cfg, s_interface->TradeTime()) == FALSE) {
+    if (s_interface->TradesCheckSessions(symbol_cfg, s_interface->TradeTime()) == FALSE) {
         LOG("CloseOrder: market closed", user_info.group);
         *error_code = &ErrorCode::EC_TRADE_MARKET_CLOSED;
         return false;  // error
@@ -1068,14 +1181,14 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     trade_trans_info.type = TT_ORDER_MK_CLOSE;
 
     //--- check tick size
-    if (s_interface->TradesCheckTickSize(close_price, &symbol_cfg) == FALSE) {
+    if (s_interface->TradesCheckTickSize(close_price, symbol_cfg) == FALSE) {
         LOG("CloseOrder: invalid price");
         *error_code = &ErrorCode::EC_TRADE_BAD_PRICES;
         return false;  // invalid price
     }
 
     //--- check secutiry
-    if (int rt = s_interface->TradesCheckSecurity(&symbol_cfg, &group_cfg) != RET_OK) {
+    if (int rt = s_interface->TradesCheckSecurity(symbol_cfg, &group_cfg) != RET_OK) {
         LOG("OrdersUpdateClose: trade disabled or market closed %d", rt);
         if (rt == RET_ERROR) {
             *error_code = &ErrorCode::EC_BAD_PARAMETER;
@@ -1090,14 +1203,14 @@ bool ServerApi::CloseOrder(const char* ip, const int order, double close_price, 
     }
 
     //--- check volume
-    if (s_interface->TradesCheckVolume(&trade_trans_info, &symbol_cfg, &group_cfg, TRUE) != RET_OK) {
+    if (s_interface->TradesCheckVolume(&trade_trans_info, symbol_cfg, &group_cfg, TRUE) != RET_OK) {
         LOG("OrdersUpdateClose: invalid volume");
         *error_code = &ErrorCode::EC_TRADE_BAD_VOLUME;
         return false;  // invalid volume
     }
 
     //--- check stops
-    if (s_interface->TradesCheckFreezed(&symbol_cfg, &group_cfg, &trade_record) != RET_OK) {
+    if (s_interface->TradesCheckFreezed(symbol_cfg, &group_cfg, &trade_record) != RET_OK) {
         LOG("OrdersUpdateClose: position freezed");
         *error_code = &ErrorCode::EC_TRADE_MODIFY_DENIED;
         return false;  // position freezed

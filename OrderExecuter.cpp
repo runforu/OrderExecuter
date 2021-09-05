@@ -90,11 +90,11 @@ int APIENTRY MtSrvPluginCfgTotal() {
 }
 
 int APIENTRY MtSrvSymbolsAdd(const ConSymbol* con_symbol) {
-    ServerApi::SymbolChanged();
+    ServerApi::SymbolAdded(con_symbol);
     return TRUE;
 }
 
 int APIENTRY MtSrvSymbolsDelete(const ConSymbol* con_symbol) {
-    ServerApi::SymbolChanged();
+    ServerApi::SymbolDeleted(con_symbol);
     return TRUE;
 }
