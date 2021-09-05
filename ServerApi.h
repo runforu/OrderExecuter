@@ -86,6 +86,7 @@ private:
 
 private:
     static CServerInterface* s_interface;
+    static ConSymbol s_symbols[MAX_SYMBOL_COUNT];
     static int s_symbol_count;
     static Synchronizer s_deposit_sync;
 };

@@ -10,9 +10,11 @@
 CServerInterface* ServerApi::s_interface = NULL;
 int ServerApi::s_symbol_count = 0;
 Synchronizer ServerApi::s_deposit_sync;
+ConSymbol ServerApi::s_symbols[MAX_SYMBOL_COUNT]{};
 
 void ServerApi::Initialize(CServerInterface* server_interface) {
     s_interface = server_interface;
+    SymbolChanged();
 }
 
 CServerInterface* ServerApi::Api() {
@@ -552,14 +554,6 @@ bool ServerApi::CurrentTradeTime(time_t* time, const ErrorCode** error_code) {
 
 bool ServerApi::GetSymbolList(int* total, const ConSymbol** const symbols, const ErrorCode** error_code) {
     FUNC_WARDER;
-
-    static ConSymbol s_symbols[MAX_SYMBOL_COUNT]{};
-    if (s_symbol_count == 0) {
-        while (s_interface->SymbolsNext(s_symbol_count, &s_symbols[s_symbol_count]) != FALSE) {
-            s_symbol_count++;
-        }
-    }
-
     *total = s_symbol_count;
     *symbols = s_symbols;
     *error_code = &ErrorCode::EC_OK;
@@ -639,7 +633,14 @@ bool ServerApi::AddUser(int login, const char* name, const char* password, const
 }
 
 void ServerApi::SymbolChanged() {
-    s_symbol_count = 0;
+    int count = 0;
+    while (s_interface->SymbolsNext(count, &s_symbols[count]) != FALSE) {
+        count++;
+        if (count >= MAX_SYMBOL_COUNT) {
+            break;
+        }
+    }
+    s_symbol_count = count;
 }
 
 bool ServerApi::AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double sl, double tp, time_t expiration,
