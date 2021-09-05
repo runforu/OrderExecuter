@@ -21,11 +21,13 @@ public:
     static void Initialize(CServerInterface* server_interface);
     static CServerInterface* Api();
 
+    static bool DeleteUser(const int login, const ErrorCode** error_code);
+
     // change balance fast, delta is increase or decrease value
     static bool Withhold(const int login, const char* ip, const double delta, const char* comment, int* order, const ErrorCode** error_code);
 
     static bool BinaryOption(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double close_price, double profit,
-                                        double balance_change, const char* comment, const ErrorCode** error_code, int* order);
+                             double balance_change, const char* comment, const ErrorCode** error_code, int* order);
 
     static bool AddOrder(const int login, const char* ip, const char* symbol, const int cmd, int volume, double open_price, double sl, double tp, time_t expiration,
                          const char* comment, const ErrorCode** error_code, int* order);

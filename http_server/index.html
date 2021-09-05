@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Help</title>
-    <meta charset="utf-8"> 
-    <style type="text/css">
-      i {color:#FF0000}
-    </style>
-    <link href="./prism.css" rel="stylesheet" />
-  </head>
-  <body>
-    <h3>Error code</h3>
-    <div style="margin-left:60px;width:80%; background:#eeeeee;">
+<head>
+  <title>Help</title>
+  <meta charset="utf-8">
+  <style type="text/css">
+    i {
+      color: #FF0000
+    }
+  </style>
+  <link href="./prism.css" rel="stylesheet" />
+</head>
+<body>
+  <h3>Error code</h3>
+  <div style="margin-left:60px;width:80%; background:#eeeeee;">
 <pre class=" language-c line-numbers">
 <code>
     const ErrorCode EC_OK = {0, "SUCCESS"};
@@ -55,50 +57,54 @@
     const ErrorCode ErrorCode::EC_ALREADY_DEPOSIT = { 512, "Already deposit for the order" };
 </code>
 </pre>
-    </div>
-        
-    <br />
-    <hr />
-    <br />
+  </div>
+
+  <br />
+  <hr />
+  <br />
+  <div style="margin-left:60px;width:80%; background:#eeeeee;">
 <pre class=" language-c line-numbers">
 <code>
 // RequestChart parameter "period": 1, 5, 15, 30, 60, 240, 1440, 10080, 43200
-enum { PERIOD_M1 = 1,           // 1-minute
-       PERIOD_M5 = 5,           // 5-minute.
-       PERIOD_M15 = 15,         // 15-minute.
-       PERIOD_M30 = 30,         // 30-minute.
-       PERIOD_H1 = 60,          // One-hour.
-       PERIOD_H4 = 240,         // 4-hour.
-       PERIOD_D1 = 1440,        // Daily
-       PERIOD_W1 = 10080,       // Weekly
-       PERIOD_MN1 = 43200       // Monthly
-       };
+enum {
+    PERIOD_M1 = 1,           // 1-minute
+    PERIOD_M5 = 5,           // 5-minute.
+    PERIOD_M15 = 15,         // 15-minute.
+    PERIOD_M30 = 30,         // 30-minute.
+    PERIOD_H1 = 60,          // One-hour.
+    PERIOD_H4 = 240,         // 4-hour.
+    PERIOD_D1 = 1440,        // Daily
+    PERIOD_W1 = 10080,       // Weekly
+    PERIOD_MN1 = 43200       // Monthly
+};
        
 // RequestChart parameter "mode": "CHART_RANGE_IN", "CHART_RANGE_OUT", "CHART_RANGE_LAST"       
-enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartInfo::to
-       CHART_RANGE_OUT,       // Data from the ranges "the beginning of history" - ChartInfo::from and ChartInfo::to - the end of history
-       CHART_RANGE_LAST       // Data from the range ChartInfo::from - the end of history.
-       };       
+enum { 
+    CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartInfo::to
+    CHART_RANGE_OUT,       // Data from the ranges "the beginning of history" - ChartInfo::from and ChartInfo::to - the end of history
+    CHART_RANGE_LAST       // Data from the range ChartInfo::from - the end of history.
+};       
 </code>
 </pre>
-    </div>
+  </div>
 
 
-    <br />
-    <br />
-    <br />
-    <h3>
-    <i>Ping</i> the server</h3>
-    <b>Request</b>
-    <div style="margin-left:60px;width:50%; background:#eeeeee;">
+  <br />
+  <br />
+  <br />
+  <h3>
+    <i>Ping</i> the server
+  </h3>
+  <b>Request</b>
+  <div style="margin-left:60px;width:50%; background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "Ping"
 }</code>
 </pre>
-    </div>
-    <b>Response (the same with request)</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response (the same with request)</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "Ping",
@@ -107,15 +113,46 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
+  </div>
 
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Withhold</i> (increase/decrease balance with <i>delta</i>)</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+
+  <br />
+  <br />
+  <br />
+  <h3>
+    <i>Delete</i> User
+  </h3>
+  <b>Request</b>
+  <div style="margin-left:60px;width:50%; background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "DeleteUser"
+    "login": 5
+}</code>
+</pre>
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+<pre class=" language-json line-numbers">
+<code>{
+    "request": "DeleteUser",
+    "result": "OK",
+    "error_code": "0",
+    "error_des": "SUCCESS"
+}</code>
+</pre>
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Withhold</i> (increase/decrease balance with <i>delta</i>)
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"Withhold",
@@ -125,9 +162,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "comment": "Withhold"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"Withhold",
@@ -136,15 +173,17 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
-    
-    <br />
-    <br />
-    <br />
-    <h3> Request to create
-    <i>Binary Option</i> order <em>history</em> with <i>profit</i>, and add <i>balance_change</i> to balance</h3>
-    <b>Request</b>
-    <div style="margin-left:60px;width:50%; background:#eeeeee;">
+  </div>
+
+  <br />
+  <br />
+  <br />
+  <h3>
+    Request to create
+    <i>Binary Option</i> order <em>history</em> with <i>profit</i>, and add <i>balance_change</i> to balance
+  </h3>
+  <b>Request</b>
+  <div style="margin-left:60px;width:50%; background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "BinaryOption",
@@ -160,9 +199,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "comment": "BinaryOption Order"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "BinaryOption",
@@ -172,15 +211,17 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "order": "123"
 }</code>
 </pre>
-    </div>
+  </div>
 
-    <br />
-    <br />
-    <br />
-    <h3>Request to 
-    <i>Open</i> an order</h3>
-    <b>Request</b>
-    <div style="margin-left:60px;width:50%; background:#eeeeee;">
+  <br />
+  <br />
+  <br />
+  <h3>
+    Request to
+    <i>Open</i> an order
+  </h3>
+  <b>Request</b>
+  <div style="margin-left:60px;width:50%; background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "OpenOrder",
@@ -198,9 +239,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "coupon_comment": "test coupon"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "OpenOrder",
@@ -210,16 +251,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "order": "123"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Add</i> order (same as OpenOrder)</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Add</i> order (same as OpenOrder)
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "AddOrder",
@@ -235,9 +278,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "comment": "test OpenOrder"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "AddOrder",
@@ -247,16 +290,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "order": "123"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Update</i> an position</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Update</i> an position
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"UpdateOrder",
@@ -269,9 +314,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "comment": "test UpdateOrder"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"UpdateOrder",
@@ -280,16 +325,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Close</i> an position</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Close</i> an position
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"CloseOrder",
@@ -299,9 +346,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "comment": "test CloseOrder"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"CloseOrder",
@@ -310,16 +357,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Deposit</i></h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Deposit</i>
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"Deposit",
@@ -329,9 +378,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "comment": "test Deposit"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"Deposit",
@@ -340,16 +389,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Change</i> password</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Change</i> password
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"ChangePassword",
@@ -358,9 +409,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "password": "12345678",
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"ChangePassword",
@@ -369,16 +420,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
+  </div>
 
 
-    <br />
-    <hr />
-    <br />
-    <h3>Request to
-    <i>Check</i> password</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Check</i> password
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"CheckPassword",
@@ -387,9 +440,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "password": "12345678",
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"CheckPassword",
@@ -398,16 +451,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
+  </div>
 
 
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Update</i> user information</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Update</i> user information
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"UpdateUserRecord",
@@ -423,9 +478,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "leverage": 20
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"UpdateUserRecord",
@@ -434,25 +489,27 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> user margin</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> user margin
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetMargin",
     "login": 5
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "GetMargin",
@@ -473,25 +530,27 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "credit": "0"
 }</code>
 </pre>
-    </div>
+  </div>
 
 
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> user margin (same with GetMargin)</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> user margin (same with GetMargin)
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetMarginInfo",
     "login": 5
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "GetMargin",
@@ -512,16 +571,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "credit": "0"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> order information</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> order information
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetOrder",
@@ -529,9 +590,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "order": 122
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetOrder",
@@ -568,25 +629,27 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "timestamp":1212312
 }</code>
 </pre>
-    </div>
+  </div>
 
 
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> open orders of a user</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> open orders of a user
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetOpenOrders",
     "login": 5
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetOpenOrders",
@@ -655,25 +718,27 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     }]   
 }</code>
 </pre>
-    </div>
-        
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> pending orders of a user</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> pending orders of a user
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetPendingOrders",
     "login": 5
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetPendingOrders",
@@ -742,16 +807,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     }]   
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> closed orders of a user</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> closed orders of a user
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetClosedOrders",
@@ -760,9 +827,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "to": 1212312
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetClosedOrders",
@@ -831,16 +898,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     }]   
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> user information</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> user information
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetUserRecord"
@@ -849,9 +918,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "ip": "0.0.0.0"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"GetUserRecord"
@@ -897,24 +966,26 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "user_color": 121212
 }</code>
 </pre>
-    </div>
-    
-        
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> trade time</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> trade time
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "TradeTime",
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "TradeTime",
@@ -924,16 +995,18 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "trade_time": "1542757323"
 }</code>
 </pre>
-    </div>
-    
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Is</i> market opening</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Is</i> market opening
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "IsOpening",
@@ -941,9 +1014,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "time": 0
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "IsOpening",
@@ -953,24 +1026,26 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "is_open": "true"
 }</code>
 </pre>
-    </div>
-    
-    
-        <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> Symbol list</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> Symbol list
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "GetSymbolList"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "GetSymbolList",
@@ -1089,17 +1164,19 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
 }
 </code>
 </pre>
-    </div>
-    
-    
+  </div>
 
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Add</i> a user</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Add</i> a user
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"AddUser",
@@ -1113,9 +1190,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "lead_source":"source"
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request":"AddUser",
@@ -1125,15 +1202,17 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
-    
-    <br />
-    <hr />
-    <br />
-    <h3>Request to 
-    <i>Get</i> rate infos</h3>
-    <b>Request</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+
+  <br />
+  <hr />
+  <br />
+  <h3>
+    Request to
+    <i>Get</i> rate infos
+  </h3>
+  <b>Request</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "request": "RequestChart",
@@ -1146,9 +1225,9 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "timestamp": 1
 }</code>
 </pre>
-    </div>
-    <b>Response</b>
-    <div style=" margin-left:60px; width:50%;background:#eeeeee;">
+  </div>
+  <b>Response</b>
+  <div style=" margin-left:60px; width:50%;background:#eeeeee;">
 <pre class=" language-json line-numbers">
 <code>{
     "count": "2",
@@ -1176,12 +1255,12 @@ enum { CHART_RANGE_IN,        // Data from the range of ChartInfo::from - ChartI
     "error_des": "SUCCESS"
 }</code>
 </pre>
-    </div>
-    
-    
-    
-    <br />
-    <br />
-    <script src="./prism.js"></script>
-  </body>
+  </div>
+
+
+
+  <br />
+  <br />
+  <script src="./prism.js"></script>
+</body>
 </html>

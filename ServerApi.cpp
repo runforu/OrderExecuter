@@ -20,6 +20,24 @@ CServerInterface* ServerApi::Api() {
     return s_interface;
 }
 
+bool ServerApi::DeleteUser(const int login, const ErrorCode** error_code) {
+    FUNC_WARDER;
+
+    if (s_interface == NULL) {
+        *error_code = &ErrorCode::EC_INVALID_SERVER_INTERFACE;
+        return false;
+    }
+
+    if (login < 0) {
+        *error_code = &ErrorCode::EC_BAD_PARAMETER;
+        return false;
+    }
+
+    int result = s_interface->ClientsDeleteUser(login);
+    *error_code = (result == 0) ? &ErrorCode::EC_UNKNOWN_ERROR : &ErrorCode::EC_OK;
+    return (result != 0);
+}
+
 bool ServerApi::Withhold(const int login, const char* ip, const double delta, const char* comment, int* order, const ErrorCode** error_code) {
     FUNC_WARDER;
 

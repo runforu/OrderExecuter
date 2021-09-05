@@ -31,6 +31,9 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
         if (request.compare("Ping") == 0) {
             Ping(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
+        } else if (request.compare("DeleteUser") == 0) {
+            DeleteUser(json);
+            rep.content.append(JsonWrapper::ToJsonStr(json));
         } else if (request.compare("Withhold") == 0) {
             Withhold(json);
             rep.content.append(JsonWrapper::ToJsonStr(json));
@@ -118,6 +121,17 @@ bool JsonHandler::handle(const http::server::request& req, http::server::reply& 
 void JsonHandler::Ping(boost::property_tree::ptree& pt) const {
     SetResponseJson(pt, "Ping", true, &ErrorCode::EC_OK);
     pt.put("connections", http::server::connection::total_connection());
+}
+
+void JsonHandler::DeleteUser(ptree& pt) const {
+    std::string request = pt.get<std::string>("request", "");
+    int login = pt.get<int>("login", -1);
+
+    const ErrorCode* error_code = nullptr;
+    bool result = ServerApi::DeleteUser(login, &error_code);
+
+    pt.clear();
+    SetResponseJson(pt, request, result, error_code);
 }
 
 void JsonHandler::Withhold(ptree& pt) const {
